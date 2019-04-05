@@ -1,0 +1,82 @@
+version: '3.3'
+
+# Start, configure and populate the ips mysql database
+#
+# to start:
+#  docker-compose up -d
+#
+# Normal usage after the initial startup and configuration is:
+#   'docker start ips-db' to start the ips-db container
+#   'docker stop ips-db'to stop the running ips-db container, and
+#   'docker restart ips-db' to restart a running container
+#
+# to remove:
+#  docker-compose down -v
+#
+# This will remove:
+#    the ips-db container: ips-db
+#    the network: ipsdbapi_default and
+#    the volume: ipsdbapi_db_data
+
+services:
+
+  ips-ui:
+    build: ../ips_user_interface
+    container_name: ips-ui
+    restart: always
+
+    environment:
+      API_HOST: ${API_HOST}
+      API_PORT: ${API_PORT}
+      API_PROTOCOL: ${API_PROTOCOL}
+      FLASK_APP: ${UI_FLASK_APP}
+      FLASK_ENV: ${FLASK_ENV}
+
+    ports:
+      - "5001:5000"
+    networks:
+      - ips-net
+
+  ips-services:
+    build: .
+    container_name: ips-services
+    restart: unless-stopped
+    ports:
+      - "8000:8000" # for testing
+
+    networks:
+      - ips-net
+
+    environment:
+      DB_SERVER: ${DB_SERVER}
+      DB_USER_NAME: ${DB_USER_NAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+
+  ips-db:
+     image: mysql:latest
+     container_name: ips-db
+     command: --default-authentication-plugin=mysql_native_password
+     restart: always
+     volumes:
+       - db_data:/var/lib/mysql
+       - ./db/data:/docker-entrypoint-initdb.d
+       - ./db/conf:/etc/mysql/conf.d/
+     environment:
+       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+       MYSQL_DATABASE: ${MYSQL_DATABASE}
+       MYSQL_USER: ${MYSQL_USER}
+       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+     ports:
+       - "3306:3306" # for testing
+
+     networks:
+       - ips-net
+
+volumes:
+    db_data: {}
+
+networks:
+    ips-net:
+      driver: bridge

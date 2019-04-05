@@ -1,0 +1,31 @@
+import json
+
+import falcon
+from falcon import Request, Response
+
+from ips.api.api import Api
+from ips.api.validation.validate import validate
+from ips.api.validation.validate_run_id import validate_run_id
+from ips.persistence import data_management as db
+
+
+class StatusApi(Api):
+
+    @validate(run_id=validate_run_id)
+    def on_get(self, req: Request, resp: Response, run_id: str) -> None:
+        # Return status for a specified  run ID
+
+        if not db.is_valid_run_id(run_id):
+            result = {'status': "invalid job id: " + run_id}
+            resp.status = falcon.HTTP_401
+            resp.body = json.dumps(result)
+            return
+
+        v = json.dumps(self.workflow.get_status())
+
+        result = {
+            'status': v,
+            'percentage_done': self.workflow.get_percentage_done()
+        }
+
+        resp.body = json.dumps(result)
