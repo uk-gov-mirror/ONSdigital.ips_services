@@ -1,11 +1,59 @@
 import io
 
-import ips_common_db.sql as db
 import pandas
 from ips_common.logging import log
 
+from ips.persistence.import_survey import insert_ss
+from ips.services import service
 
-def extract_data(df: pandas.DataFrame) -> pandas.DataFrame:
+
+@service
+def import_survey_stream(data, run_id):
+    df: pandas.DataFrame = pandas.read_csv(io.BytesIO(data), encoding="ISO-8859-1", engine="python")
+    log.debug("Importing survey data")
+    return _import_survey_data(df, run_id)
+
+
+@service
+def import_survey_file(survey_data_path: str, run_id: str) -> pandas.DataFrame:
+    df: pandas.DataFrame = pandas.read_csv(survey_data_path, encoding="ISO-8859-1", engine="python")
+    return _import_survey_data(df, run_id)
+
+
+def _import_survey_data(df, run_id: str) -> pandas.DataFrame:
+    """
+    Author       : Thomas Mahoney
+    Date         : 26 / 04 / 2018
+    Purpose      : Loads the dataimport data into a dataframe then appends the data to the 'SURVEY_SUBSAMPLE'
+                   table on the connected database.
+    Parameters   : survey_data_path - the dataframe containing all of the dataimport data.
+                   run_id - the generated run_id for the current run.
+                   version_id - ID indicating the current version
+    Returns      : NA
+    Requirements : Datafile is of type '.csv', '.pkl' or '.sas7bdat'
+    Dependencies : NA
+    """
+
+    # Fill left side of INTDATE column with an additional 0 if length less than 8 characters
+    df.columns = df.columns.str.upper()
+    if 'INTDATE' in df.columns:
+        df['INTDATE'] = df['INTDATE'].astype(str).str.rjust(8, '0')
+
+    # df.Day = df.Day.astype(str)
+
+    # Call the extract data function to select only the needed columns.
+    df_survey_data = _extract_data(df)
+
+    # Add the generated run id to the dataset.
+    df_survey_data['RUN_ID'] = pandas.Series(run_id, index=df_survey_data.index)
+
+    # Insert the imported data into the survey_subsample table on the database.
+    insert_ss(df_survey_data)
+    # common_functions.insert_df_into_survey(df_survey_data)
+    return df_survey_data
+
+
+def _extract_data(df: pandas.DataFrame) -> pandas.DataFrame:
     """
     Author       : Thomas Mahoney
     Date         : 26 / 04 / 2018
@@ -49,48 +97,3 @@ def extract_data(df: pandas.DataFrame) -> pandas.DataFrame:
     df_new = df_new.filter(columns, axis=1)
 
     return df_new
-
-
-def import_survey_stream(data, run_id):
-    df: pandas.DataFrame = pandas.read_csv(io.BytesIO(data), encoding="ISO-8859-1", engine="python")
-    log.debug("Importing survey data")
-    return _import_survey_data(df, run_id)
-
-
-def import_survey_file(survey_data_path: str, run_id: str) -> pandas.DataFrame:
-    df: pandas.DataFrame = pandas.read_csv(survey_data_path, encoding="ISO-8859-1", engine="python")
-    return _import_survey_data(df, run_id)
-
-
-def _import_survey_data(df, run_id: str) -> pandas.DataFrame:
-
-    """
-    Author       : Thomas Mahoney
-    Date         : 26 / 04 / 2018
-    Purpose      : Loads the dataimport data into a dataframe then appends the data to the 'SURVEY_SUBSAMPLE'
-                   table on the connected database.
-    Parameters   : survey_data_path - the dataframe containing all of the dataimport data.
-                   run_id - the generated run_id for the current run.
-                   version_id - ID indicating the current version
-    Returns      : NA
-    Requirements : Datafile is of type '.csv', '.pkl' or '.sas7bdat'
-    Dependencies : NA
-    """
-
-    # Fill left side of INTDATE column with an additional 0 if length less than 8 characters
-    df.columns = df.columns.str.upper()
-    if 'INTDATE' in df.columns:
-        df['INTDATE'] = df['INTDATE'].astype(str).str.rjust(8, '0')
-
-    # df.Day = df.Day.astype(str)
-
-    # Call the extract data function to select only the needed columns.
-    df_survey_data = extract_data(df)
-
-    # Add the generated run id to the dataset.
-    df_survey_data['RUN_ID'] = pandas.Series(run_id, index=df_survey_data.index)
-
-    # Insert the imported data into the survey_subsample table on the database.
-    db.insert_dataframe_into_table('SURVEY_SUBSAMPLE', df_survey_data)
-    # common_functions.insert_df_into_survey(df_survey_data)
-    return df_survey_data
