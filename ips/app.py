@@ -57,6 +57,7 @@ app.add_route("/login/{user_name}/{password}", login_api)
 
 app.add_route("/process_variables/{run_id}", pv_api)
 
+app.add_route("/builder/{run_id}", pv_builder_api)
 app.add_route("/builder/{run_id}/{pv_id}", pv_builder_api)
 app.add_route("/builder/variables", pv_builder_variables_api)
 

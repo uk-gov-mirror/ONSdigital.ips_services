@@ -25,7 +25,7 @@ def get_pv_build_variables() -> str:
     return data.to_json(orient='records')
 
 
-def get_pv_builds(run_id):
+def get_pv_build_by_runid(run_id):
     get_sql = f"""
         SELECT * FROM PV_Block JOIN PV_Expression ON PV_Block.Block_ID = PV_Expression.Block_ID
         JOIN PV_Element ON PV_Expression.Expression_ID = PV_Element.Expression_ID

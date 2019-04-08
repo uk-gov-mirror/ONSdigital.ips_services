@@ -11,10 +11,13 @@ class PvBuilderApi(Api):
         resp.status = falcon.HTTP_201
 
     def on_get(self, req: Request, resp: Response, run_id) -> None:
-        resp.body = get_pv_builds(run_id)
+        resp.status = falcon.HTTP_200
+        b = get_pv_builds(run_id)
+        resp.body = b
 
 
 class PvBuilderVariablesApi(Api):
 
     def on_get(self, req: Request, resp: Response) -> None:
+        resp.status = falcon.HTTP_200
         resp.body = get_pv_build_variables()
