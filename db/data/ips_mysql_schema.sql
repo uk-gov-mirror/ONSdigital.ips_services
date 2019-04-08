@@ -3017,6 +3017,20 @@ CREATE TABLE PV_Element (
   CONSTRAINT expression_fk FOREIGN KEY (Expression_ID) REFERENCES PV_Expression (Expression_ID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+create table user
+(
+	id int auto_increment primary key,
+	username varchar(80) null,
+	password varchar(255) null,
+	firstname varchar(255) null,
+	surname varchar(255) null,
+	role varchar(50) null
+);
+
+INSERT INTO user (id, username, password, firstname, surname, role) VALUES (1, 'Admin', 'pbkdf2:sha256:50000$jYlAjFyT$a3990f67a04492fdffae29256cc168caf7becbe33ca6fefb2f89c04b00ef9d27', null, null, 'admin');
+
+
+
 DROP TABLE IF EXISTS `PV_Bytes`;
 CREATE TABLE `PV_Bytes` (
   `PV_Bytes_ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -3029,16 +3043,4 @@ CREATE TABLE `PV_Bytes` (
   CONSTRAINT `pv_b_fk` FOREIGN KEY (`PV_ID`) REFERENCES `G_PVs` (`PV_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `pv_r_fk` FOREIGN KEY (`Run_ID`) REFERENCES `RUN` (`RUN_ID`) ON DELETE CASCADE ON UPDATE CASCADE
 )
-
-create table user
-(
-	id int auto_increment primary key,
-	username varchar(80) null,
-	password varchar(255) null,
-	firstname varchar(255) null,
-	surname varchar(255) null,
-	role varchar(50) null
-);
-
-INSERT INTO user (id, username, password, firstname, surname, role) VALUES (1, 'Admin', 'pbkdf2:sha256:50000$jYlAjFyT$a3990f67a04492fdffae29256cc168caf7becbe33ca6fefb2f89c04b00ef9d27', null, null, 'admin');
 
