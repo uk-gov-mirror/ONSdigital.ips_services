@@ -5,11 +5,11 @@ import pandas as pd
 from ips_common.logging import log
 
 import ips.services.dataimport.schemas.traffic_schema as traffic_schema
-from ips.persistence.persistence import execute_sql, insert_from_dataframe
+from ips.persistence.persistence import insert_from_dataframe, delete_from_table
 
 TRAFFIC_TABLE = 'TRAFFIC_DATA'
 insert_traffic = insert_from_dataframe(TRAFFIC_TABLE, "append")
-delete_traffic = execute_sql()
+delete_traffic = delete_from_table(TRAFFIC_TABLE)
 
 
 def import_traffic_from_stream(import_type, run_id, data):
@@ -31,20 +31,10 @@ def _import_traffic_data(import_type, dataframe, run_id):
     dataframe["RUN_ID"] = run_id
     dataframe.rename(columns={"DATASOURCE": "DATA_SOURCE_ID"}, inplace=True)
 
-    datasource_type = import_type.name
-    datasource_id = import_type.value
-
-    datasource_id = datasource_id
-    dataframe['DATA_SOURCE_ID'].replace([datasource_type], datasource_id, inplace=True)
-
-    sql = f"""
-              DELETE FROM {TRAFFIC_TABLE}
-              WHERE RUN_ID = '{run_id}'
-              AND DATA_SOURCE_ID = '{datasource_id}'
-    """
+    dataframe['DATA_SOURCE_ID'].replace([import_type.name], import_type.value, inplace=True)
 
     try:
-        delete_traffic(sql)
+        delete_traffic(run_id=run_id)
         insert_traffic(dataframe)
     except Exception as err:
         log.error(f"Cannot insert traffic_data dataframe into database: {err}")

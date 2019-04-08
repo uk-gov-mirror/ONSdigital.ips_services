@@ -1,34 +1,13 @@
-import pandas as pd
+import ips.persistence.import_unsampled as db
 
-import ips.services.dataimport.schemas.unsampled_schema as unsampled_schema
-from ips_common.logging import log
-import ips_common_db.sql as db
+from ips.services import service
 
 
-def import_unsampled(file_name, file_type, run_id):
+@service
+def import_unsampled_stream(import_type, run_id, data):
+    return db.import_unsampled_from_stream(import_type, run_id, data)
 
-    data_schema = unsampled_schema.get_schema()
-    # Convert CSV to dataframe and stage
-    dataframe = pd.read_csv(file_name, engine="python", dtype=data_schema)
 
-    dataframe.columns = dataframe.columns.str.upper()
-    dataframe.columns = dataframe.columns.str.replace(' ', '')
-    dataframe["RUN_ID"] = run_id
-    dataframe.rename(columns={"DATASOURCE": "DATA_SOURCE_ID"}, inplace=True)
-
-    # replace "REGION" values with 0 if not an expected value
-    dataframe['REGION'].replace(['None', "", ".", 'nan'], 0, inplace=True)
-
-    datasource_id = file_type.value
-
-    datasource_id = datasource_id
-    dataframe['DATA_SOURCE_ID'].replace(['Unsampled'], datasource_id, inplace=True)
-
-    sql = f"DELETE FROM UNSAMPLED_OOH_DATA WHERE RUN_ID = '{run_id}'"
-
-    try:
-        db.execute_sql_statement(sql)
-        db.insert_dataframe_into_table('UNSAMPLED_OOH_DATA', dataframe)
-    except Exception as err:
-        log.error(f"Cannot insert unsampled_data dataframe into database: {err}")
-        return None
+@service
+def import_unsampled_file(run_id, survey_data_path):
+    return db.import_unsampled_from_file(run_id, survey_data_path)

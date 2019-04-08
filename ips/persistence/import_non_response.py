@@ -3,13 +3,13 @@ import io
 import pandas as pd
 from ips_common.logging import log
 
+from ips.persistence.persistence import insert_from_dataframe, delete_from_table
+from ips.services.dataimport import CSVType
 from ips.services.dataimport.schemas import non_response_schema
-from ips.persistence.persistence import execute_sql, insert_from_dataframe
-
 
 NON_RESPONSE_TABLE = 'NON_RESPONSE_DATA'
 insert_non_response = insert_from_dataframe(NON_RESPONSE_TABLE, "append")
-delete_non_response = execute_sql()
+delete_non_response = delete_from_table(NON_RESPONSE_TABLE)
 
 
 def import_nonresponse_from_stream(run_id, data):
@@ -31,18 +31,10 @@ def _import_non_response(dataframe, run_id):
     dataframe["RUN_ID"] = run_id
     dataframe.rename(columns={"DATASOURCE": "DATA_SOURCE_ID"}, inplace=True)
 
-    datasource_id = 'NonResponse'
-
-    datasource_id = datasource_id
-    dataframe['DATA_SOURCE_ID'].replace(['Non Response'], datasource_id, inplace=True)
-
-    sql = f"""
-            DELETE FROM NON_RESPONSE_DATA
-            WHERE RUN_ID = '{run_id}'
-            """
+    dataframe['DATA_SOURCE_ID'].replace([CSVType.NonResponse.name], CSVType.NonResponse.value, inplace=True)
 
     try:
-        delete_non_response(sql)
+        delete_non_response(run_id=run_id)
         insert_non_response(dataframe)
     except Exception as err:
         log.error(f"Cannot insert non_response dataframe into table: {err}")

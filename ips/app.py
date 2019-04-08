@@ -5,7 +5,13 @@ from falcon_multipart.middleware import MultipartMiddleware
 from ips_common.logging import log
 
 from ips.api.cancel_api import CancelApi
+from ips.api.dataimport.import_air import ImportAir
+from ips.api.dataimport.import_non_response import ImportNonResponse
+from ips.api.dataimport.import_sea import ImportSea
+from ips.api.dataimport.import_shift import ImportShift
 from ips.api.dataimport.import_survey import ImportSurvey
+from ips.api.dataimport.import_tunnel import ImportTunnel
+from ips.api.dataimport.import_unsampled import ImportUnsampled
 from ips.api.login_api import LoginApi
 from ips.api.pv_api import PvApi
 from ips.api.pv_builder_api import PvBuilderApi, PvBuilderVariablesApi
@@ -40,6 +46,13 @@ pv_builder_api = PvBuilderApi(workflow)
 pv_builder_variables_api = PvBuilderVariablesApi(workflow)
 
 import_survey = ImportSurvey(workflow)
+import_air = ImportAir(workflow)
+import_non_response = ImportNonResponse(workflow)
+import_sea = ImportSea(workflow)
+import_shift = ImportShift(workflow)
+import_tunnel = ImportTunnel(workflow)
+import_unsampled = ImportUnsampled(workflow)
+
 
 app.add_route('/ips-service/start/{run_id}', start_api)
 app.add_route('/ips-service/status/{run_id}', status_api)
@@ -62,3 +75,11 @@ app.add_route("/builder/{run_id}/{pv_id}", pv_builder_api)
 app.add_route("/builder/variables", pv_builder_variables_api)
 
 app.add_route("/import/survey/{run_id}", import_survey)
+app.add_route("/import/air/{run_id}", import_air)
+app.add_route("/import/nonresponse/{run_id}", import_non_response)
+app.add_route("/import/sea/{run_id}", import_sea)
+app.add_route("/import/shift/{run_id}", import_shift)
+app.add_route("/import/tunnel/{run_id}", import_tunnel)
+app.add_route("/import/unsampled/{run_id}", import_unsampled)
+
+

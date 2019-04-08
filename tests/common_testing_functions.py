@@ -6,12 +6,11 @@ import pandas as pd
 
 from ips.persistence import data_management as idm
 from ips.services.calculations import calculate_traffic_weight as tr_calc
-from ips.services.dataimport import CSVType
 from ips.services.dataimport.import_non_response import import_nonresponse_file
-from ips.services.dataimport.import_shift import import_shift
+from ips.services.dataimport.import_shift import import_shift_file
 from ips.services.dataimport.import_survey import import_survey_file
 from ips.services.dataimport.import_traffic import import_sea_file, import_air_file, import_tunnel_file
-from ips.services.dataimport.import_unsampled import import_unsampled
+from ips.services.dataimport.import_unsampled import import_unsampled_file
 
 
 def import_survey_data_into_database(survey_data_path, run_id):
@@ -84,8 +83,8 @@ def import_test_data_into_database(import_data_dir, run_id, load_survey_data=Tru
 
     import_nonresponse_file(frun_id=run_id, file_name=nr_data_path)
 
-    import_shift(file_type=CSVType.Shift, run_id=run_id, file_name=shift_data_path)
-    import_unsampled(file_type=CSVType.Unsampled, run_id=run_id, file_name=unsampled_data_path)
+    import_shift_file(run_id=run_id, file_name=shift_data_path)
+    import_unsampled_file(run_id=run_id, file_name=unsampled_data_path)
 
 
 def populate_test_pv_table(conn, run_id, pv_run_id):

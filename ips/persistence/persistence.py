@@ -33,9 +33,6 @@ def delete_from_table(table: str) -> Callable[..., None]:
     :return: a function that is called with the run_id
     """
 
-    # def delete(run_id: str):
-    #     db.execute_sql_statement(f"delete from {table} where RUN_ID = '{run_id}'")
-
     def delete(**kwargs):
         val = f"DELETE FROM {table}"
         if len(kwargs) == 1:
