@@ -3030,9 +3030,6 @@ CREATE TABLE `PV_Bytes` (
   CONSTRAINT `pv_r_fk` FOREIGN KEY (`Run_ID`) REFERENCES `RUN` (`RUN_ID`) ON DELETE CASCADE ON UPDATE CASCADE
 )
 
-SET FOREIGN_KEY_CHECKS = 1;
-
-
 create table user
 (
 	id int auto_increment primary key,
