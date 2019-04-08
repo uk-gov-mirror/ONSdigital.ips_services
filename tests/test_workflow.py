@@ -7,10 +7,10 @@ from ips_common.logging import log
 
 from ips.persistence import data_management as idm
 from ips.services.dataimport import CSVType
-from ips.services.dataimport.import_non_response import import_non_response
+from ips.services.dataimport.import_non_response import import_nonresponse_file
 from ips.services.dataimport.import_shift import import_shift
 from ips.services.dataimport.import_survey import import_survey_file
-from ips.services.dataimport.import_traffic import import_traffic
+from ips.services.dataimport.import_traffic import import_air_file, import_sea_file, import_tunnel_file
 from ips.services.dataimport.import_unsampled import import_unsampled
 
 reference_data = {
@@ -39,12 +39,12 @@ def setup_module(module):
 def import_reference_data():
     log.info("-> Start data load")
 
-    import_traffic(file_type=CSVType.Sea, run_id=run_id, file_name=reference_data['Sea'])
-    import_traffic(file_type=CSVType.Air, run_id=run_id, file_name=reference_data['Air'])
-    import_traffic(file_type=CSVType.Tunnel, run_id=run_id, file_name=reference_data['Tunnel'])
+    import_sea_file(run_id=run_id, file_name=reference_data['Sea'])
+    import_air_file(run_id=run_id, file_name=reference_data['Air'])
+    import_tunnel_file(run_id=run_id, file_name=reference_data['Tunnel'])
 
     import_shift(file_type=CSVType.Shift, run_id=run_id, file_name=reference_data['Shift'])
-    import_non_response(file_type=CSVType.NonResponse, run_id=run_id, file_name=reference_data['Non Response'])
+    import_nonresponse_file(frun_id=run_id, file_name=reference_data['Non Response'])
     import_unsampled(file_type=CSVType.Unsampled, run_id=run_id, file_name=reference_data['Unsampled'])
 
     import_survey_file(survey_data_path=survey_data, run_id=run_id)
