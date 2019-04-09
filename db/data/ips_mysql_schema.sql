@@ -153,7 +153,8 @@ create table PROCESS_VARIABLE_PY
   PV_DEF              text          not null
 );
 
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 12, 'imbal_port_fact_pv', 'imbal_port_fact_pv', 'if row[''IMBAL_PORT_GRP_PV''] == 1 and row[''ARRIVEDEPART''] == 1:
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 12, 'imbal_port_fact_pv', 'imbal_port_fact_pv', '
+if row[''IMBAL_PORT_GRP_PV''] == 1 and row[''ARRIVEDEPART''] == 1:
     row[''IMBAL_PORT_FACT_PV''] = 1.00
 elif row[''IMBAL_PORT_GRP_PV''] == 1 and row[''ARRIVEDEPART''] == 2:
     row[''IMBAL_PORT_FACT_PV''] = 0.99
@@ -223,11 +224,13 @@ elif row[''IMBAL_PORT_GRP_PV''] == 17 and row[''ARRIVEDEPART''] == 2:
     row[''IMBAL_PORT_FACT_PV''] = 1.03
 else:
     row[''IMBAL_PORT_FACT_PV''] = 1.0');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 13, 'stay_imp_flag_pv', 'stay_imp_flag_pv', 'if math.isnan(row[''NUMNIGHTS'']) or row[''NUMNIGHTS''] == 999:
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 13, 'stay_imp_flag_pv', 'stay_imp_flag_pv', '
+if math.isnan(row[''NUMNIGHTS'']) or row[''NUMNIGHTS''] == 999:
     row[''STAY_IMP_FLAG_PV''] = 1
 else:
     row[''STAY_IMP_FLAG_PV''] = 0');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 14, 'stay_imp_eligible_pv', 'stay_imp_eligible_pv', 'if row[''FLOW''] in (1,4,5,8) and row[''MINS_FLAG_PV''] == 0 and row[''PURPOSE''] != 80:
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 14, 'stay_imp_eligible_pv', 'stay_imp_eligible_pv', '
+if row[''FLOW''] in (1,4,5,8) and row[''MINS_FLAG_PV''] == 0 and row[''PURPOSE''] != 80:
     row[''STAY_IMP_ELIGIBLE_PV''] = 1
 else:
     row[''STAY_IMP_ELIGIBLE_PV''] = 0');
@@ -257,9 +260,6 @@ elif row[''OSPORT2_PV''] == 160:
     row[''OSPORT2_PV''] = 210
 ');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 47, 'rail_cntry_grp_pv', 'rail_cntry_grp_pv', '
-
-
-
 railcountry = 0
 
 if row[''FLOW''] == 5:
@@ -320,7 +320,6 @@ elif row[''OSPORT2_PV''] in (940,941,942,943,944,945,946,947,949):
 else:
     row[''OSPORT3_PV''] = 13');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 35, 'osport4_pv', 'osport4_pv', '
-
 if row[''OSPORT3_PV''] in (1,2):
     row[''OSPORT4_PV''] = 1
 else:
@@ -351,8 +350,6 @@ else:
     row[''APD_PV''] = 40/2
 ');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 37, 'qmfare_pv', 'qmfare_pv', '
-
-
 if row[''OSPORT3_PV''] == 12 and (row[''MINS_FLAG_PV''] == 0 or math.isnan(row[''MINS_FLAG_PV''])):
     row[''QMFARE_PV''] = 1500
 else:
@@ -370,8 +367,6 @@ else:
     row[''SPEND_IMP_ELIGIBLE_PV''] = 0
 ');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 40, 'uk_os_pv', 'uk_os_pv', '
-
-
 if row[''FLOW''] in (1,5):
     row[''UK_OS_PV''] = 2
 
@@ -401,8 +396,6 @@ if row[''IND''] == 1 and row[''PUR1_PV''] == 2:
     row[''PUR1_PV''] = 1
 ');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 42, 'pur2_pv', 'pur2_pv', '
-
-
 if row[''PURPOSE''] in (10,14,17,18,11,12):
     row[''PUR2_PV''] = 2
 elif row[''PURPOSE''] in (20,21,22):
@@ -417,8 +410,6 @@ else:
 if row[''IND''] == 1 and row[''PUR2_PV''] == 2:
     row[''PUR2_PV''] = 1');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 43, 'pur3_pv', 'pur3_pv', '
-
-
 if row[''PURPOSE''] in (20,21,22):
     row[''PUR3_PV''] = 1
 elif math.isnan(row[''PURPOSE'']):
@@ -446,7 +437,6 @@ elif row[''STAY''] >= 31:
     row[''DUR2_PV''] = 2
 ');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 46, 'imbal_ctry_fact_pv', 'imbal_ctry_fact_pv', '
-
 if row[''RESIDENCE''] == 352 or row[''RESIDENCE''] == 40 or row[''RESIDENCE''] in (292, 470, 902, 901) or row[''RESIDENCE''] == 792 or row[''RESIDENCE''] == 620 or row[''RESIDENCE''] == 621 or row[''RESIDENCE''] in (973, 70, 191, 807, 499, 688, 951, 705)  or row[''RESIDENCE''] == 234:
     row[''IMBAL_CTRY_FACT_PV''] = 1.02
 elif row[''RESIDENCE''] == 56 or row[''RESIDENCE''] == 442:
@@ -504,8 +494,6 @@ if row[''UKFOREIGN''] == 2:
         row[''STAYIMPCTRYLEVEL1_PV''] = int(row[''RESIDENCE''])
 ');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 16, 'StayImpCtryLevel2_pv', 'StayImpCtryLevel2_pv', '
-
-
 if row[''STAYIMPCTRYLEVEL1_PV''] in (830, 831, 832, 833, 931, 372):
     row[''STAYIMPCTRYLEVEL2_PV''] = 1
 elif row[''STAYIMPCTRYLEVEL1_PV''] in (250, 56, 442, 528, 492):
@@ -567,9 +555,6 @@ elif row[''STAYIMPCTRYLEVEL1_PV''] in (0, 969, 99):
 else:
     row[''STAYIMPCTRYLEVEL2_PV''] = 99');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 28, 'ukport1_pv', 'ukport1_pv', '
-
-
-
 if (row[''PORTROUTE''] >= 111 and row[''PORTROUTE''] <= 119) or row[''PORTROUTE''] in (161,171):
     row[''UKPORT1_PV''] = 110
 elif (row[''PORTROUTE''] >= 121 and row[''PORTROUTE''] <= 129) or row[''PORTROUTE''] in (162,172):
@@ -597,9 +582,6 @@ elif row[''PORTROUTE''] >= 311 and row[''PORTROUTE''] <= 319:
 else:
     row[''UKPORT1_PV''] = row[''PORTROUTE'']');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 29, 'ukport2_pv', 'ukport2_pv', '
-
-
-
 if row[''UKPORT1_PV''] >= 110 and row[''UKPORT1_PV''] <= 150:
     row[''UKPORT2_PV''] = 1
 elif row[''UKPORT1_PV''] in (180,190):
@@ -643,9 +625,6 @@ elif row[''UKPORT1_PV''] >= 911 and row[''UKPORT1_PV''] <= 951:
 else:
     row[''UKPORT2_PV''] = 99');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 30, 'ukport3_pv', 'ukport3_pv', '
-
-
-
 if row[''UKPORT2_PV''] in (1,2,4,13):
     row[''UKPORT3_PV''] = 1
 elif row[''UKPORT2_PV''] in (3,10,11):
@@ -667,9 +646,6 @@ elif row[''UKPORT2_PV''] == 32:
 else:
     row[''UKPORT3_PV''] = 0');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 31, 'ukport4_pv', 'ukport4_pv', '
-
-
-
 if row[''UKPORT3_PV''] in (1,2,3,9):
     row[''UKPORT4_PV''] = 1
 elif row[''UKPORT3_PV''] in (4,5,6,7,8):
@@ -686,8 +662,6 @@ if row[''OSPORT1_PV''] in (999998,999999):
     row[''OSPORT1_PV''] = float(''NaN'')
 ');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 48, 'rail_exercise_pv', 'rail_exercise_pv', '
-
-
 if row[''FLOW''] == 8:
     if row[''RAIL_CNTRY_GRP_PV''] == 1:
         row[''RAIL_EXERCISE_PV''] = 38
@@ -741,22 +715,16 @@ elif row[''FLOW''] == 5:
 
 row[''RAIL_EXERCISE_PV''] = row[''RAIL_EXERCISE_PV''] * 1000');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 49, 'rail_imp_eligible_pv', 'rail_imp_eligible_pv', '
-
-
 if row[''FLOW''] in (5,8):
     row[''RAIL_IMP_ELIGIBLE_PV''] = 1
 else:
     row[''RAIL_IMP_ELIGIBLE_PV''] = 0');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 50, 'spend_imp_flag_pv', 'spend_imp_flag_pv', '
-
 if math.isnan(row[''SPEND'']):
     row[''SPEND_IMP_FLAG_PV''] = 1
 else:
     row[''SPEND_IMP_FLAG_PV''] = 0');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 51, 'purpose_pv', 'purpose_pv', '
-
-
-
 if row[''PURPOSE''] == 3 or row[''PURPOSE''] == 4 or row[''PURPOSE''] == 31 or row[''PURPOSE''] == 32:
     row[''PURPOSE_PV''] = 1
 elif row[''PURPOSE''] == 1 or row[''PURPOSE''] == 2:
@@ -779,9 +747,9 @@ if row[''FLOW''] in (1,5) and row[''RESPNSE''] != 5 and (row[''PURPOSE''] <= 89 
 else:
     row[''REG_IMP_ELIGIBLE_PV''] = 0
 ');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 54, 'mins_ctry_grp_pv', 'mins_ctry_grp_pv', 'row[''MINS_CTRY_GRP_PV''] = row[''FLOW'']');
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 54, 'mins_ctry_grp_pv', 'mins_ctry_grp_pv', '
+row[''MINS_CTRY_GRP_PV''] = row[''FLOW'']');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 55, 'mins_port_grp_pv', 'mins_port_grp_pv', '
-
 row[''MINS_PORT_GRP_PV''] = int(row[''PORTROUTE''])');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 56, 'samp_port_grp_pv', 'samp_port_grp_pv', '
 if row[''PORTROUTE''] in (111, 113, 119, 161, 171):
@@ -1091,15 +1059,18 @@ if dataset == ''survey'':
     elif (IoM) and (row[''PORTROUTE''] >= 300) and (row[''PORTROUTE''] < 600):
         row[''UNSAMP_PORT_GRP_PV''] = ''RAM''
 ');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 4, 'shift_flag_pv', 'shift_flag_pv', 'if row[''PORTROUTE''] < 600 or row[''PORTROUTE''] > 900:
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 4, 'shift_flag_pv', 'shift_flag_pv', '
+if row[''PORTROUTE''] < 600 or row[''PORTROUTE''] > 900:
     row[''SHIFT_FLAG_PV''] = 1
 else:
     row[''SHIFT_FLAG_PV''] = 0');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 5, 'crossings_flag_pv', 'crossings_flag_pv', 'if row[''PORTROUTE''] < 600 or row[''PORTROUTE''] > 900:
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 5, 'crossings_flag_pv', 'crossings_flag_pv', '
+if row[''PORTROUTE''] < 600 or row[''PORTROUTE''] > 900:
     row[''CROSSINGS_FLAG_PV''] = 0
 else:
     row[''CROSSINGS_FLAG_PV''] = 1');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 6, 'shift_port_grp_pv', 'shift_port_grp_pv', 'if row[''PORTROUTE''] >= 161 and row[''PORTROUTE''] <= 165:
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 6, 'shift_port_grp_pv', 'shift_port_grp_pv', '
+if row[''PORTROUTE''] >= 161 and row[''PORTROUTE''] <= 165:
     row[''SHIFT_PORT_GRP_PV''] = ''LHR Transits''
 elif row[''PORTROUTE''] >= 171 and row[''PORTROUTE''] <= 175:
     row[''SHIFT_PORT_GRP_PV''] = ''LHR Mig Transits''
@@ -1107,14 +1078,17 @@ else:
     #  row[''SHIFT_PORT_GRP_PV''] = str(row[''PORTROUTE'']).rjust(3,'' '')
     row[''SHIFT_PORT_GRP_PV''] = str(int(row[''PORTROUTE'']))
   ');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 7, 'nr_flag_pv', 'nr_flag_pv', 'if row[''RESPNSE''] > 0 and row[''RESPNSE''] < 4:
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 7, 'nr_flag_pv', 'nr_flag_pv', '
+if row[''RESPNSE''] > 0 and row[''RESPNSE''] < 4:
     row[''NR_FLAG_PV''] = 0
 elif row[''RESPNSE''] >= 4 and row[''RESPNSE''] < 7:
     row[''NR_FLAG_PV''] = 1
 else:
     row[''NR_FLAG_PV''] = 2');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 8, 'nr_port_grp_pv', 'nr_port_grp_pv', 'row[''NR_PORT_GRP_PV''] = str(row[''PORTROUTE'']).rjust(3,'' '')');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 9, 'mins_flag_pv', 'mins_flag_pv', 'if row[''TYPEINTERVIEW''] == 1:
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 8, 'nr_port_grp_pv', 'nr_port_grp_pv', '
+row[''NR_PORT_GRP_PV''] = str(row[''PORTROUTE'']).rjust(3,'' '')');
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 9, 'mins_flag_pv', 'mins_flag_pv', '
+if row[''TYPEINTERVIEW''] == 1:
     row[''MINS_FLAG_PV''] = 2
 elif row[''RESPNSE''] == 1 or row[''RESPNSE''] == 2:
     row[''MINS_FLAG_PV''] = 0
@@ -1122,11 +1096,13 @@ elif row[''RESPNSE''] == 3:
     row[''MINS_FLAG_PV''] = 1
 else:
     row[''MINS_FLAG_PV''] = 3');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 10, 'imbal_eligible_pv', 'imbal_eligible_pv', 'if not math.isnan(row[''FLOW'']) and (row[''RESPNSE''] > 0) and (row[''RESPNSE''] < 3) and ((row[''PURPOSE''] != 23) and (row[''PURPOSE''] != 24) and (row[''PURPOSE''] < 71 or math.isnan(row[''PURPOSE'']))) and (math.isnan(row[''INTENDLOS'']) or (row[''INTENDLOS''] < 2) or (row[''INTENDLOS''] > 7)):
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 10, 'imbal_eligible_pv', 'imbal_eligible_pv', '
+if not math.isnan(row[''FLOW'']) and (row[''RESPNSE''] > 0) and (row[''RESPNSE''] < 3) and ((row[''PURPOSE''] != 23) and (row[''PURPOSE''] != 24) and (row[''PURPOSE''] < 71 or math.isnan(row[''PURPOSE'']))) and (math.isnan(row[''INTENDLOS'']) or (row[''INTENDLOS''] < 2) or (row[''INTENDLOS''] > 7)):
     row[''IMBAL_ELIGIBLE_PV''] = 1
 else:
     row[''IMBAL_ELIGIBLE_PV''] = 0');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 11, 'imbal_port_grp_pv', 'imbal_port_grp_pv', 'if row[''PORTROUTE''] in (111, 113, 119, 161, 171):
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 11, 'imbal_port_grp_pv', 'imbal_port_grp_pv', '
+if row[''PORTROUTE''] in (111, 113, 119, 161, 171):
     row[''IMBAL_PORT_GRP_PV''] = 1
 elif row[''PORTROUTE''] in (121, 123, 151, 153, 162, 165, 172, 175):
     row[''IMBAL_PORT_GRP_PV''] = 2
@@ -1228,9 +1204,10 @@ if row[''UNSAMP_PORT_GRP_PV''] == ''RSS'' and row[''ARRIVEDEPART''] == 1:
 if row[''UNSAMP_PORT_GRP_PV''] == ''RSS'' and row[''ARRIVEDEPART''] == 2:
     row[''UNSAMP_PORT_GRP_PV''] = ''HBN''
 ');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 1, 'weekday_end_pv', 'weekday_end_pv', 'if dataset == ''survey'':
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 1, 'weekday_end_pv', 'weekday_end_pv', '
+if dataset == ''survey'':
     weekday = float(''nan'')
-    from datetime dataimport datetime
+    from datetime import datetime
 
     day = int(row[''INTDATE''][:2])
     month = int(row[''INTDATE''][2:4])
@@ -1265,17 +1242,20 @@ else:
     else:
         row[''WEEKDAY_END_PV''] = row[''WEEKDAY'']
 ');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 2, 'am_pm_night_pv', 'am_pm_night_pv', 'if row[''PORTROUTE''] == 811 and row[''AM_PM_NIGHT''] == 2:
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 2, 'am_pm_night_pv', 'am_pm_night_pv', '
+if row[''PORTROUTE''] == 811 and row[''AM_PM_NIGHT''] == 2:
     row[''AM_PM_NIGHT_PV''] = 1
 elif row[''PORTROUTE''] == 811 or row[''PORTROUTE''] == 812:
     row[''AM_PM_NIGHT_PV''] = row[''AM_PM_NIGHT'']
 else:
     row[''AM_PM_NIGHT_PV''] = 1');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 3, 'mig_flag_pv', 'mig_flag_pv', 'if row[''LOSKEY''] > 0:
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 3, 'mig_flag_pv', 'mig_flag_pv', '
+if row[''LOSKEY''] > 0:
     row[''MIG_FLAG_PV''] = 1
 else:
     row[''MIG_FLAG_PV''] = 0');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 17, 'StayImpCtryLevel3_pv', 'StayImpCtryLevel3_pv', 'if row[''STAYIMPCTRYLEVEL2_PV''] in (1,2,4,6,8):
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 17, 'StayImpCtryLevel3_pv', 'StayImpCtryLevel3_pv', '
+if row[''STAYIMPCTRYLEVEL2_PV''] in (1,2,4,6,8):
     row[''STAYIMPCTRYLEVEL3_PV''] = 1
 elif row[''STAYIMPCTRYLEVEL2_PV''] in (3,5,7):
     row[''STAYIMPCTRYLEVEL3_PV''] = 2
@@ -1297,7 +1277,8 @@ elif row[''STAYIMPCTRYLEVEL2_PV''] == 91:
     row[''STAYIMPCTRYLEVEL3_PV''] = 10
 else:
     row[''STAYIMPCTRYLEVEL3_PV''] = 99');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 18, 'StayImpCtryLevel4_pv', 'StayImpCtryLevel4_pv', 'if row[''STAYIMPCTRYLEVEL2_PV''] >= 1 and row[''STAYIMPCTRYLEVEL2_PV''] <= 8:
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 18, 'StayImpCtryLevel4_pv', 'StayImpCtryLevel4_pv', '
+if row[''STAYIMPCTRYLEVEL2_PV''] >= 1 and row[''STAYIMPCTRYLEVEL2_PV''] <= 8:
     row[''STAYIMPCTRYLEVEL4_PV''] = 1
 elif row[''STAYIMPCTRYLEVEL2_PV''] >= 11 and row[''STAYIMPCTRYLEVEL2_PV''] <= 15:
     row[''STAYIMPCTRYLEVEL4_PV''] = 2
@@ -1307,7 +1288,8 @@ elif row[''STAYIMPCTRYLEVEL2_PV''] >= 41 and row[''STAYIMPCTRYLEVEL2_PV''] <= 46
     row[''STAYIMPCTRYLEVEL4_PV''] = 4
 else:
     row[''STAYIMPCTRYLEVEL4_PV''] = 5');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 19, 'stay_purpose_grp_pv', 'stay_purpose_grp_pv', 'if row[''PURPOSE''] in (20, 21, 22, 24, 25):
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 19, 'stay_purpose_grp_pv', 'stay_purpose_grp_pv', '
+if row[''PURPOSE''] in (20, 21, 22, 24, 25):
     row[''STAY_PURPOSE_GRP_PV''] = 1
 elif row[''PURPOSE''] in (10, 15, 16):
     row[''STAY_PURPOSE_GRP_PV''] = 2
@@ -1319,7 +1301,8 @@ elif row[''PURPOSE''] in (17, 18, 70, 71):
     row[''STAY_PURPOSE_GRP_PV''] = 5
 else:
     row[''STAY_PURPOSE_GRP_PV''] = 6');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 20, 'fares_imp_flag_pv', 'fares_imp_flag_pv', 'if (row[''DVFARE''] == 999999) or math.isnan(row[''DVFARE'']) or (row[''DVFARE''] == 0):
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 20, 'fares_imp_flag_pv', 'fares_imp_flag_pv', '
+if (row[''DVFARE''] == 999999) or math.isnan(row[''DVFARE'']) or (row[''DVFARE''] == 0):
     row[''FARES_IMP_FLAG_PV''] = 1
 else:
     row[''FARES_IMP_FLAG_PV''] = 0');
@@ -1329,11 +1312,13 @@ if (((row[''FAREKEY''] == ''1'') or (row[''FAREKEY''] == ''1.0'')) or ((row[''FA
 else:
     row[''FARES_IMP_ELIGIBLE_PV''] = 0
 ');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 22, 'discnt_f1_pv', 'discnt_f1_pv', 'if row[''FLOW''] in (1,3,5,7):
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 22, 'discnt_f1_pv', 'discnt_f1_pv', '
+if row[''FLOW''] in (1,3,5,7):
     row[''DISCNT_F1_PV''] = 0.85
 elif row[''FLOW''] in (2,4,6,8):
     row[''DISCNT_F1_PV''] = 0.85');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 23, 'discnt_package_cost_pv', 'discnt_package_cost_pv', 'packagecost = None
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 23, 'discnt_package_cost_pv', 'discnt_package_cost_pv', '
+packagecost = None
 if row[''PACKAGE''] in (1 ,2):
     if packagecost != 999999:
         if not packagecost==None:
@@ -1341,11 +1326,13 @@ if row[''PACKAGE''] in (1 ,2):
     else:
         row[''DISCNT_PACKAGE_COST_PV''] = packagecost
 row[''DISCNT_PACKAGE_COST_PV''] = round(row[''DISCNT_PACKAGE_COST_PV''], 1)');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 24, 'discnt_f2_pv', 'discnt_f2_pv', 'if row[''PACKAGE''] in (1,2) and row[''FLOW''] in (1,3,5,7):
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 24, 'discnt_f2_pv', 'discnt_f2_pv', '
+if row[''PACKAGE''] in (1,2) and row[''FLOW''] in (1,3,5,7):
     row[''DISCNT_F2_PV''] = 0.85
 elif row[''PACKAGE''] in (1,2) and row[''FLOW''] in (2,4,6,8):
     row[''DISCNT_F2_PV''] = 0.85');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 25, 'fage_pv', 'fage_pv', 'if row[''KIDAGE''] in (0, 1):
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 25, 'fage_pv', 'fage_pv', '
+if row[''KIDAGE''] in (0, 1):
     row[''FAGE_PV''] = 1
 elif (row[''KIDAGE''] >= 2) and (row[''KIDAGE''] <= 15):
     row[''FAGE_PV''] = 2
@@ -1356,11 +1343,13 @@ if (row[''AGE''] > 1) or math.isnan(row[''AGE'']):
     row[''FAGE_PV''] = 6
 elif (row[''AGE''] < 2) and math.isnan(row[''KIDAGE'']):
     row[''FAGE_PV''] = 2');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 26, 'type_pv', 'type_pv', 'if row[''PURPOSE''] in (20,21,22):
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 26, 'type_pv', 'type_pv', '
+if row[''PURPOSE''] in (20,21,22):
     row[''TYPE_PV''] = 1
 else:
     row[''TYPE_PV''] = 2');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 27, 'opera_pv', 'opera_pv', 'if row[''FLOW''] < 5:
+INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF) VALUES ('TEMPLATE', 27, 'opera_pv', 'opera_pv', '
+if row[''FLOW''] < 5:
     if not math.isnan(row[''DVLINECODE'']):
         carrier = int(row[''DVLINECODE''])
     else:
@@ -2036,6 +2025,224 @@ create table SAS_SURVEY_COLUMN
   COLUMN_LENGTH decimal(5)  not null
 );
 
+create table SAS_SURVEY_SUBSAMPLE
+(
+  SERIAL                 decimal(15)    not null,
+  AGE                    decimal(3)     null,
+  AM_PM_NIGHT            decimal(1)     null,
+  ANYUNDER16             varchar(2)     null,
+  APORTLATDEG            decimal(2)     null,
+  APORTLATMIN            decimal(2)     null,
+  APORTLATSEC            decimal(2)     null,
+  APORTLATNS             varchar(1)     null,
+  APORTLONDEG            decimal(3)     null,
+  APORTLONMIN            decimal(2)     null,
+  APORTLONSEC            decimal(2)     null,
+  APORTLONEW             varchar(1)     null,
+  ARRIVEDEPART           decimal(1)     null,
+  BABYFARE               decimal(4, 2)  null,
+  BEFAF                  decimal(6)     null,
+  CHANGECODE             decimal(6)     null,
+  CHILDFARE              decimal(4, 2)  null,
+  COUNTRYVISIT           decimal(4)     null,
+  CPORTLATDEG            decimal(2)     null,
+  CPORTLATMIN            decimal(2)     null,
+  CPORTLATSEC            decimal(2)     null,
+  CPORTLATNS             varchar(1)     null,
+  CPORTLONDEG            decimal(3)     null,
+  CPORTLONMIN            decimal(2)     null,
+  CPORTLONSEC            decimal(2)     null,
+  CPORTLONEW             varchar(1)     null,
+  INTDATE                varchar(8)     null,
+  DAYTYPE                decimal(1)     null,
+  DIRECTLEG              decimal(6)     null,
+  DVEXPEND               decimal(6)            null,
+  DVFARE                 decimal(6)     null,
+  DVLINECODE             decimal(6)     null,
+  DVPACKAGE              decimal(1)     null,
+  DVPACKCOST             decimal(6)     null,
+  DVPERSONS              decimal(3)     null,
+  DVPORTCODE             decimal(6)     null,
+  EXPENDCODE             varchar(4)     null,
+  EXPENDITURE            decimal(6)            null,
+  FARE                   decimal(6)     null,
+  FAREK                  decimal(2)     null,
+  FLOW                   decimal(2)     null,
+  HAULKEY                decimal(2)     null,
+  INTENDLOS              decimal(2)     null,
+  KIDAGE                 decimal(2)     null,
+  LOSKEY                 decimal(2)     null,
+  MAINCONTRA             decimal(1)     null,
+  MIGSI                  int            null,
+  INTMONTH               decimal(2)     null,
+  NATIONALITY            decimal(4)     null,
+  NATIONNAME             varchar(50)    null,
+  NIGHTS1                decimal(3)     null,
+  NIGHTS2                decimal(3)     null,
+  NIGHTS3                decimal(3)     null,
+  NIGHTS4                decimal(3)     null,
+  NIGHTS5                decimal(3)     null,
+  NIGHTS6                decimal(3)     null,
+  NIGHTS7                decimal(3)     null,
+  NIGHTS8                decimal(3)     null,
+  NUMADULTS              decimal(3)     null,
+  NUMDAYS                decimal(3)     null,
+  NUMNIGHTS              decimal(3)     null,
+  NUMPEOPLE              decimal(3)     null,
+  PACKAGEHOL             decimal(1)     null,
+  PACKAGEHOLUK           decimal(1)     null,
+  PERSONS                decimal(2)     null,
+  PORTROUTE              decimal(4)     null,
+  PACKAGE                decimal(2)     null,
+  PROUTELATDEG           decimal(2)     null,
+  PROUTELATMIN           decimal(2)     null,
+  PROUTELATSEC           decimal(2)     null,
+  PROUTELATNS            varchar(1)     null,
+  PROUTELONDEG           decimal(3)     null,
+  PROUTELONMIN           decimal(2)     null,
+  PROUTELONSEC           decimal(2)     null,
+  PROUTELONEW            varchar(1)     null,
+  PURPOSE                decimal(2)     null,
+  QUARTER                decimal(1)     null,
+  RESIDENCE              decimal(4)     null,
+  RESPNSE                decimal(2)     null,
+  SEX                    decimal(1)     null,
+  SHIFTNO                decimal(6)     null,
+  SHUTTLE                decimal(1)     null,
+  SINGLERETURN           decimal(1)     null,
+  TANDTSI                decimal(8)            null,
+  TICKETCOST             decimal(6)     null,
+  TOWNCODE1              decimal(6)     null,
+  TOWNCODE2              decimal(6)     null,
+  TOWNCODE3              decimal(6)     null,
+  TOWNCODE4              decimal(6)     null,
+  TOWNCODE5              decimal(6)     null,
+  TOWNCODE6              decimal(6)     null,
+  TOWNCODE7              decimal(6)     null,
+  TOWNCODE8              decimal(6)     null,
+  TRANSFER               decimal(6)     null,
+  UKFOREIGN              decimal(1)     null,
+  VEHICLE                decimal(1)     null,
+  VISITBEGAN             varchar(8)     null,
+  WELSHNIGHTS            decimal(3)     null,
+  WELSHTOWN              decimal(6)     null,
+  AM_PM_NIGHT_PV         decimal(1)     null,
+  APD_PV                 decimal(4)     null,
+  ARRIVEDEPART_PV        decimal(1)     null,
+  CROSSINGS_FLAG_PV      decimal(1)     null,
+  STAYIMPCTRYLEVEL1_PV   decimal(8)     null,
+  STAYIMPCTRYLEVEL2_PV   decimal(8)     null,
+  STAYIMPCTRYLEVEL3_PV   decimal(8)     null,
+  STAYIMPCTRYLEVEL4_PV   decimal(8)     null,
+  DAY_PV                 decimal(2)     null,
+  DISCNT_F1_PV           decimal(4, 3)  null,
+  DISCNT_F2_PV           decimal(4, 3)  null,
+  DISCNT_PACKAGE_COST_PV decimal(6)     null,
+  DUR1_PV                decimal(3)     null,
+  DUR2_PV                decimal(3)     null,
+  DUTY_FREE_PV           decimal(4)     null,
+  FAGE_PV                decimal(2)     null,
+  FARES_IMP_ELIGIBLE_PV  decimal(1)     null,
+  FARES_IMP_FLAG_PV      decimal(1)     null,
+  FLOW_PV                decimal(2)     null,
+  FOOT_OR_VEHICLE_PV     decimal(2)     null,
+  HAUL_PV                varchar(2)     null,
+  IMBAL_CTRY_FACT_PV     decimal(5, 3)  null,
+  IMBAL_CTRY_GRP_PV      decimal(3)     null,
+  IMBAL_ELIGIBLE_PV      decimal(1)     null,
+  IMBAL_PORT_FACT_PV     decimal(5, 3)  null,
+  IMBAL_PORT_GRP_PV      decimal(3)     null,
+  IMBAL_PORT_SUBGRP_PV   decimal(3)     null,
+  LOS_PV                 decimal(3)     null,
+  LOSDAYS_PV             decimal(3)     null,
+  MIG_FLAG_PV            decimal(1)     null,
+  MINS_CTRY_GRP_PV       decimal(6)     null,
+  MINS_CTRY_PORT_GRP_PV  varchar(10)    null,
+  MINS_FLAG_PV           decimal(1)     null,
+  MINS_NAT_GRP_PV        decimal(6)     null,
+  MINS_PORT_GRP_PV       varchar(6)     null,
+  MINS_QUALITY_PV        decimal(1)     null,
+  NR_FLAG_PV             decimal(1)     null,
+  NR_PORT_GRP_PV         varchar(10)    null,
+  OPERA_PV               decimal(2)     null,
+  OSPORT1_PV             decimal(8)     null,
+  OSPORT2_PV             decimal(8)     null,
+  OSPORT3_PV             decimal(8)     null,
+  OSPORT4_PV             decimal(8)     null,
+  PUR1_PV                decimal(8)     null,
+  PUR2_PV                decimal(8)     null,
+  PUR3_PV                decimal(8)     null,
+  PURPOSE_PV             decimal(8)     null,
+  QMFARE_PV              decimal(8)     null,
+  RAIL_CNTRY_GRP_PV      decimal(3)     null,
+  RAIL_EXERCISE_PV       decimal(6)     null,
+  RAIL_IMP_ELIGIBLE_PV   decimal(1)     null,
+  REG_IMP_ELIGIBLE_PV    decimal(1)     null,
+  SAMP_PORT_GRP_PV       varchar(10)    null,
+  SHIFT_FLAG_PV          decimal(1)     null,
+  SHIFT_PORT_GRP_PV      varchar(10)    null,
+  SPEND_IMP_FLAG_PV      decimal(1)     null,
+  SPEND_IMP_ELIGIBLE_PV  decimal(1)     null,
+  STAY_IMP_ELIGIBLE_PV   decimal(1)     null,
+  STAY_IMP_FLAG_PV       decimal(1)     null,
+  STAY_PURPOSE_GRP_PV    decimal(2)     null,
+  TOWNCODE_PV            varchar(10)    null,
+  TOWN_IMP_ELIGIBLE_PV   decimal(1)     null,
+  TYPE_PV                decimal(2)     null,
+  UK_OS_PV               decimal(1)     null,
+  UKPORT1_PV             decimal(4)     null,
+  UKPORT2_PV             decimal(4)     null,
+  UKPORT3_PV             decimal(4)     null,
+  UKPORT4_PV             decimal(4)     null,
+  UNSAMP_PORT_GRP_PV     varchar(10)    null,
+  UNSAMP_REGION_GRP_PV   varchar(10)    null,
+  WEEKDAY_END_PV         decimal(1)     null,
+  DIRECT                 decimal(6)     null,
+  EXPENDITURE_WT         decimal(6, 3)  null,
+  EXPENDITURE_WTK        varchar(10)    null,
+  FAREKEY                varchar(4)     null,
+  OVLEG                  decimal(6)     null,
+  SPEND                  decimal(7)     null,
+  SPEND1                 decimal(7)     null,
+  SPEND2                 decimal(7)     null,
+  SPEND3                 decimal(7)     null,
+  SPEND4                 decimal(7)     null,
+  SPEND5                 decimal(7)     null,
+  SPEND6                 decimal(7)     null,
+  SPEND7                 decimal(7)     null,
+  SPEND8                 decimal(7)     null,
+  SPEND9                 decimal(7)     null,
+  SPENDIMPREASON         decimal(1)     null,
+  SPENDK                 decimal(2)     null,
+  STAY                   decimal(3)     null,
+  STAYK                  decimal(1)     null,
+  STAY1K                 varchar(10)    null,
+  STAY2K                 varchar(10)    null,
+  STAY3K                 varchar(10)    null,
+  STAY4K                 varchar(10)    null,
+  STAY5K                 varchar(10)    null,
+  STAY6K                 varchar(10)    null,
+  STAY7K                 varchar(10)    null,
+  STAY8K                 varchar(10)    null,
+  STAY9K                 varchar(10)    null,
+  STAYTLY                decimal(6)     null,
+  STAY_WT                decimal(6, 3)  null,
+  STAY_WTK               varchar(10)    null,
+  TYPEINTERVIEW          decimal(3)     null,
+  UKLEG                  decimal(6)     null,
+  VISIT_WT               decimal(6, 3)  null,
+  VISIT_WTK              varchar(10)    null,
+  SHIFT_WT               decimal(9, 3)  null,
+  NON_RESPONSE_WT        decimal(9, 3)  null,
+  MINS_WT                decimal(9, 3)  null,
+  TRAFFIC_WT             decimal(9, 3)  null,
+  UNSAMP_TRAFFIC_WT      decimal(9, 3)  null,
+  IMBAL_WT               decimal(9, 3)  null,
+  FINAL_WT               decimal(12, 3) null,
+  constraint SAS_SURVEY_SUBSAMPLE_pk
+    unique (SERIAL)
+);
+
 create table SAS_SURVEY_VALUE
 (
   VERSION_ID   decimal      not null,
@@ -2261,7 +2468,7 @@ create table SURVEY_SUBSAMPLE
   INTDATE                varchar(8)     null,
   DAYTYPE                decimal(1)     null,
   DIRECTLEG              decimal(6)     null,
-  DVEXPEND               int            null,
+  DVEXPEND               decimal(6)           null,
   DVFARE                 decimal(6)     null,
   DVLINECODE             decimal(6)     null,
   DVPACKAGE              decimal(1)     null,
@@ -2269,7 +2476,7 @@ create table SURVEY_SUBSAMPLE
   DVPERSONS              decimal(3)     null,
   DVPORTCODE             decimal(6)     null,
   EXPENDCODE             varchar(4)     null,
-  EXPENDITURE            int            null,
+  EXPENDITURE            decimal(6)           null,
   FARE                   decimal(6)     null,
   FAREK                  decimal(2)     null,
   FLOW                   decimal(2)     null,
@@ -2315,7 +2522,7 @@ create table SURVEY_SUBSAMPLE
   SHIFTNO                decimal(6)     null,
   SHUTTLE                decimal(1)     null,
   SINGLERETURN           decimal(1)     null,
-  TANDTSI                int            null,
+  TANDTSI                decimal(8)           null,
   TICKETCOST             decimal(6)     null,
   TOWNCODE1              decimal(6)     null,
   TOWNCODE2              decimal(6)     null,

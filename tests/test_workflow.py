@@ -39,15 +39,15 @@ def setup_module(module):
 def import_reference_data():
     log.info("-> Start data load")
 
-    import_sea_file(run_id=run_id, file_name=reference_data['Sea'])
-    import_air_file(run_id=run_id, file_name=reference_data['Air'])
-    import_tunnel_file(run_id=run_id, file_name=reference_data['Tunnel'])
+    import_sea_file(run_id, reference_data['Sea'])
+    import_air_file(run_id, reference_data['Air'])
+    import_tunnel_file(run_id, reference_data['Tunnel'])
 
-    import_shift_file(run_id=run_id, file_name=reference_data['Shift'])
-    import_nonresponse_file(frun_id=run_id, file_name=reference_data['Non Response'])
-    import_unsampled_file(run_id=run_id, file_name=reference_data['Unsampled'])
+    import_shift_file(run_id, reference_data['Shift'])
+    import_nonresponse_file(run_id, reference_data['Non Response'])
+    import_unsampled_file(run_id, reference_data['Unsampled'])
 
-    import_survey_file(survey_data_path=survey_data, run_id=run_id)
+    import_survey_file(run_id, survey_data)
 
     log.info("-> End data load")
 
@@ -85,13 +85,13 @@ def teardown_module(module):
 
 
 def test_workflow():
-    endpoint = 'http://localhost:8000/ips-service/start/' + run_id
+    endpoint = 'http://localhost:5000/ips-service/start/' + run_id
     log.info(f"Starting request... {endpoint}")
     r = requests.put(endpoint)
 
     assert (r.status_code == 200)
 
-    status_endpoint = 'http://localhost:8000/ips-service/status/' + run_id
+    status_endpoint = 'http://localhost:5000/ips-service/status/' + run_id
 
     done = False
     perc = 0

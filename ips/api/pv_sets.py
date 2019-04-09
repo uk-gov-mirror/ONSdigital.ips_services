@@ -20,4 +20,5 @@ class PvSetsApi(Api):
         resp.status = falcon.HTTP_201
 
     def on_get(self, req: Request, resp: Response) -> None:
+        resp.status = falcon.HTTP_200
         resp.body = get_pv_sets()

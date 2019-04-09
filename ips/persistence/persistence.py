@@ -18,6 +18,7 @@ def read_table_values(table: str) -> Callable[[], pd.DataFrame]:
     :param table: the name of the table to read from
     :return: a function that, when called will return a pandas DataFrame containing all rows in the table
     """
+
     def read():
         return db.get_table_values(table)
 
@@ -126,6 +127,10 @@ def insert_from_json(table: str, if_exists: str = "append") -> Callable[[str], N
         db.insert_dataframe_into_table(table, data_frame, if_exists)
 
     return insert
+
+
+def select_data(column_name: str, table_name: str, condition1: str, condition2: str):
+    return db.select_data(column_name, table_name, condition1, condition2)
 
 
 def execute_sql() -> Callable[[str], Any]:
