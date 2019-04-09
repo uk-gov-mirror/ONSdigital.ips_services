@@ -2,8 +2,9 @@ import time
 import uuid
 
 import ips_common_db.sql as db
+import requests
 
-from ips_common.logging import log
+from ips_common.ips_logging import log
 
 from ips.persistence import data_management as idm
 from ips.services.dataimport.import_shift import import_shift_file

@@ -1,7 +1,7 @@
 from base64 import b64decode
 
 import falcon
-from ips_common.logging import log
+from ips_common.ips_logging import log
 from werkzeug.security import check_password_hash
 
 import ips.persistence.users as users

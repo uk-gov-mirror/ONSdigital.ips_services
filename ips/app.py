@@ -2,7 +2,7 @@ import logging
 
 import falcon
 from falcon_multipart.middleware import MultipartMiddleware
-from ips_common.logging import log
+from ips_common.ips_logging import log
 
 from ips.api.cancel_api import CancelApi
 from ips.api.dataimport.import_air import ImportAir

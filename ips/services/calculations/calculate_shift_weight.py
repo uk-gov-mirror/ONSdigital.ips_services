@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from ips_common.logging import log
+from ips_common.ips_logging import log
 
 OUTPUT_TABLE_NAME = 'SAS_SHIFT_WT'
 SUMMARY_TABLE_NAME = 'SAS_PS_SHIFT_DATA'

@@ -3,7 +3,7 @@ import pandas as pd
 
 # dataimport survey_support
 
-from ips_common.logging import log
+from ips_common.ips_logging import log
 
 OUTPUT_TABLE_NAME = 'SAS_MINIMUMS_WT'
 SUMMARY_TABLE_NAME = 'SAS_PS_MINIMUMS'

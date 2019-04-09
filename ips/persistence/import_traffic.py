@@ -2,7 +2,7 @@ import io
 
 import pandas
 import pandas as pd
-from ips_common.logging import log
+from ips_common.ips_logging import log
 
 import ips.services.dataimport.schemas.traffic_schema as traffic_schema
 from ips.persistence.persistence import insert_from_dataframe, delete_from_table

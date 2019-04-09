@@ -2,7 +2,7 @@ from typing import Callable, Tuple, Any
 
 import ips_common_db.sql as db
 import pandas as pd
-from ips_common.logging import log
+from ips_common.ips_logging import log
 
 
 def clear_memory_table(table: str) -> Callable[[str], None]:
