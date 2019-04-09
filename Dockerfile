@@ -4,6 +4,11 @@ FROM python:3.7.2-stretch
 COPY . /ips_services
 WORKDIR /ips_services
 
+ENV DB_SERVER=${DB_SERVER}
+ENV DB_USER_NAME=${DB_USER_NAME}
+ENV DB_PASSWORD=${DB_PASSWORD}
+ENV DB_NAME=${DB_NAME}
+
 RUN pip install -r requirements.txt && \
     apt-get update && \
     apt-get install -y --no-install-recommends apt-utils r-base && \
