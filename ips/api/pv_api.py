@@ -11,6 +11,7 @@ class PvApi(Api):
 
     @validate(run_id=validate_run_id)
     def on_get(self, req: Request, resp: Response, run_id: str) -> None:
+        resp.status = falcon.HTTP_200
         resp.body = get_process_variables(run_id)
 
     def on_post(self, req: Request, resp: Response, run_id: str) -> None:
@@ -22,8 +23,10 @@ class PvApi(Api):
             raise falcon.HTTPError(falcon.HTTP_400, 'Invalid request',
                                    'Could not decode the request body. The JSON was invalid.')
 
-        return create_process_variables(data, run_id)
+        create_process_variables(data, run_id)
+        resp.status = falcon.HTTP_201
 
     @validate(run_id=validate_run_id)
     def on_delete(self, req: Request, resp: Response, run_id: str) -> None:
-        return delete_process_variables(run_id)
+        resp.status = falcon.HTTP_200
+        delete_process_variables(run_id)

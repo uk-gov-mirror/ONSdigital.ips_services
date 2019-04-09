@@ -1,36 +1,12 @@
-import pandas as pd
-
-import ips.services.dataimport.schemas.shift_schema as shift_schema
-from ips_common.logging import log
-import ips_common_db.sql as db
+import ips.persistence.import_shift as db
+from ips.services import service
 
 
-def import_shift(file_name, file_type, run_id):
-    data_schema = shift_schema.get_schema()
+@service
+def import_shift_stream(run_id, data):
+    return db.import_shift_from_stream(run_id, data)
 
-    # Convert CSV to dataframe and stage
-    # dataframe = pd.read_csv(file_name, engine="python", dtype=data_schema)
-    dataframe = pd.read_csv(file_name)
 
-    dataframe.columns = dataframe.columns.str.upper()
-    dataframe.columns = dataframe.columns.str.replace(' ', '')
-    dataframe["RUN_ID"] = run_id
-    dataframe.rename(columns={"DATASOURCE": "DATA_SOURCE_ID"}, inplace=True)
-
-    datasource_type = file_type.name
-    datasource_id = file_type.value
-
-    datasource_id = datasource_id
-    dataframe['DATA_SOURCE_ID'].replace([datasource_type], datasource_id, inplace=True)
-
-    sql = f"""
-            DELETE FROM SHIFT_DATA
-            WHERE RUN_ID = '{run_id}'
-            """
-
-    try:
-        db.execute_sql_statement(sql)
-        db.insert_dataframe_into_table('SHIFT_DATA', dataframe)
-    except Exception as err:
-        log.error(f"Cannot insert shift_data dataframe into database: {err}")
-        return None
+@service
+def import_shift_file(run_id, nr_data_path):
+    return db.import_shift_from_file(run_id, nr_data_path)

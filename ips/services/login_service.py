@@ -1,18 +1,14 @@
+from base64 import b64decode
+
 import falcon
 from ips_common.logging import log
-from base64 import b64decode
 from werkzeug.security import check_password_hash
 
-from ips.persistence.persistence import read_table_values
-
-get_users = read_table_values('user')
+import ips.persistence.users as users
 
 
 def login(user_name: str, password: str) -> None:
-
-    data = get_users()
-
-    user_credentials = data.loc[data['username'] == user_name]
+    user_credentials = users.get_user_details(user_name)
 
     if user_credentials.empty:
         error = f"User, {user_name}, not found."
@@ -25,4 +21,3 @@ def login(user_name: str, password: str) -> None:
         error = f"Invalid password."
         log.error(error)
         raise falcon.HTTPError(falcon.HTTP_401, 'login error', error)
-

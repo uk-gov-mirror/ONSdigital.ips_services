@@ -1,36 +1,25 @@
-import pandas as pd
+from functools import partial
 
-import ips.services.dataimport.schemas.traffic_schema as traffic_schema
-from ips_common.logging import log
-import ips_common_db.sql as db
+import ips.persistence.import_traffic as db
+from ips.services import service
+from ips.services.dataimport import CSVType
 
 
-def import_traffic(file_name, file_type, run_id):
-    data_schema = traffic_schema.get_schema()
+@service
+def _import_traffic_from_stream(import_type, run_id, data):
+    return db.import_traffic_from_stream(import_type, run_id, data)
 
-    # Convert CSV to dataframe and stage
-    dataframe = pd.read_csv(file_name, engine="python", dtype=data_schema)
 
-    dataframe.columns = dataframe.columns.str.upper()
-    dataframe.columns = dataframe.columns.str.replace(' ', '')
-    dataframe["RUN_ID"] = run_id
-    dataframe.rename(columns={"DATASOURCE": "DATA_SOURCE_ID"}, inplace=True)
+@service
+def _import_traffic_from_file(import_type, run_id, survey_data_path):
+    return db.import_traffic_from_file(import_type, run_id, survey_data_path)
 
-    datasource_type = file_type.name
-    datasource_id = file_type.value
 
-    datasource_id = datasource_id
-    dataframe['DATA_SOURCE_ID'].replace([datasource_type], datasource_id, inplace=True)
+import_air_file = partial(_import_traffic_from_file, CSVType.Air)
+import_air_stream = partial(_import_traffic_from_stream, CSVType.Air)
 
-    sql = f"""
-              DELETE FROM TRAFFIC_DATA
-              WHERE RUN_ID = '{run_id}'
-              AND DATA_SOURCE_ID = '{datasource_id}'
-    """
+import_sea_file = partial(_import_traffic_from_file, CSVType.Sea)
+import_sea_stream = partial(_import_traffic_from_stream, CSVType.Sea)
 
-    try:
-        db.execute_sql_statement(sql)
-        db.insert_dataframe_into_table('TRAFFIC_DATA', dataframe)
-    except Exception as err:
-        log.error(f"Cannot insert traffic_data dataframe into database: {err}")
-        return None
+import_tunnel_file = partial(_import_traffic_from_file, CSVType.Tunnel)
+import_tunnel_stream = partial(_import_traffic_from_stream, CSVType.Tunnel)
