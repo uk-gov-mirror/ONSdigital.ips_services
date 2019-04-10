@@ -10,6 +10,8 @@ from ips.api.validation.validate import validate
 
 from ips.persistence import data_management as db
 
+from ips.services.apply_pv_service import apply_pvs
+
 
 class ApplyPVsApi(Api):
     @validate(run_id=validate_run_id) # add validation for the pv_set
@@ -26,3 +28,11 @@ class ApplyPVsApi(Api):
             return
 
         # Call the apply function here
+        # TODO: EEEEEELLLLLL!
+        in_table_name = "dummy"
+        out_table_name = "dummy"
+        in_id = "dummy"
+        dataset = "dummy"
+
+        apply_pvs(in_table_name, out_table_name, in_id, dataset, run_id)
+        resp.status = falcon.HTTP_201
