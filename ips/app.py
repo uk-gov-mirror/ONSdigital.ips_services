@@ -65,6 +65,6 @@ app.add_route("/applypvs/{run_id}/{pv_set}", ApplyPVsApi(workflow))
 
 app.add_route("/export/{run_id}/{table_name}", ExportApi(workflow))
 
-from waitress import serve
-
-serve(app, host='0.0.0.0', port=5000, threads=4)
+# from waitress import serve
+#
+# serve(app, host='0.0.0.0', port=5000, threads=4)

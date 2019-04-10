@@ -3,12 +3,10 @@ import uuid
 
 import ips_common_db.sql as db
 import requests
-
 from ips_common.ips_logging import log
 
-from ips.persistence import data_management as idm
-from ips.services.dataimport.import_shift import import_shift_file
 from ips.services.dataimport.import_non_response import import_nonresponse_file
+from ips.services.dataimport.import_shift import import_shift_file
 from ips.services.dataimport.import_survey import import_survey_file
 from ips.services.dataimport.import_traffic import import_air_file, import_sea_file, import_tunnel_file
 from ips.services.dataimport.import_unsampled import import_unsampled_file
@@ -85,32 +83,32 @@ def teardown_module(module):
 
 
 def test_workflow():
-    # endpoint = 'http://localhost:5000/ips-service/start/' + run_id
-    # log.info(f"Starting request... {endpoint}")
-    # r = requests.put(endpoint)
-    #
-    # assert (r.status_code == 200)
-    #
-    # status_endpoint = 'http://localhost:5000/ips-service/status/' + run_id
-    #
-    # done = False
-    # perc = 0
-    #
-    # while not done:
-    #     r = requests.get(status_endpoint)
-    #     assert (r.status_code == 200)
-    #     result = r.json()
-    #     perc_done = result['percentage_done']
-    #     if perc_done != perc:
-    #         log.info(f"Percentage Done: {perc_done}")
-    #         perc = perc_done
-    #     if perc_done == 100:
-    #         done = True
-    #     else:
-    #         time.sleep(10)
+    endpoint = 'http://localhost:5000/ips-service/start/' + run_id
+    log.info(f"Starting request... {endpoint}")
+    r = requests.put(endpoint)
 
+    assert (r.status_code == 200)
+
+    status_endpoint = 'http://localhost:5000/ips-service/status/' + run_id
+
+    done = False
+    perc = 0
+
+    while not done:
+        r = requests.get(status_endpoint)
+        assert (r.status_code == 200)
+        result = r.json()
+        perc_done = result['percentage_done']
+        if perc_done != perc:
+            log.info(f"Percentage Done: {perc_done}")
+            perc = perc_done
+        if perc_done == 100:
+            done = True
+        else:
+            time.sleep(10)
+
+
+def run_pytest_debug():
     from ips.services import ips_workflow
     workflow = ips_workflow.IPSWorkflow()
     workflow.run_calculations(run_id=run_id)
-
-
