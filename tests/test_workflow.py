@@ -62,24 +62,24 @@ def teardown_module(module):
     """ teardown any state that was previously setup with a setup_module
         method.
     """
-    db.delete_from_table(idm.SURVEY_SUBSAMPLE_TABLE, 'RUN_ID', '=', run_id)
-
-    # List of tables to cleanse where [RUN_ID] = RUN_ID
-    tables_to_cleanse = ['PROCESS_VARIABLE_PY',
-                         'PROCESS_VARIABLE_TESTING',
-                         'TRAFFIC_DATA',
-                         'SHIFT_DATA',
-                         'NON_RESPONSE_DATA',
-                         'UNSAMPLED_OOH_DATA',
-                         idm.SURVEY_SUBSAMPLE_TABLE]
-
-    # Try to delete from each table in list where condition.  If exception occurs,
-    # assume table is already empty, and continue deleting from tables in list.
-    for table in tables_to_cleanse:
-        try:
-            db.delete_from_table(table, 'RUN_ID', '=', run_id)
-        except Exception:
-            continue
+    # db.delete_from_table(idm.SURVEY_SUBSAMPLE_TABLE, 'RUN_ID', '=', run_id)
+    #
+    # # List of tables to cleanse where [RUN_ID] = RUN_ID
+    # tables_to_cleanse = ['PROCESS_VARIABLE_PY',
+    #                      'PROCESS_VARIABLE_TESTING',
+    #                      'TRAFFIC_DATA',
+    #                      'SHIFT_DATA',
+    #                      'NON_RESPONSE_DATA',
+    #                      'UNSAMPLED_OOH_DATA',
+    #                      idm.SURVEY_SUBSAMPLE_TABLE]
+    #
+    # # Try to delete from each table in list where condition.  If exception occurs,
+    # # assume table is already empty, and continue deleting from tables in list.
+    # for table in tables_to_cleanse:
+    #     try:
+    #         db.delete_from_table(table, 'RUN_ID', '=', run_id)
+    #     except Exception:
+    #         continue
 
     print("Duration: {}".format(time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time))))
 

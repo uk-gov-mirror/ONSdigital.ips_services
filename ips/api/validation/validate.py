@@ -16,12 +16,12 @@ class ValidationFailed(ValueError):
 
 
 def _apply_rule(func, rule, param, getval):
-    log.debug(f"Rule: function: {func.__name__}, rule: {rule.__name__}, param: {param} value: {getval(param)}")
+    log.debug(f"Rule: function: {func.__name__}, rule: {rule.__name__}, param: {param}, value: {getval(param)}")
     return rule(getval(param))
 
 
-def throw_404(error: str):
-    raise falcon.HTTPError(falcon.HTTP_400, 'Invalid request', error)
+def invalid_parameter(error: str):
+    raise falcon.HTTPError(status=falcon.HTTP_412, title='Invalid parameter', description=error)
 
 
 def validate(*name, **paramrules):
@@ -33,7 +33,7 @@ def validate(*name, **paramrules):
                 # a value that can be passed into the validation
                 # function
                 if rule.getter is None:
-                    msg = "Free rules must specify a getter. Rule={0}"
+                    msg = "Rules must specify a getter. Rule={0}"
                     msg = msg.format(rule.__class__.__name__)
                     raise ValidationProgrammingError(msg)
             funcparams = inspect.getfullargspec(func)
@@ -52,8 +52,6 @@ def validate(*name, **paramrules):
             param_names = set(param_values.keys())
             rule_names = set(paramrules.keys())
 
-            missing_rules = list(param_names - rule_names)
-
             # TODO: for optimization, move this out to a
             # variable since it's immutable for our purposes
             # if missing_rules not in [[], ['self']]:
@@ -71,9 +69,11 @@ def validate(*name, **paramrules):
             for param, rule in paramrules.items():
                 getval = param_values.get
 
-                if _apply_rule(func, rule, param, getval) is not None:
-                    # Validation was not successful
-                    return
+                try:
+                    if _apply_rule(func, rule, param, getval) is not None:
+                        raise ValidationFailed(f"Validation Failed")
+                except ValidationFailed as ve:
+                    raise invalid_parameter(f"Validation failed for parameter: [{param}], error: {str(ve)}")
 
             # Validation was successful, call the wrapped function
 
