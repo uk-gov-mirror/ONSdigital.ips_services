@@ -2,12 +2,11 @@ import time
 import uuid
 
 import ips_common_db.sql as db
+import requests
+from ips_common.ips_logging import log
 
-from ips_common.logging import log
-
-from ips.persistence import data_management as idm
-from ips.services.dataimport.import_shift import import_shift_file
 from ips.services.dataimport.import_non_response import import_nonresponse_file
+from ips.services.dataimport.import_shift import import_shift_file
 from ips.services.dataimport.import_survey import import_survey_file
 from ips.services.dataimport.import_traffic import import_air_file, import_sea_file, import_tunnel_file
 from ips.services.dataimport.import_unsampled import import_unsampled_file
@@ -38,15 +37,15 @@ def setup_module(module):
 def import_reference_data():
     log.info("-> Start data load")
 
-    import_sea_file(run_id=run_id, file_name=reference_data['Sea'])
-    import_air_file(run_id=run_id, file_name=reference_data['Air'])
-    import_tunnel_file(run_id=run_id, file_name=reference_data['Tunnel'])
+    import_sea_file(run_id, reference_data['Sea'])
+    import_air_file(run_id, reference_data['Air'])
+    import_tunnel_file(run_id, reference_data['Tunnel'])
 
-    import_shift_file(run_id=run_id, file_name=reference_data['Shift'])
-    import_nonresponse_file(frun_id=run_id, file_name=reference_data['Non Response'])
-    import_unsampled_file(run_id=run_id, file_name=reference_data['Unsampled'])
+    import_shift_file(run_id, reference_data['Shift'])
+    import_nonresponse_file(run_id, reference_data['Non Response'])
+    import_unsampled_file(run_id, reference_data['Unsampled'])
 
-    import_survey_file(survey_data_path=survey_data, run_id=run_id)
+    import_survey_file(run_id, survey_data)
 
     log.info("-> End data load")
 
@@ -61,36 +60,36 @@ def teardown_module(module):
     """ teardown any state that was previously setup with a setup_module
         method.
     """
-    db.delete_from_table(idm.SURVEY_SUBSAMPLE_TABLE, 'RUN_ID', '=', run_id)
-
-    # List of tables to cleanse where [RUN_ID] = RUN_ID
-    tables_to_cleanse = ['PROCESS_VARIABLE_PY',
-                         'PROCESS_VARIABLE_TESTING',
-                         'TRAFFIC_DATA',
-                         'SHIFT_DATA',
-                         'NON_RESPONSE_DATA',
-                         'UNSAMPLED_OOH_DATA',
-                         idm.SURVEY_SUBSAMPLE_TABLE]
-
-    # Try to delete from each table in list where condition.  If exception occurs,
-    # assume table is already empty, and continue deleting from tables in list.
-    for table in tables_to_cleanse:
-        try:
-            db.delete_from_table(table, 'RUN_ID', '=', run_id)
-        except Exception:
-            continue
+    # db.delete_from_table(idm.SURVEY_SUBSAMPLE_TABLE, 'RUN_ID', '=', run_id)
+    #
+    # # List of tables to cleanse where [RUN_ID] = RUN_ID
+    # tables_to_cleanse = ['PROCESS_VARIABLE_PY',
+    #                      'PROCESS_VARIABLE_TESTING',
+    #                      'TRAFFIC_DATA',
+    #                      'SHIFT_DATA',
+    #                      'NON_RESPONSE_DATA',
+    #                      'UNSAMPLED_OOH_DATA',
+    #                      idm.SURVEY_SUBSAMPLE_TABLE]
+    #
+    # # Try to delete from each table in list where condition.  If exception occurs,
+    # # assume table is already empty, and continue deleting from tables in list.
+    # for table in tables_to_cleanse:
+    #     try:
+    #         db.delete_from_table(table, 'RUN_ID', '=', run_id)
+    #     except Exception:
+    #         continue
 
     print("Duration: {}".format(time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time))))
 
 
 def test_workflow():
-    endpoint = 'http://localhost:8000/ips-service/start/' + run_id
+    endpoint = 'http://localhost:5000/ips-service/start/' + run_id
     log.info(f"Starting request... {endpoint}")
     r = requests.put(endpoint)
 
     assert (r.status_code == 200)
 
-    status_endpoint = 'http://localhost:8000/ips-service/status/' + run_id
+    status_endpoint = 'http://localhost:5000/ips-service/status/' + run_id
 
     done = False
     perc = 0
@@ -108,4 +107,8 @@ def test_workflow():
         else:
             time.sleep(10)
 
-#  run_calculations(run_id)
+
+def run_pytest_debug():
+    from ips.services import ips_workflow
+    workflow = ips_workflow.IPSWorkflow()
+    workflow.run_calculations(run_id=run_id)

@@ -2,7 +2,7 @@ import json
 
 import falcon
 from falcon import Request, falcon
-from ips_common.logging import log
+from ips_common.ips_logging import log
 
 from ips.services.ips_workflow import IPSWorkflow
 

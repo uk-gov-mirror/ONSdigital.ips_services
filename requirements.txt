@@ -1,7 +1,9 @@
+requests
+pytest
 falcon==1.4.1
 falcon-multipart==0.2.0
-IPS-Common-Library==0.1.15
-IPS-Common-Library-DB==0.1.5
+IPS-Common-Library==0.1.16
+IPS-Common-Library-DB==0.1.16
 numpy==1.16.2
 pandas==0.24.2
 pbr==5.1.3

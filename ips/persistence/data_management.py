@@ -1,6 +1,6 @@
 import os
 
-from ips_common.logging import log
+from ips_common.ips_logging import log
 import ips_common_db.sql as db
 from tests import common_testing_functions as ctf
 

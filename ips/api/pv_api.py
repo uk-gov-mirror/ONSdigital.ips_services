@@ -1,5 +1,5 @@
 from falcon import Request, Response, falcon
-from ips_common.logging import log
+from ips_common.ips_logging import log
 
 from ips.api.api import Api
 from ips.api.validation.validate import validate

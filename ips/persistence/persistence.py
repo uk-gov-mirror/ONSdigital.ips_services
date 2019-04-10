@@ -2,7 +2,7 @@ from typing import Callable, Tuple, Any
 
 import ips_common_db.sql as db
 import pandas as pd
-from ips_common.logging import log
+from ips_common.ips_logging import log
 
 
 def clear_memory_table(table: str) -> Callable[[str], None]:
@@ -18,6 +18,7 @@ def read_table_values(table: str) -> Callable[[], pd.DataFrame]:
     :param table: the name of the table to read from
     :return: a function that, when called will return a pandas DataFrame containing all rows in the table
     """
+
     def read():
         return db.get_table_values(table)
 
@@ -45,7 +46,10 @@ def delete_from_table(table: str) -> Callable[..., None]:
             for key, value in kwargs.items():
                 if isinstance(value, str):
                     value = '"' + value + '"'
-                val += f' WHERE {key} = {value}'
+                if i == 0:
+                    val += f' WHERE {key} = {value}'
+                else:
+                    val += f' {key} = {value}'
                 i = i + 1
                 if i != len(kwargs):
                     val += ' AND '
@@ -126,6 +130,10 @@ def insert_from_json(table: str, if_exists: str = "append") -> Callable[[str], N
         db.insert_dataframe_into_table(table, data_frame, if_exists)
 
     return insert
+
+
+def select_data(column_name: str, table_name: str, condition1: str, condition2: str):
+    return db.select_data(column_name, table_name, condition1, condition2)
 
 
 def execute_sql() -> Callable[[str], Any]:

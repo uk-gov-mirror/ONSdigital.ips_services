@@ -1,7 +1,7 @@
 import io
 
 import pandas
-from ips_common.logging import log
+from ips_common.ips_logging import log
 
 from ips.persistence.persistence import insert_from_dataframe
 

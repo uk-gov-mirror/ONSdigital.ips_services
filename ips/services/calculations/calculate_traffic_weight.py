@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from pkg_resources import resource_filename
 
-from ips_common.logging import log
+from ips_common.ips_logging import log
 import ips_common_db.sql as db
 
 SERIAL = 'SERIAL'

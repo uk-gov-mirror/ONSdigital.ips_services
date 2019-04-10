@@ -1,5 +1,5 @@
 from falcon import Request, Response, falcon
-from ips_common.logging import log
+from ips_common.ips_logging import log
 
 from ips.api.api import Api
 from ips.services.pv_sets import create_new_pv_set, get_pv_sets
@@ -20,4 +20,5 @@ class PvSetsApi(Api):
         resp.status = falcon.HTTP_201
 
     def on_get(self, req: Request, resp: Response) -> None:
+        resp.status = falcon.HTTP_200
         resp.body = get_pv_sets()

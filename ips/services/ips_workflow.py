@@ -2,7 +2,7 @@ import multiprocessing
 import os
 from typing import Dict, Callable, List, TypeVar
 
-from ips_common.logging import log
+from ips_common.ips_logging import log
 
 import ips.services.steps.air_miles as airmiles
 import ips.services.steps.fares_imputation as fares_imputation
@@ -69,7 +69,7 @@ class IPSWorkflow:
 
     def set_status(self, step: str, status: int) -> None:
         self._current_status[step] = status
-        log.info(f"Step: {step}, status: {status}")
+        log.debug(f"Step: {step}, status: {status}")
 
     def run_complete(self) -> bool:
         if len(self._current_status.keys()) != 14:

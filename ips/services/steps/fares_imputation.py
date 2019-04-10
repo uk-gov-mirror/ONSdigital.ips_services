@@ -1,9 +1,9 @@
-from ips.services.calculations import calculate_fares_imputation
-from ips.persistence import data_management as idm
-from ips.util.config.services_configuration import ServicesConfiguration
-from ips.util import process_variables
 import ips_common_db.sql as db
 
+from ips.persistence import data_management as idm
+from ips.services.calculations import calculate_fares_imputation
+from ips.util import process_variables
+from ips.util.config.services_configuration import ServicesConfiguration
 
 
 def fares_imputation_step(run_id):

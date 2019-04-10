@@ -1,10 +1,9 @@
 import io
 
 import pandas as pd
-from ips_common.logging import log
+from ips_common.ips_logging import log
 
 from ips.persistence.persistence import insert_from_dataframe, delete_from_table
-from ips.services.dataimport import CSVType
 from ips.services.dataimport.schemas import non_response_schema
 
 NON_RESPONSE_TABLE = 'NON_RESPONSE_DATA'
@@ -31,7 +30,7 @@ def _import_non_response(dataframe, run_id):
     dataframe["RUN_ID"] = run_id
     dataframe.rename(columns={"DATASOURCE": "DATA_SOURCE_ID"}, inplace=True)
 
-    dataframe['DATA_SOURCE_ID'].replace([CSVType.NonResponse.name], CSVType.NonResponse.value, inplace=True)
+    dataframe['DATA_SOURCE_ID'].replace('Non Response', 4, inplace=True)
 
     try:
         delete_non_response(run_id=run_id)

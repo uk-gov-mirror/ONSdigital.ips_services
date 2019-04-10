@@ -4,7 +4,7 @@ import numpy as np
 from pandas import DataFrame, Series
 
 from ips.services.calculations import ips_impute
-from ips_common.logging import log
+from ips_common.ips_logging import log
 
 # dataimport survey_support
 
