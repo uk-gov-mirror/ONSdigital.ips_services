@@ -34,7 +34,7 @@ def _import_traffic_data(import_type, dataframe, run_id):
     dataframe['DATA_SOURCE_ID'].replace([import_type.name], import_type.value, inplace=True)
 
     try:
-        delete_traffic(run_id=run_id)
+        delete_traffic(run_id=run_id, data_source_id=import_type.value)
         insert_traffic(dataframe)
     except Exception as err:
         log.error(f"Cannot insert traffic_data dataframe into database: {err}")

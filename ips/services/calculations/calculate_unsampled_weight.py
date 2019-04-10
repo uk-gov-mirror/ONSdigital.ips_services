@@ -181,6 +181,7 @@ def r_population_input(survey_input: pd.DataFrame, ustotals: pd.DataFrame) -> No
 
     df_mod_totals = df_mod_totals.add_prefix('T_')
 
+    # TODO: Move to persistence
     db.insert_dataframe_into_table('poprowvec_unsamp', df_mod_totals, if_exists='replace')
 
 

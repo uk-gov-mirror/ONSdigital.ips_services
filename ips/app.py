@@ -28,7 +28,7 @@ workflow = ips_workflow.IPSWorkflow()
 
 app = falcon.API(middleware=MultipartMiddleware())
 
-log.setLevel(logging.DEBUG)
+# log.setLevel(logging.DEBUG)
 
 apply_pvs = ApplyPVsApi(workflow)
 
@@ -64,6 +64,6 @@ app.add_route("/applypvs/{run_id}/{pv_set}", ApplyPVsApi(workflow))
 
 app.add_route("/export/{run_id}/{table}", ExportApi(workflow))
 
-from waitress import serve
-
-serve(app, host='0.0.0.0', port=5000, threads=4)
+# from waitress import serve
+#
+# serve(app, host='0.0.0.0', port=5000, threads=4)

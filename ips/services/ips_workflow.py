@@ -69,7 +69,7 @@ class IPSWorkflow:
 
     def set_status(self, step: str, status: int) -> None:
         self._current_status[step] = status
-        log.info(f"Step: {step}, status: {status}")
+        log.debug(f"Step: {step}, status: {status}")
 
     def run_complete(self) -> bool:
         if len(self._current_status.keys()) != 14:

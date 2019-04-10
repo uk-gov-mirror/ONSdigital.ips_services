@@ -46,7 +46,10 @@ def delete_from_table(table: str) -> Callable[..., None]:
             for key, value in kwargs.items():
                 if isinstance(value, str):
                     value = '"' + value + '"'
-                val += f' WHERE {key} = {value}'
+                if i == 0:
+                    val += f' WHERE {key} = {value}'
+                else:
+                    val += f' {key} = {value}'
                 i = i + 1
                 if i != len(kwargs):
                     val += ' AND '
