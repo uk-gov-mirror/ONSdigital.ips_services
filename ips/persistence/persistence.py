@@ -143,5 +143,5 @@ def execute_sql() -> Callable[[str], Any]:
     return execute
 
 
-def get_identity() -> Tuple:
-    return db.execute_sql_statement('SELECT @@IDENTITY AS id').first()
+def get_identity() -> str:
+    return str(db.execute_sql_statement('SELECT @@IDENTITY AS id').first()[0])
