@@ -58,7 +58,6 @@ app.add_route("/import/shift/{run_id}", ImportShift(workflow))
 app.add_route("/import/tunnel/{run_id}", ImportTunnel(workflow))
 app.add_route("/import/unsampled/{run_id}", ImportUnsampled(workflow))
 
-# TODO: ELLLL!
 app.add_route("/applypvs/{run_id}/{pv_set}", ApplyPVsApi(workflow))
 
 app.add_route("/export/{run_id}/{table_name}", ExportApi(workflow))

@@ -28,11 +28,5 @@ class ApplyPVsApi(Api):
             return
 
         # Call the apply function here
-        # TODO: EEEEEELLLLLL!
-        in_table_name = "dummy"
-        out_table_name = "dummy"
-        in_id = "dummy"
-        dataset = "dummy"
-
-        apply_pvs(in_table_name, out_table_name, in_id, dataset, run_id)
+        apply_pvs(run_id)
         resp.status = falcon.HTTP_201
