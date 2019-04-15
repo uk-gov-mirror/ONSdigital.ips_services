@@ -183,5 +183,5 @@ def execute_sql() -> Callable[[str], Any]:
     return execute
 
 
-def get_identity() -> str:
-    return str(db.execute_sql_statement('SELECT LAST_INSERT_ID() AS id').first()[0])
+def get_identity(table: str, id_column: str) -> str:
+    return str(db.execute_sql_statement(f"SELECT {id_column} FROM {table} ORDER BY {id_column} DESC LIMIT 1").first()[0])

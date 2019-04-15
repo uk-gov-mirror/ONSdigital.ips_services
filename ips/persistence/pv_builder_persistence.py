@@ -41,7 +41,8 @@ def _get_pv_build_by_runid(run_id):
 
 
 def _create_block(run_id, index, pv_id):
-    return insert_into_pv_block(Run_ID=run_id, Block_Index=index, pv_id=pv_id)
+    insert_into_pv_block(Run_ID=run_id, Block_Index=index, pv_id=pv_id)
+    return get_identity("PV_Block", "Block_ID")
 
 
 def _delete_pv_build(run_id, pv_id):
@@ -57,7 +58,8 @@ def _store_pv_bytes(run_id, pv_id, code_bytes):
 
 
 def _create_expression(block_id, index):
-    return insert_into_expressions(Block_ID=block_id, Expression_Index=index)
+    insert_into_expressions(Block_ID=block_id, Expression_Index=index)
+    return get_identity("PV_Expression", "Expression_ID")
 
 
 def _create_element(expression_id, typ, value):
@@ -70,7 +72,7 @@ def _get_index(el):
 
 def create_pv_build(request, run_id, pv_id=None):
     a = request.get_param_as_json('json')
-    pv = request.get_param('pv')
+    pv = ""
     _delete_pv_build(run_id, pv_id)
 
     setel = False
@@ -78,36 +80,39 @@ def create_pv_build(request, run_id, pv_id=None):
     for block in a:
         if type(a[block]) is dict:
             first = True
-            s = "\n"
+            pv += "\n"
             block_id = _create_block(run_id, _get_index(block), pv_id)
             print(block_id)
             for expression in a[block]:
                 expression_id = _create_expression(block_id, _get_index(expression))
                 print(expression_id)
                 for element in a[block][expression]:
-                    print(element)
+                    if a[block][expression][element] == "undefined":
+                        continue
                     _create_element(expression_id, element, a[block][expression][element].replace("\"","\\\""))
                     if element != "var":
                         a[block][expression][element] = a[block][expression][element].lower()
                     if a[block][expression][element] == "set":
                         setel = True
-                        s += ":"
+                        pv += ":"
                     else:
                         if setel:
-                            s += "\n   "
+                            pv += "\n   "
                             setel = False
                         if not first:
-                            s += " "
-                        s += a[block][expression][element]
+                            pv += " "
+                        pv += a[block][expression][element]
                     first = False
-            pv += s
         else:
             print(a[block])
-    print(pv)
-    pv_bytes = base64.b64decode(pv)
-    print(pv_bytes)
     _delete_pv_bytes(run_id, pv_id)
-    _store_pv_bytes(run_id, pv_id, pv_bytes)
+    if pv != "":
+        print(pv)
+        pv_bytes = base64.b64decode(pv)
+        print(str(pv_bytes))
+        pv_bytes = str(pv_bytes).replace("\\","\\\\")
+        pv_bytes = str(pv_bytes).replace("\"", "\\\"")
+        _store_pv_bytes(run_id, pv_id, pv_bytes)
 
 
 def get_pv_builds(run_id):
