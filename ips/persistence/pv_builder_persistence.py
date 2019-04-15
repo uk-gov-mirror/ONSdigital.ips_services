@@ -1,5 +1,6 @@
 import json
 import base64
+import time
 
 from ips.persistence.persistence import delete_from_table, execute_sql, get_identity, \
     insert_into_table, read_table_values
@@ -41,6 +42,7 @@ def _get_pv_build_by_runid(run_id):
 
 def _create_block(run_id, index, pv_id):
     insert_into_pv_block(Run_ID=run_id, Block_Index=index, pv_id=pv_id)
+    time.sleep(0.1)
     return get_identity()
 
 
@@ -58,6 +60,7 @@ def _store_pv_bytes(run_id, pv_id, code_bytes):
 
 def _create_expression(block_id, index):
     insert_into_expressions(Block_ID=block_id, Expression_Index=index)
+    time.sleep(0.1)
     return get_identity()
 
 

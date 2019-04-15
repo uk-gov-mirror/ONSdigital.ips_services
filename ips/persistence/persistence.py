@@ -144,4 +144,4 @@ def execute_sql() -> Callable[[str], Any]:
 
 
 def get_identity() -> str:
-    return str(db.execute_sql_statement('SELECT @@IDENTITY AS id').first()[0])
+    return str(db.execute_sql_statement('SELECT LAST_INSERT_ID() AS id').first()[0])
