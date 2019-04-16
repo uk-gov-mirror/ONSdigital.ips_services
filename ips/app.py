@@ -61,9 +61,6 @@ app.add_route("/import/unsampled/{run_id}", ImportUnsampled(workflow))
 
 app.add_route("/applypvs/{run_id}/{pv_set}", ApplyPVsApi(workflow))
 
-
-app.add_route("/applypvs/{run_id}/{pv_set}", ApplyPVsApi(workflow))
-
 app.add_route("/export/{run_id}/{table_name}", ExportApi(workflow))
 
 # from waitress import serve
