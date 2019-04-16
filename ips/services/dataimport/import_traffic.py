@@ -1,18 +1,42 @@
+import io
 from functools import partial
+
+import pandas as pd
+from ips_common.ips_logging import log
 
 import ips.persistence.import_traffic as db
 from ips.services import service
 from ips.services.dataimport import CSVType
+from ips.services.dataimport.schemas import traffic_schema
 
 
 @service
 def _import_traffic_from_stream(import_type, run_id, data):
-    return db.import_traffic_from_stream(import_type, run_id, data)
+    log.debug("Importing traffic data from stream")
+    return _import_traffic(import_type, run_id, io.BytesIO(data))
 
 
 @service
-def _import_traffic_from_file(import_type, run_id, survey_data_path):
-    return db.import_traffic_from_file(import_type, run_id, survey_data_path)
+def _import_traffic_from_file(import_type, run_id, data):
+    log.debug(f"Importing traffic data from file: {data}")
+    return _import_traffic(import_type, run_id, data)
+
+
+def _import_traffic(import_type, run_id, data):
+    df: pd.DataFrame = pd.read_csv(
+        data,
+        encoding="ISO-8859-1",
+        engine="python",
+        dtype=traffic_schema.get_schema()
+    )
+
+    _validate_data(df)
+    db.import_traffic_data(import_type, df, run_id)
+    return df
+
+
+def _validate_data(data: pd.DataFrame) -> bool:
+    pass
 
 
 import_air_file = partial(_import_traffic_from_file, CSVType.Air)
