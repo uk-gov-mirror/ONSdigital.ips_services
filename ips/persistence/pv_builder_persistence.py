@@ -1,12 +1,13 @@
 import json
-import marshal
+import base64
+import time
 
 from ips.persistence.persistence import delete_from_table, execute_sql, get_identity, \
-    insert_into_table, read_table_values
+    insert_into_table, insert_into_table_id, read_table_values
 
 PV_BUILDER_VARIABLES = 'G_PV_Variables'
 PV_BLOCK = 'PV_Block'
-PV_BYTES = 'PV_BYTES'
+PV_BYTES = 'PV_Bytes'
 PV_EXPRESSION = 'PV_Expression'
 PV_ELEMENT = 'PV_Element'
 
@@ -17,9 +18,9 @@ delete_bytes = delete_from_table(PV_BYTES)
 
 run_query = execute_sql()
 insert = execute_sql()
-insert_into_pv_block = insert_into_table(PV_BLOCK)
+insert_into_pv_block = insert_into_table_id(PV_BLOCK)
 insert_into_pv_bytes = insert_into_table(PV_BYTES)
-insert_into_expressions = insert_into_table(PV_EXPRESSION)
+insert_into_expressions = insert_into_table_id(PV_EXPRESSION)
 insert_into_elements = insert_into_table(PV_ELEMENT)
 
 
@@ -36,12 +37,12 @@ def _get_pv_build_by_runid(run_id):
     """
 
     data = run_query(get_sql)
-    return data.to_json(orient='records')
+    return data
 
 
 def _create_block(run_id, index, pv_id):
     insert_into_pv_block(Run_ID=run_id, Block_Index=index, pv_id=pv_id)
-    return get_identity()
+    return get_identity("PV_Block", "Block_ID")
 
 
 def _delete_pv_build(run_id, pv_id):
@@ -58,7 +59,7 @@ def _store_pv_bytes(run_id, pv_id, code_bytes):
 
 def _create_expression(block_id, index):
     insert_into_expressions(Block_ID=block_id, Expression_Index=index)
-    return get_identity()
+    return get_identity("PV_Expression", "Expression_ID")
 
 
 def _create_element(expression_id, typ, value):
@@ -70,48 +71,56 @@ def _get_index(el):
 
 
 def create_pv_build(request, run_id, pv_id=None):
-    a = json.loads(request.form.get('json'))
-    pv = request.form.get('pv')
-
+    a = request.get_param_as_json('json')
+    pv = ""
     _delete_pv_build(run_id, pv_id)
 
     setel = False
+    print(a)
     for block in a:
         if type(a[block]) is dict:
             first = True
-            s = "\n"
+            pv += "\n"
             block_id = _create_block(run_id, _get_index(block), pv_id)
+            print(block_id)
             for expression in a[block]:
                 expression_id = _create_expression(block_id, _get_index(expression))
+                print(expression_id)
                 for element in a[block][expression]:
-                    _create_element(expression_id, element, a[block][expression][element])
+                    if a[block][expression][element] == "undefined":
+                        continue
+                    _create_element(expression_id, element, a[block][expression][element].replace("\"","\\\""))
                     if element != "var":
                         a[block][expression][element] = a[block][expression][element].lower()
                     if a[block][expression][element] == "set":
                         setel = True
-                        s += ":"
+                        pv += ":"
                     else:
                         if setel:
-                            s += "\n   "
+                            pv += "\n   "
                             setel = False
                         if not first:
-                            s += " "
-                        s += a[block][expression][element]
+                            pv += " "
+                        pv += a[block][expression][element]
                     first = False
-            pv += s
         else:
             print(a[block])
-    code_obj = compile(pv, str(pv_id), 'exec')
-    code_bytes = marshal.dumps(code_obj)
     _delete_pv_bytes(run_id, pv_id)
-    _store_pv_bytes(run_id, pv_id, code_bytes)
+    if pv != "":
+        print(pv)
+        pv_bytes = base64.b64decode(pv)
+        print(str(pv_bytes))
+        pv_bytes = str(pv_bytes).replace("\\","\\\\")
+        pv_bytes = str(pv_bytes).replace("\"", "\\\"")
+        _store_pv_bytes(run_id, pv_id, pv_bytes)
 
 
 def get_pv_builds(run_id):
+    print(run_id)
     res = _get_pv_build_by_runid(run_id)
-
     arr = {}
     for row in res:
+        print(row)
         if row['PV_ID'] not in arr.keys():
             arr[row['PV_ID']] = {}
         if row['Block_ID'] not in arr[row['PV_ID']].keys():
