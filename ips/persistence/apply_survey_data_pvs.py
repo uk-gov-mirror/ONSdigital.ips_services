@@ -4,17 +4,7 @@ from ips_common.ips_logging import log
 from ips.persistence import apply_pvs_persistence as run
 from ips.persistence.persistence import read_table_values
 
-# for exec
-import random
-random.seed(123456)
-import math
-
-PROCESS_VARIABLES_TABLE = 'PROCESS_VARIABLE_PY'
-PV_CODE = 'PV_DEF'
-
 SURVEY_SUBSAMPLE_TABLE = 'SURVEY_SUBSAMPLE'
-
-get_pv = read_table_values(PROCESS_VARIABLES_TABLE)
 get_survey_subsample = read_table_values(SURVEY_SUBSAMPLE_TABLE)
 
 
@@ -37,10 +27,9 @@ def apply_pvs_to_survey_data(run_id):
 
     # Apply process variables
     dataset = 'survey'
-
-    # data = survey_data.apply(_modify_values, axis=1, args=(pv_list, dataset))
     data = run.parallelise_pvs(survey_data, pv_list, dataset)
 
+    # Cleanse
     if 'IND' in data.columns:
         data.drop(labels='IND', axis=1, inplace=True)
 
