@@ -6,7 +6,7 @@ from ips.persistence import apply_pvs_persistence as run
 def apply_pvs_to_unsamp_data(run_id, dataset):
     unsampled_data_table = 'UNSAMPLED_OOH_DATA'
 
-    # Get survey data
+    # Get reference data
     data = run.get_reference_data(unsampled_data_table, run_id=run_id)
 
     # Get process variables

@@ -1,23 +1,12 @@
 import ips_common_db.sql as db
 from ips_common.ips_logging import log
 from ips.persistence import apply_pvs_persistence as run
-# from ips.persistence.persistence import read_table_values
-
-# get_shift_data = read_table_values(SHIFT_DATA_TABLE)
-
-
-# def _get_shift_data(run_id=None):
-#     # TODO: This is similar to _get_non_response_data.  Can this be moved to apply_pvs_persistence?
-#     data = get_shift_data()
-#     data = data.loc[data['RUN_ID'] == run_id]
-#     data.drop(labels=['RUN_ID', 'YEAR', 'MONTH', 'DATA_SOURCE_ID'], axis=1, inplace=True)
-#
-#     return data
 
 
 def apply_pvs_to_shift_data(run_id, dataset):
     shift_data_table = 'SHIFT_DATA'
-    # Get survey data
+
+    # Get reference data
     data = run.get_reference_data(shift_data_table, run_id=run_id)
 
     # Get process variables
