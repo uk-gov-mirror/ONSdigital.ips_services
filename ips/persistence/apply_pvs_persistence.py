@@ -1,14 +1,14 @@
 import numpy as np
-import falcon
+import io
+import pandas
+import ips_common_db.sql as db
 from ips_common.ips_logging import log
 from ips.persistence.persistence import read_table_values
-import ips_common_db.sql as db
 from ips.persistence.pv_persistence import get_process_variables
 
 # for exec
 import random
 random.seed(123456)
-import pandas
 import math
 
 PROCESS_VARIABLES_TABLE = 'PROCESS_VARIABLE_PY'
@@ -19,7 +19,9 @@ SURVEY_SUBSAMPLE_TABLE = 'SURVEY_SUBSAMPLE'
 get_pv = read_table_values(PROCESS_VARIABLES_TABLE)
 get_survey_subsample = read_table_values(SURVEY_SUBSAMPLE_TABLE)
 
+
 def _order_to_execute_pvs():
+    # TODO: Add order column to George's PV_BYTES table
     dict = {'shift_port_grp_pv': 1,
             'weekday_end_pv': 2,
             'am_pm_night_pv': 3,
@@ -85,15 +87,13 @@ def _get_pv_list(run_id=None):
     pv_json = get_process_variables(run_id)
     pv_dataframe = pandas.read_json(pv_json)
 
-    # TODO: When PROCESS_VARIABLE_PY is swapped out for PV_BYTES, the below PV_NAME will need attention
+    # TODO: When PROCESS_VARIABLE_PY is swapped out for PV_BYTES, the below PV_NAME will need attention. Rectified by
+    #  adding ORDER column to PV_BYTES.
     for column_name, order in _order_to_execute_pvs().items():
         pv_dataframe.loc[pv_dataframe['PV_NAME'] == column_name, 'ORDER'] = order
 
     pv_dataframe.sort_values(by='ORDER', inplace=True)
     pv_dataframe.drop(labels='ORDER', axis=1, inplace=True)
-
-    # TODO: Remove after testing
-    pv_dataframe = pv_dataframe.head(2)
 
     return pv_dataframe.values.tolist()
 
@@ -101,12 +101,11 @@ def _get_pv_list(run_id=None):
 def _get_survey_data(run_id=None):
     survey_data = get_survey_subsample()
     survey_data = survey_data.loc[survey_data['RUN_ID'] == run_id]
+    survey_data.drop(labels='RUN_ID', axis=1, inplace=True)
     survey_data.fillna(value=np.NaN, inplace=True)
     survey_data.sort_values('SERIAL', inplace=True)
 
-    # TODO: Change this after testing
-    # return survey_data
-    return survey_data.head(2)
+    return survey_data
 
 
 def _modify_values(row, pvs, dataset):
@@ -158,14 +157,24 @@ def apply_pvs_to_survey_data(run_id):
     dataset = 'survey'
     data = survey_data.apply(_modify_values, axis=1, args=(pv_list, dataset))
 
+    if 'IND' in data.columns:
+        data.drop(labels='IND', axis=1, inplace=True)
+
+    if 'REGION' in data.columns:
+        data.drop(labels='REGION', axis=1, inplace=True)
+
     # Insert the dataframe to SURVEY_SUBSAMPLE
-    db.insert_dataframe_into_table(SURVEY_SUBSAMPLE_TABLE, data)
+    db.insert_dataframe_into_table('SAS_SURVEY_SUBSAMPLE', data)
 
 
 if __name__ == '__main__':
     run_id = 'EL-TEST-123'
 
-    # from ips.persistence.import_survey import import_survey_from_file
-    # import_survey_from_file(run_id, r'/Users/ThornE1/PycharmProjects/ips_services/tests/data/import_data/dec/survey_data_in_actual.csv')
+    from ips.persistence.persistence import delete_from_table
+    cleanse = delete_from_table('SURVEY_SUBSAMPLE')
+    cleanse()
+
+    from ips.persistence.import_survey import import_survey_from_file
+    import_survey_from_file(run_id, r'/Users/ThornE1/PycharmProjects/ips_services/tests/data/import_data/dec/survey_data_in_actual.csv')
 
     apply_pvs_to_survey_data(run_id)
