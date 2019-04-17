@@ -27,6 +27,7 @@ from ips.services import ips_workflow
 workflow = ips_workflow.IPSWorkflow()
 
 app = falcon.API(middleware=MultipartMiddleware())
+app.req_options.auto_parse_form_urlencoded = True;
 
 log.setLevel(logging.DEBUG)
 

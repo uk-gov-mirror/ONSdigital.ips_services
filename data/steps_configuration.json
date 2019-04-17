@@ -24,7 +24,7 @@
       "name": "NON_RESPONSE",
       "nullify_pvs": ["[NR_PORT_GRP_PV]", "[MIG_FLAG_PV]", "[NR_FLAG_PV]", "[NON_RESPONSE_WT]"],
       "pv_columns": ["'NR_PORT_GRP_PV'", "'MIG_FLAG_PV'", "'NR_FLAG_PV'"],
-      "pv_columns2": ["'NR_PORT_GRP_PV'", "'WEEKDAY_END_PV'"],
+      "pv_columns2": ["nr_port_grp_pv", "weekday_end_pv"],
       "ps_columns": ["[RUN_ID]", "[NR_PORT_GRP_PV]", "[ARRIVEDEPART]", "[WEEKDAY_END_PV]", "[MEAN_RESPS_SH_WT]", "[COUNT_RESPS]", "[PRIOR_SUM]", "[GROSS_RESP]", "[GNR]", "[MEAN_NR_WT]"],
       "results_columns": ["[NON_RESPONSE_WT]"],
       "delete_tables": ["SAS_NON_RESPONSE_WT", "SAS_PS_NON_RESPONSE"],
