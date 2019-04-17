@@ -1,4 +1,4 @@
-import ips.persistence.apply_pvs_persistence as builder
+import ips.persistence.apply_survey_data_pvs as builder
 from ips.services import service
 
 
