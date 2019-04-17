@@ -7,6 +7,7 @@ import pandas
 import ips_common_db.sql as db
 from ips_common.ips_logging import log
 from ips.persistence.pv_persistence import get_process_variables
+from ips.persistence.persistence import read_table_values
 from functools import partial
 from ips.util.config.services_configuration import ServicesConfiguration
 import sys
@@ -159,3 +160,11 @@ def parallelise_pvs(dataframe, pv_list, dataset=None):
     pool.join()
 
     return res
+
+
+def get_reference_data(table_name, run_id=None):
+    data = read_table_values(table_name)()
+    data = data.loc[data['RUN_ID'] == run_id]
+    data.drop(labels=['RUN_ID', 'YEAR', 'MONTH', 'DATA_SOURCE_ID'], axis=1, inplace=True)
+
+    return data
