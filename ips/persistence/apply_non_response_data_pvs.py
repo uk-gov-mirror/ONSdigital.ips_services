@@ -20,7 +20,7 @@ def apply_pvs_to_non_response_data(run_id):
     nr_data = _get_non_response_data(run_id)
 
     # Get process variables
-    pv_list = run.get_pv_list(run_id='TEMPLATE', reference_data=True, reference_data_name='NON_RESPONSE')
+    pv_list = run.get_pv_list(run_id='TEMPLATE', reference_data=True, reference_data_name='non_response')
 
     # Apply PVs to data
     data = run.parallelise_pvs(nr_data, pv_list)

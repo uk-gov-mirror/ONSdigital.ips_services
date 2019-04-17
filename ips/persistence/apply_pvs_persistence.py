@@ -8,16 +8,13 @@ import ips_common_db.sql as db
 from ips_common.ips_logging import log
 from ips.persistence.pv_persistence import get_process_variables
 from functools import partial
+from ips.util.config.services_configuration import ServicesConfiguration
 import sys
 
 # for exec
 import random
 random.seed(123456)
 import math
-
-with open('../../data/steps_configuration.json') as config_file:
-    STEP_CONFIG = json.load(config_file)
-
 
 def order_to_execute_pvs():
     # TODO: Add order column to George's PV_BYTES table
@@ -87,7 +84,8 @@ def get_pv_list(run_id=None, reference_data=False, reference_data_name=None):
     pv_dataframe = pandas.read_json(pv_json)
 
     if reference_data:
-        pv_names = STEP_CONFIG[reference_data_name]['pv_columns2']
+        config = ServicesConfiguration().cfg
+        pv_names = config[reference_data_name]['pv_columns2']
         pv_names = map(str.lower, pv_names)
         pv_dataframe = pv_dataframe[pv_dataframe['PV_NAME'].isin(pv_names)]
     else:
