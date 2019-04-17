@@ -10,13 +10,13 @@ from ips.services.dataimport.schemas import shift_schema
 
 @service
 def import_shift_stream(run_id, data):
-    log.debug("Importing shift data from stream")
+    log.info("Importing shift data from stream")
     return _import_shift(run_id, io.BytesIO(data))
 
 
 @service
 def import_shift_file(run_id, data_path):
-    log.debug(f"Importing shift data from file: {data_path}")
+    log.info(f"Importing shift data from file: {data_path}")
     return _import_shift(run_id, data_path)
 
 

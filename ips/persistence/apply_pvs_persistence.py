@@ -1,3 +1,5 @@
+import multiprocessing
+
 import numpy as np
 import io
 import pandas
@@ -5,9 +7,13 @@ import ips_common_db.sql as db
 from ips_common.ips_logging import log
 from ips.persistence.persistence import read_table_values
 from ips.persistence.pv_persistence import get_process_variables
+import pandas as pd
+from functools import partial
 
 # for exec
 import random
+
+from ips.services.dataimport.import_survey import import_survey_file
 random.seed(123456)
 import math
 
@@ -106,6 +112,7 @@ def _get_survey_data(run_id=None):
     survey_data.sort_values('SERIAL', inplace=True)
 
     return survey_data
+    # return survey_data.head(5)
 
 
 def _modify_values(row, pvs, dataset):
@@ -146,6 +153,29 @@ def _modify_values(row, pvs, dataset):
     return row
 
 
+def parallel_func(pv_df, pv_list, dataset):
+    return pv_df.apply(_modify_values, axis=1, args=(pv_list, dataset))
+
+
+def parallelise_pvs(dataframe, pv_list, dataset):
+    num_partitions = multiprocessing.cpu_count()
+    df_split = np.array_split(dataframe, num_partitions)
+    pool = multiprocessing.Pool(num_partitions)
+
+    res = pd.concat(
+        pool.map(
+            partial(parallel_func, pv_list=pv_list, dataset=dataset),
+            df_split
+        ),
+        sort=True
+    )
+
+    pool.close()
+    pool.join()
+
+    return res
+
+
 def apply_pvs_to_survey_data(run_id):
     # Get survey data
     survey_data = _get_survey_data(run_id)
@@ -155,7 +185,9 @@ def apply_pvs_to_survey_data(run_id):
 
     # Apply process variables
     dataset = 'survey'
-    data = survey_data.apply(_modify_values, axis=1, args=(pv_list, dataset))
+
+    # data = survey_data.apply(_modify_values, axis=1, args=(pv_list, dataset))
+    data = parallelise_pvs(survey_data, pv_list, dataset)
 
     if 'IND' in data.columns:
         data.drop(labels='IND', axis=1, inplace=True)
@@ -168,13 +200,14 @@ def apply_pvs_to_survey_data(run_id):
 
 
 if __name__ == '__main__':
+    log.info("Start test")
     run_id = 'EL-TEST-123'
 
     from ips.persistence.persistence import delete_from_table
-    cleanse = delete_from_table('SURVEY_SUBSAMPLE')
-    cleanse()
+    delete_from_table('SURVEY_SUBSAMPLE')()
+    delete_from_table('SAS_SURVEY_SUBSAMPLE')()
 
-    from ips.persistence.import_survey import import_survey_from_file
-    import_survey_from_file(run_id, r'/Users/ThornE1/PycharmProjects/ips_services/tests/data/import_data/dec/survey_data_in_actual.csv')
+    df = import_survey_file(run_id, '../../tests/data/import_data/dec/survey_data_in_actual.csv')
 
     apply_pvs_to_survey_data(run_id)
+    log.info("End test")
