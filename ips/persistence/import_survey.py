@@ -16,6 +16,5 @@ def import_survey_data(run_id, df):
     # Add the generated run id to the dataset.
     df['RUN_ID'] = pandas.Series(run_id, index=df.index)
 
-    # Insert the imported data into the survey_subsample table on the database.
     insert_ss(df)
 

@@ -9,6 +9,7 @@ from ips.persistence.persistence import read_table_values
 from ips.persistence.pv_persistence import get_process_variables
 import pandas as pd
 from functools import partial
+import sys
 
 # for exec
 import random
@@ -104,15 +105,14 @@ def _get_pv_list(run_id=None):
     return pv_dataframe.values.tolist()
 
 
-def _get_survey_data(run_id=None):
+def _get_survey_data(pv_run_id):
     survey_data = get_survey_subsample()
-    survey_data = survey_data.loc[survey_data['RUN_ID'] == run_id]
+    survey_data = survey_data.loc[survey_data['RUN_ID'] == pv_run_id]
     survey_data.drop(labels='RUN_ID', axis=1, inplace=True)
     survey_data.fillna(value=np.NaN, inplace=True)
     survey_data.sort_values('SERIAL', inplace=True)
 
     return survey_data
-    # return survey_data.head(5)
 
 
 def _modify_values(row, pvs, dataset):
@@ -207,7 +207,8 @@ if __name__ == '__main__':
     delete_from_table('SURVEY_SUBSAMPLE')()
     delete_from_table('SAS_SURVEY_SUBSAMPLE')()
 
-    df = import_survey_file(run_id, '../../tests/data/import_data/dec/survey_data_in_actual.csv')
+    import_survey_file(run_id, '../../tests/data/import_data/dec/survey_data_in_actual.csv')
 
     apply_pvs_to_survey_data(run_id)
+
     log.info("End test")
