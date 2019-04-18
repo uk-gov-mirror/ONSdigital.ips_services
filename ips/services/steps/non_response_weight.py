@@ -20,8 +20,8 @@ def non_response_weight_step(run_id):
     # Populate Survey Data For Non Response Wt
     idm.populate_survey_data_for_step(run_id, config)
 
-    # Populate Non Response Data
-    idm.populate_step_data(run_id, config)
+    # # Populate Non Response Data
+    # idm.populate_step_data(run_id, config)
 
     # Copy Non Response Wt PVs For Survey Data
     idm.copy_step_pvs_for_survey_data(run_id, config)
@@ -35,17 +35,21 @@ def non_response_weight_step(run_id):
     # Update Survey Data with Non Response Wt PVs Output
     idm.update_survey_data_with_step_pv_output(config)
 
-    # Copy Non Response Wt PVs for Non Response Data
-    idm.copy_step_pvs_for_step_data(run_id, config)
+    # # Copy Non Response Wt PVs for Non Response Data
+    # idm.copy_step_pvs_for_step_data(run_id, config)
 
-    # Apply Non Response Wt PVs On Non Response Data
-    process_variables.process(dataset='non_response',
-                              in_table_name='SAS_NON_RESPONSE_DATA',
-                              out_table_name='SAS_NON_RESPONSE_PV',
-                              in_id='REC_ID')
+    # # Apply Non Response Wt PVs On Non Response Data
+    # process_variables.process(dataset='non_response',
+    #                           in_table_name='SAS_NON_RESPONSE_DATA',
+    #                           out_table_name='SAS_NON_RESPONSE_PV',
+    #                           in_id='REC_ID')
 
-    # Update NonResponse Data With PVs Output
-    idm.update_step_data_with_step_pv_output(config)
+    # # Update NonResponse Data With PVs Output
+    # idm.update_step_data_with_step_pv_output(config)
+
+    # TODO: Under construction!
+    from ips.persistence import apply_non_response_data_pvs as apply_pvs
+    apply_pvs.apply_pvs_to_non_response_data(run_id)
 
     # Retrieve data from SQL
     survey_data = db.get_table_values(idm.SAS_SURVEY_SUBSAMPLE_TABLE)
@@ -70,3 +74,42 @@ def non_response_weight_step(run_id):
 
     # Store Non Response Wt Summary
     idm.store_step_summary(run_id, config)
+
+
+if __name__ == '__main__':
+    from ips_common.ips_logging import log
+    log.info("Start test")
+    run_id = 'TEMPLATE'
+
+    # Cleanse Shift reference
+    from ips.persistence.persistence import delete_from_table
+    delete_from_table('SHIFT_DATA')()
+    delete_from_table('SAS_SHIFT_DATA')()
+
+    # Cleanse NR reference
+    from ips.persistence.persistence import delete_from_table
+    delete_from_table('NON_RESPONSE_DATA')()
+    delete_from_table('SAS_NON_RESPONSE_DATA')()
+
+    # Cleanse data
+    from ips.persistence.persistence import delete_from_table
+    delete_from_table('SURVEY_SUBSAMPLE')()
+    delete_from_table('SAS_SURVEY_SUBSAMPLE')()
+
+    # Import survey
+    from ips.services.dataimport.import_survey import import_survey_file
+    df = import_survey_file(run_id, '../../tests/data/import_data/dec/survey_data_in_actual.csv')
+
+    # Import Shift reference
+    from ips.services.dataimport.import_shift import import_shift_file
+    df = import_shift_file(run_id, '../../tests/data/import_data/dec/Poss shifts Dec 2017.csv')
+
+    # Import NR reference
+    from ips.services.dataimport.import_non_response import import_nonresponse_file
+    df = import_nonresponse_file(run_id, '../../tests/data/import_data/dec/Dec17_NR.csv')
+
+    from ips.services.steps import shift_weight
+    shift_weight.shift_weight_step(run_id)
+    non_response_weight_step(run_id)
+
+    log.info("End test")

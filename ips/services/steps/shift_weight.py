@@ -21,8 +21,8 @@ def shift_weight_step(run_id):
     # Populate Survey Data For Shift Wt
     idm.populate_survey_data_for_step(run_id, config)
 
-    # Populate Shift Data
-    idm.populate_step_data(run_id, config)
+    # # Populate Shift Data
+    # idm.populate_step_data(run_id, config)
 
     # Copy Shift Wt PVs For Survey Data
     idm.copy_step_pvs_for_survey_data(run_id, config)
@@ -36,17 +36,21 @@ def shift_weight_step(run_id):
     # Update Survey Data with Shift Wt PV Output
     idm.update_survey_data_with_step_pv_output(config)
 
-    # Copy Shift Wt PVs For Shift Data
-    idm.copy_step_pvs_for_step_data(run_id, config)
+    # # Copy Shift Wt PVs For Shift Data
+    # idm.copy_step_pvs_for_step_data(run_id, config)
 
-    # Apply Shift Wt PVs On Shift Data
-    process_variables.process(dataset='shift',
-                              in_table_name='SAS_SHIFT_DATA',
-                              out_table_name='SAS_SHIFT_PV',
-                              in_id='REC_ID')
+    # # Apply Shift Wt PVs On Shift Data
+    # process_variables.process(dataset='shift',
+    #                           in_table_name='SAS_SHIFT_DATA',
+    #                           out_table_name='SAS_SHIFT_PV',
+    #                           in_id='REC_ID')
+    #
+    # TODO: Under construction!
+    from ips.persistence import apply_shift_data_pvs as apply_pvs
+    apply_pvs.apply_pvs_to_shift_data(run_id)
 
-    # Update Shift Data with PVs Output
-    idm.update_step_data_with_step_pv_output(config)
+    # # Update Shift Data with PVs Output
+    # idm.update_step_data_with_step_pv_output(config)
 
     # Retrieve data from SQL
     survey_data = db.get_table_values(idm.SAS_SURVEY_SUBSAMPLE_TABLE)

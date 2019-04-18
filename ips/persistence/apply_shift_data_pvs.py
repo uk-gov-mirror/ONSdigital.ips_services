@@ -21,7 +21,7 @@ def apply_pvs_to_shift_data(run_id):
     data = _get_shift_data(run_id)
 
     # Get process variables
-    pv_list = run.get_pv_list(run_id='TEMPLATE', reference_data=True, reference_data_name='shift_weight')
+    pv_list = run.get_pv_list(run_id=run_id, reference_data=True, reference_data_name='shift_weight')
 
     # Apply PVs to data
     dataset = 'shift'
