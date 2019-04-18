@@ -18,13 +18,13 @@ def non_response_weight_step(run_id):
     config = ServicesConfiguration().get_non_response()
 
     # Populate Survey Data For Non Response Wt
-    idm.populate_survey_data_for_step(run_id, config)
+    idm.populate_survey_data_for_step(run_id, config) # move to file load
 
     # Populate Non Response Data
-    idm.populate_step_data(run_id, config)
+    idm.populate_step_data(run_id, config) # move to file load
 
     # Copy Non Response Wt PVs For Survey Data
-    idm.copy_step_pvs_for_survey_data(run_id, config)
+    idm.copy_step_pvs_for_survey_data(run_id, config) # move to load
 
     # Apply Non Response Wt PVs On Survey Data
     process_variables.process(dataset='survey',
