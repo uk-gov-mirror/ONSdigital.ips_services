@@ -5,6 +5,7 @@ from ips.persistence import apply_pvs_persistence as run
 
 def apply_pvs_to_unsamp_data(run_id, dataset):
     unsampled_data_table = 'UNSAMPLED_OOH_DATA'
+    delete_from_table(unsampled_data_table)(run_id=run_id)
 
     # Get reference data
     data = run.get_reference_data(unsampled_data_table, run_id=run_id)
@@ -21,14 +22,13 @@ def apply_pvs_to_unsamp_data(run_id, dataset):
 
 if __name__ == '__main__':
     log.info("Start test")
-    run_id = 'EL-TEST-123'
+    test_run_id = 'EL-TEST-123'
 
     from ips.persistence.persistence import delete_from_table
-    delete_from_table('UNSAMPLED_OOH_DATA')()
     delete_from_table('SAS_UNSAMPLED_OOH_DATA')()
 
     from ips.services.dataimport.import_unsampled import import_unsampled_file
-    df = import_unsampled_file(run_id, '../../tests/data/import_data/dec/Unsampled Traffic Dec 2017.csv')
+    df = import_unsampled_file(test_run_id, '../../tests/data/import_data/dec/Unsampled Traffic Dec 2017.csv')
 
-    apply_pvs_to_unsamp_data(run_id, dataset='unsampled')
+    apply_pvs_to_unsamp_data(test_run_id, dataset='unsampled')
     log.info("End test")

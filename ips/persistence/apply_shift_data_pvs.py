@@ -2,10 +2,12 @@ import ips_common_db.sql as db
 from ips_common.ips_logging import log
 from ips.persistence import apply_pvs_persistence as run
 
+shift_data_table = 'SHIFT_DATA'
+
 
 def apply_pvs_to_shift_data(run_id, dataset):
-    shift_data_table = 'SHIFT_DATA'
 
+    delete_from_table(shift_data_table)(run_id=run_id)
     # Get reference data
     data = run.get_reference_data(shift_data_table, run_id=run_id)
 
@@ -22,14 +24,13 @@ def apply_pvs_to_shift_data(run_id, dataset):
 
 if __name__ == '__main__':
     log.info("Start test")
-    run_id = 'EL-TEST-123'
+    test_run_id = 'EL-TEST-123'
 
     from ips.persistence.persistence import delete_from_table
-    delete_from_table('SHIFT_DATA')()
     delete_from_table('SAS_SHIFT_DATA')()
 
     from ips.services.dataimport.import_shift import import_shift_file
-    df = import_shift_file(run_id, '../../tests/data/import_data/dec/Poss shifts Dec 2017.csv')
+    df = import_shift_file(test_run_id, '../../tests/data/import_data/dec/Poss shifts Dec 2017.csv')
 
-    apply_pvs_to_shift_data(run_id, dataset='shift')
+    apply_pvs_to_shift_data(test_run_id, dataset='shift')
     log.info("End test")

@@ -3,6 +3,8 @@ import multiprocessing
 import numpy as np
 import pandas
 from ips_common.ips_logging import log
+from ips_common_db.sql import delete_from_table
+
 from ips.persistence.pv_persistence import get_process_variables
 from ips.persistence.persistence import read_table_values
 from functools import partial
@@ -13,6 +15,7 @@ import random
 random.seed(123456)
 import math
 
+# This has to be global to be shared across sub-processes
 compiled_pv_list = []
 
 
@@ -144,10 +147,8 @@ def parallel_func(pv_df, dataset=None):
 
 
 def compile_pvs(pv_list):
-    log.info("start PV compile")
     for pv in pv_list:
         pv[1] = compile(pv[1], 'pv', 'exec')
-    log.info("end PV compile")
     return pv_list
 
 

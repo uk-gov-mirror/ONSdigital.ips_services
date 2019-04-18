@@ -1,11 +1,14 @@
 import ips_common_db.sql as db
 from ips_common.ips_logging import log
+
 from ips.persistence import apply_pvs_persistence as run
+
+non_response_data_table = 'NON_RESPONSE_DATA'
 
 
 def apply_pvs_to_non_response_data(run_id, dataset=None):
     # TODO: This function can be used for Shift, NR and Unsamp
-    non_response_data_table = 'NON_RESPONSE_DATA'
+    delete_from_table(non_response_data_table)(run_id=run_id)
 
     # Get reference data
     nr_data = run.get_reference_data(non_response_data_table, run_id=run_id)
@@ -22,14 +25,16 @@ def apply_pvs_to_non_response_data(run_id, dataset=None):
 
 if __name__ == '__main__':
     log.info("Start test")
-    run_id = 'EL-TEST-123'
+    test_run_id = 'EL-TEST-123'
 
     from ips.persistence.persistence import delete_from_table
+
     delete_from_table('NON_RESPONSE_DATA')()
     delete_from_table('SAS_NON_RESPONSE_DATA')()
 
     from ips.services.dataimport.import_non_response import import_nonresponse_file
-    df = import_nonresponse_file(run_id, '../../tests/data/import_data/dec/Dec17_NR.csv')
 
-    apply_pvs_to_non_response_data(run_id)
+    df = import_nonresponse_file(test_run_id, '../../tests/data/import_data/dec/Dec17_NR.csv')
+
+    apply_pvs_to_non_response_data(test_run_id)
     log.info("End test")

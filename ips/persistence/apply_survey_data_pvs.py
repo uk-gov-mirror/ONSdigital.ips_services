@@ -19,7 +19,8 @@ def _get_survey_data(run_id=None):
 
 
 def apply_pvs_to_survey_data(run_id):
-    # Get survey data
+
+    delete_from_table('SURVEY_SUBSAMPLE')(run_id=run_id)
     survey_data = _get_survey_data(run_id)
 
     # Get process variables
@@ -42,14 +43,13 @@ def apply_pvs_to_survey_data(run_id):
 
 if __name__ == '__main__':
     log.info("Start test")
-    run_id = 'EL-TEST-123'
+    test_run_id = 'EL-TEST-123'
 
     from ips.persistence.persistence import delete_from_table
-    delete_from_table('SURVEY_SUBSAMPLE')()
     delete_from_table('SAS_SURVEY_SUBSAMPLE')()
 
     from ips.services.dataimport.import_survey import import_survey_file
-    df = import_survey_file(run_id, '../../tests/data/import_data/dec/survey_data_in_actual.csv')
+    df = import_survey_file(test_run_id, '../../tests/data/import_data/dec/survey_data_in_actual.csv')
 
-    apply_pvs_to_survey_data(run_id)
+    apply_pvs_to_survey_data(test_run_id)
     log.info("End test")

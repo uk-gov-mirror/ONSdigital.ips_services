@@ -35,24 +35,28 @@ def delete_from_table(table: str) -> Callable[..., None]:
     """
 
     def delete(**kwargs):
-        val = f"DELETE FROM {table}"
-        if len(kwargs) == 1:
-            key, value = kwargs.popitem()
-            if isinstance(value, str):
-                value = '"' + value + '"'
-            val += f' WHERE {key} = {value}'
+        if len(kwargs) == 0:
+            val = f"TRUNCATE {table}"
         else:
-            i = 0
-            for key, value in kwargs.items():
+            val = f"DELETE FROM {table}"
+
+            if len(kwargs) == 1:
+                key, value = kwargs.popitem()
                 if isinstance(value, str):
                     value = '"' + value + '"'
-                if i == 0:
-                    val += f' WHERE {key} = {value}'
-                else:
-                    val += f' {key} = {value}'
-                i = i + 1
-                if i != len(kwargs):
-                    val += ' AND '
+                val += f' WHERE {key} = {value}'
+            else:
+                i = 0
+                for key, value in kwargs.items():
+                    if isinstance(value, str):
+                        value = '"' + value + '"'
+                    if i == 0:
+                        val += f' WHERE {key} = {value}'
+                    else:
+                        val += f' {key} = {value}'
+                    i = i + 1
+                    if i != len(kwargs):
+                        val += ' AND '
 
         log.debug(val)
 
