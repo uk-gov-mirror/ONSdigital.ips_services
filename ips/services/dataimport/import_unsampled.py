@@ -10,13 +10,13 @@ from ips.services.dataimport.schemas import unsampled_schema
 
 @service
 def import_unsampled_stream(run_id, data):
-    log.debug("Importing unsampled data from stream")
+    log.info("Importing unsampled data from stream")
     return _import_unsampled(run_id, io.BytesIO(data))
 
 
 @service
 def import_unsampled_file(run_id, data):
-    log.debug(f"Importing unsampled data from file: {data}")
+    log.info(f"Importing unsampled data from file: {data}")
     return _import_unsampled(run_id, data)
 
 

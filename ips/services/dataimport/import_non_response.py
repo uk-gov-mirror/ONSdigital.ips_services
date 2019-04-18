@@ -10,13 +10,13 @@ from ips.services.dataimport.schemas import non_response_schema
 
 @service
 def import_nonresponse_stream(run_id, data):
-    log.debug(f"Importing non_response data from stream")
+    log.info(f"Importing non_response data from stream")
     return _import_non_response(run_id, io.BytesIO(data))
 
 
 @service
 def import_nonresponse_file(run_id, nr_data_path):
-    log.debug(f"Importing non_response data from file {nr_data_path}")
+    log.info(f"Importing non_response data from file {nr_data_path}")
     return _import_non_response(run_id, nr_data_path)
 
 

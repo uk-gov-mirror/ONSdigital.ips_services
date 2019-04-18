@@ -24,5 +24,3 @@ class ApplyPVsApi(Api):
             resp.status = falcon.HTTP_401
             resp.body = json.dumps(result)
             return
-
-        # Call the apply function here
