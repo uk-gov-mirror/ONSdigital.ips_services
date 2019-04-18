@@ -1,6 +1,5 @@
 import json
 import base64
-import time
 
 from ips.persistence.persistence import delete_from_table, execute_sql, get_identity, \
     insert_into_table, insert_into_table_id, read_table_values
@@ -72,7 +71,7 @@ def _get_index(el):
 
 def create_pv_build(request, run_id, pv_id=None):
     a = request.get_param_as_json('json')
-    pv = ""
+    pv = request.get_param('pv')
     _delete_pv_build(run_id, pv_id)
 
     setel = False
@@ -107,12 +106,10 @@ def create_pv_build(request, run_id, pv_id=None):
             print(a[block])
     _delete_pv_bytes(run_id, pv_id)
     if pv != "":
-        print(pv)
-        pv_bytes = base64.b64decode(pv)
-        print(str(pv_bytes))
-        pv_bytes = str(pv_bytes).replace("\\","\\\\")
-        pv_bytes = str(pv_bytes).replace("\"", "\\\"")
-        _store_pv_bytes(run_id, pv_id, pv_bytes)
+        pv = pv.replace("\\","\\\\")
+        pv = pv.replace("\"", "\\\"")
+        pv = pv.replace("%", "%%")
+        _store_pv_bytes(run_id, pv_id, pv)
 
 
 def get_pv_builds(run_id):
