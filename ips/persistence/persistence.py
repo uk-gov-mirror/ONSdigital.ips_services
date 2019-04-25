@@ -150,3 +150,49 @@ def execute_sql() -> Callable[[str], Any]:
 def get_identity(table: str, id_column: str) -> str:
     return str(
         db.execute_sql_statement(f"SELECT {id_column} FROM {table} ORDER BY {id_column} DESC LIMIT 1").first()[0])
+
+
+def insert_into_table_id(table: str) -> Callable[..., None]:
+    """
+        A closure that takes the name of a table to insert into. and returns a function for that table that can be
+        called with any number of key/values that are mapped to table columes and their values as select predicates
+    :param table: the name of the table to insert
+    :return: a function that, when called will insert key/value items into the table
+    """
+
+    def insert(**kwargs):
+        val = f"INSERT INTO {table} ("
+        if len(kwargs) == 1:
+            key, value = kwargs.popitem()
+            if isinstance(value, str):
+                value = '"' + value + '"'
+            val += f' {key}) VALUES({value})'
+        else:
+            i = 0
+            for key, _ in kwargs.items():
+                val += key
+                i = i + 1
+                if i != len(kwargs):
+                    val += ', '
+                else:
+                    val += ') VALUES ('
+            i = 0
+            for _, value in kwargs.items():
+                if isinstance(value, str):
+                    value = '"' + value + '"'
+                val += value
+                i = i + 1
+                if i != len(kwargs):
+                    val += ', '
+                else:
+                    val += ') '
+
+        log.debug(val)
+        return execute_sql_statement_id(val)
+
+    return insert
+
+
+def execute_sql_statement_id(sq):
+    execute_sql()(sq)
+    return execute_sql()("SELECT @@IDENTITY AS id")

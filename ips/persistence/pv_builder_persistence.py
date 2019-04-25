@@ -1,5 +1,4 @@
 import json
-import base64
 
 from ips.persistence.persistence import delete_from_table, execute_sql, get_identity, \
     insert_into_table, insert_into_table_id, read_table_values
