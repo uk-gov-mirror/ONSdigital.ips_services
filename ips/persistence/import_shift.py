@@ -19,6 +19,7 @@ def import_shift_data(run_id, dataframe):
     try:
         delete_shift(run_id=run_id)
         insert_shift(dataframe)
+
     except Exception as err:
         log.error(f"Cannot insert shift_data dataframe into database: {err}")
         return None

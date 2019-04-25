@@ -7,6 +7,7 @@ from ips_common.ips_logging import log
 from ips.services.ips_workflow import IPSWorkflow
 
 
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 class Api:
     def __init__(self, wf: IPSWorkflow):
         self.workflow = wf

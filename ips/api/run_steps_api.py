@@ -9,6 +9,7 @@ from ips.api.validation.validate_step_value import validate_step_value
 from ips.services.run_steps_service import create_run_steps, edit_run_steps, get_run_steps
 
 
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 class RunStepsApi(Api):
 
     @validate(run_id=validate_run_id)
@@ -29,6 +30,7 @@ class RunStepsValueApi(Api):
         resp.status = falcon.HTTP_200
 
 
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 class RunStepsValueStepApi(Api):
 
     @validate(run_id=validate_run_id, step_value=validate_step_value, step=validate_step)

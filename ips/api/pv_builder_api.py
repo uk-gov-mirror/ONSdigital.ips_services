@@ -4,6 +4,7 @@ from ips.api.api import Api
 from ips.services.pv_builder_service import create_pv_build, get_pv_builds, get_pv_build_variables
 
 
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 class PvBuilderApi(Api):
 
     def on_post(self, req: Request, resp: Response, run_id, pv_id) -> None:
@@ -16,6 +17,7 @@ class PvBuilderApi(Api):
         resp.body = b
 
 
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 class PvBuilderVariablesApi(Api):
 
     def on_get(self, req: Request, resp: Response) -> None:

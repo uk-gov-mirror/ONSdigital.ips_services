@@ -1,12 +1,15 @@
 import os
 
 from ips_common.ips_logging import log
-import ips_common_db.sql as db
-from tests import common_testing_functions as ctf
+from ips.persistence.persistence import delete_from_table, insert_into_table, select_data
+from ips.persistence.persistence import execute_sql as exec_sql
 
 SURVEY_SUBSAMPLE_TABLE = "SURVEY_SUBSAMPLE"
 SAS_SURVEY_SUBSAMPLE_TABLE = "SAS_SURVEY_SUBSAMPLE"
 SAS_PROCESS_VARIABLES_TABLE = "SAS_PROCESS_VARIABLE"
+
+clear_subsample = delete_from_table(SAS_SURVEY_SUBSAMPLE_TABLE)
+execute_sql = exec_sql()
 
 COLUMNS_TO_MOVE = [
     'SERIAL', 'AGE', 'AM_PM_NIGHT', 'ANYUNDER16', 'APORTLATDEG', 'APORTLATMIN', 'APORTLATSEC',
@@ -56,6 +59,8 @@ def nullify_survey_subsample_values(run_id: str, pv_values):
     Returns      : NA
     """
 
+    # insert_into_pv_bytes(Run_ID=run_id, PV_Bytes=str(code_bytes), PV_ID=pv_id)
+
     # Construct string for SQL statement
     columns_to_null = []
     for item in pv_values:
@@ -69,7 +74,7 @@ def nullify_survey_subsample_values(run_id: str, pv_values):
 
     # Execute and commits the SQL command
 
-    db.execute_sql_statement(sql)
+    execute_sql(sql)
 
 
 def move_survey_subsample_to_sas_table(run_id, step_name):
@@ -100,7 +105,7 @@ def move_survey_subsample_to_sas_table(run_id, step_name):
         AND RESPNSE {respnse})
     """
 
-    db.execute_sql_statement(sql)
+    execute_sql(sql)
 
 
 def populate_survey_data_for_step(run_id, step_configuration):
@@ -115,10 +120,10 @@ def populate_survey_data_for_step(run_id, step_configuration):
     """
 
     # Cleanse tables as applicable
-    db.delete_from_table(SAS_SURVEY_SUBSAMPLE_TABLE)
+    clear_subsample()
 
     for table in step_configuration["delete_tables"]:
-        db.delete_from_table(table)
+        delete_from_table(table)()
 
     nullify_survey_subsample_values(run_id, step_configuration["nullify_pvs"])
     move_survey_subsample_to_sas_table(run_id, step_configuration["name"])
@@ -146,7 +151,7 @@ def populate_step_data(run_id, step_configuration):
     calc_columns = ", ".join(map(str, calc_cols))
 
     # Cleanse temp table
-    db.delete_from_table(data_table)
+    delete_from_table(data_table)()
 
     # Create and execute SQL statement
     sql = f"""
@@ -157,7 +162,7 @@ def populate_step_data(run_id, step_configuration):
         WHERE RUN_ID = '{run_id}'
     """
 
-    db.execute_sql_statement(sql)
+    execute_sql(sql)
 
 
 def copy_step_pvs_for_survey_data(run_id, step_configuration):
@@ -174,8 +179,8 @@ def copy_step_pvs_for_survey_data(run_id, step_configuration):
     spv_table = step_configuration["spv_table"]
 
     # Cleanse tables
-    db.delete_from_table(SAS_PROCESS_VARIABLES_TABLE)
-    db.delete_from_table(spv_table)
+    delete_from_table(SAS_PROCESS_VARIABLES_TABLE)()
+    delete_from_table(spv_table)()
 
     step = step_configuration["name"]
 
@@ -189,7 +194,7 @@ def copy_step_pvs_for_survey_data(run_id, step_configuration):
             FROM PROCESS_VARIABLE_PY AS PV WHERE PV.RUN_ID = '{run_id}' 
             AND UPPER(PV.PV_NAME) IN ('{item}'))
         """
-        db.execute_sql_statement(sql)
+        execute_sql(sql)
 
 
 def update_survey_data_with_step_pv_output(step_configuration):
@@ -216,17 +221,17 @@ def update_survey_data_with_step_pv_output(step_configuration):
             WHERE SSS.SERIAL = CALC.SERIAL
         """
 
-    db.execute_sql_statement(sql)
+    execute_sql(sql)
 
     # Cleanse temp tables
-    db.delete_from_table(SAS_PROCESS_VARIABLES_TABLE)
-    db.delete_from_table(spv_table)
+    delete_from_table(SAS_PROCESS_VARIABLES_TABLE)()
+    delete_from_table(spv_table)()
 
     # code specific to minimums weight function/step
     # TODO: consider moving this out to another function called by minimum weight
     if step_configuration["name"] == "MINIMUMS_WEIGHT":
-        db.delete_from_table(step_configuration["temp_table"])
-        db.delete_from_table(step_configuration["sas_ps_table"])
+        delete_from_table(step_configuration["temp_table"])()
+        delete_from_table(step_configuration["sas_ps_table"])()
 
 
 def copy_step_pvs_for_step_data(run_id, step_configuration):
@@ -241,8 +246,8 @@ def copy_step_pvs_for_step_data(run_id, step_configuration):
     """
 
     # Cleanse temp tables
-    db.delete_from_table(SAS_PROCESS_VARIABLES_TABLE)
-    db.delete_from_table(step_configuration["pv_table"])
+    delete_from_table(SAS_PROCESS_VARIABLES_TABLE)()
+    delete_from_table(step_configuration["pv_table"])()
 
     # Construct and execute SQL statements as applicable
     if step_configuration["name"] == 'UNSAMPLED_WEIGHT':
@@ -256,7 +261,7 @@ def copy_step_pvs_for_step_data(run_id, step_configuration):
                      WHERE pv.RUN_ID = '{run_id}'
                      AND UPPER(pv.PV_NAME) in ('{item}'))
                  """)
-            db.execute_sql_statement(sql)
+            execute_sql(sql)
             order = order + 1
     else:
         cols = []
@@ -272,7 +277,7 @@ def copy_step_pvs_for_step_data(run_id, step_configuration):
                 WHERE pv.RUN_ID = '{run_id}'
                 AND UPPER(pv.PV_NAME) in ({pv_columns})) 
         """
-        db.execute_sql_statement(sql)
+        execute_sql(sql)
 
 
 def update_step_data_with_step_pv_output(step_configuration):
@@ -300,13 +305,13 @@ def update_step_data_with_step_pv_output(step_configuration):
             WHERE SSS.REC_ID = CALC.REC_ID
             """
 
-    db.execute_sql_statement(sql)
+    execute_sql(sql)
 
     # Cleanse temporary tables
-    db.delete_from_table(step_configuration["pv_table"])
-    db.delete_from_table(step_configuration["temp_table"])
-    db.delete_from_table(SAS_PROCESS_VARIABLES_TABLE)
-    db.delete_from_table(step_configuration["sas_ps_table"])
+    delete_from_table(step_configuration["pv_table"])()
+    delete_from_table(step_configuration["temp_table"])()
+    delete_from_table(SAS_PROCESS_VARIABLES_TABLE)()
+    delete_from_table(step_configuration["sas_ps_table"])()
 
 
 def sql_update_statement(table_to_update_from, columns_to_update):
@@ -334,7 +339,7 @@ def sql_update_statement(table_to_update_from, columns_to_update):
 
 def update_green(table, results_columns):
     sql1 = sql_update_statement(table, results_columns)
-    db.execute_sql_statement(sql1)
+    execute_sql(sql1)
 
 
 def update_imbalance_weights(table, results_columns):
@@ -344,8 +349,8 @@ def update_imbalance_weights(table, results_columns):
             SET IMBAL_WT = 1.00
                 WHERE IMBAL_WT IS NULL
             """
-    db.execute_sql_statement(sql1)
-    db.execute_sql_statement(sql2)
+    execute_sql(sql1)
+    execute_sql(sql2)
 
 
 def update_stay_imputation(table, results_columns):
@@ -356,8 +361,8 @@ def update_stay_imputation(table, results_columns):
             SET STAY = NUMNIGHTS
                 WHERE SERIAL NOT IN (SELECT SERIAL FROM SAS_STAY_IMP)
     """
-    db.execute_sql_statement(sql1)
-    db.execute_sql_statement(sql2)
+    execute_sql(sql1)
+    execute_sql(sql2)
 
 
 def update_spend_imputation(table, results_columns):
@@ -370,8 +375,8 @@ def update_spend_imputation(table, results_columns):
     """
 
     sql2 = sql_update_statement(table, results_columns)
-    db.execute_sql_statement(sql1)
-    db.execute_sql_statement(sql2)
+    execute_sql(sql1)
+    execute_sql(sql2)
 
 
 def update_others(table):
@@ -381,7 +386,7 @@ def update_others(table):
             WHERE ({SAS_SURVEY_SUBSAMPLE_TABLE}.SERIAL = {table}.SERIAL)
                 AND {table}.SPEND >=0
         """
-    db.execute_sql_statement(sql1)
+    execute_sql(sql1)
 
 
 def update_survey_data_with_step_results(step_configuration):
@@ -433,7 +438,7 @@ def update_survey_data_with_step_results(step_configuration):
     else:
         update_others(table)
 
-    db.delete_from_table(table)
+    delete_from_table(table)()
 
 
 def store_survey_data_with_step_results(run_id, step_configuration):
@@ -463,10 +468,7 @@ def store_survey_data_with_step_results(run_id, step_configuration):
                 WHERE SS.SERIAL = SSS.SERIAL AND SS.RUN_ID = '{run_id}'
     """
 
-    db.execute_sql_statement(sql)
-
-    if os.getenv("POPULATE_TEST_DATA") == 'True':
-        ctf.populate_test_data(SURVEY_SUBSAMPLE_TABLE, run_id, step_configuration, dataset='survey')
+    execute_sql(sql)
 
     # Cleanse summary and subsample tables as applicable
     ps_tables_to_delete = [
@@ -480,9 +482,9 @@ def store_survey_data_with_step_results(run_id, step_configuration):
     ]
 
     if step in ps_tables_to_delete:
-        db.delete_from_table(step_configuration["ps_table"], "RUN_ID", "=", run_id)
+        delete_from_table(step_configuration["ps_table"])(run_id=run_id)
 
-    db.delete_from_table(SAS_SURVEY_SUBSAMPLE_TABLE)
+    delete_from_table(SAS_SURVEY_SUBSAMPLE_TABLE)()
 
 
 def store_step_summary(run_id, step_configuration):
@@ -501,7 +503,7 @@ def store_step_summary(run_id, step_configuration):
     sas_ps_table = step_configuration["sas_ps_table"]
 
     # Cleanse summary table as applicable
-    db.delete_from_table(ps_table, "RUN_ID", "=", run_id)
+    delete_from_table(ps_table)(run_id=run_id)
 
     # Create selection string
     selection = [col for col in step_configuration["ps_columns"] if col != "RUN_ID"]
@@ -514,19 +516,17 @@ def store_step_summary(run_id, step_configuration):
             SELECT '{run_id}', {selection} FROM {sas_ps_table}
     """
 
-    db.execute_sql_statement(sql)
-
-    if os.getenv("POPULATE_TEST_DATA") == 'True':
-        ctf.populate_test_data(ps_table, run_id, step_configuration, dataset='summary')
+    execute_sql(sql)
 
     # Cleanse temporary summary table
-    db.delete_from_table(sas_ps_table)
+    delete_from_table(sas_ps_table)()
 
 
 def is_valid_run_id(run_id: str) -> bool:
-    sql = f"select run_id from SURVEY_SUBSAMPLE where run_id = '{run_id}'"
-    result = db.execute_sql_statement(sql).first()
-    if result is not None:
+
+    df = select_data(column_name="run_id", table_name='SURVEY_SUBSAMPLE', condition1="RUN_ID", condition2=run_id)
+
+    if df.count() != 0:
         return True
     else:
         return False

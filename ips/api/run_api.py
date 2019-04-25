@@ -8,6 +8,7 @@ from ips.api.validation.validate_run_id import validate_run_id
 from ips.services.runs_service import create_run, edit_run, get_run
 
 
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 class RunApi(Api):
 
     def on_get(self, req: Request, resp: Response) -> str:

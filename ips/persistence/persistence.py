@@ -107,7 +107,7 @@ def insert_into_table(table: str) -> Callable[..., None]:
     return insert
 
 
-def insert_from_dataframe(table: str, if_exists: str) -> Callable[[pd.DataFrame], None]:
+def insert_from_dataframe(table: str, if_exists: str = "append") -> Callable[[pd.DataFrame], None]:
     """
         A closure that inserts a pandas DataFrame into a table
     :param table: the name of the table to insert into

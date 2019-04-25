@@ -7,6 +7,7 @@ from ips.api.validation.validate_user_id import validate_user_id
 from ips.services.login_service import login
 
 
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 class LoginApi(Api):
 
     @validate(user_name=validate_user_id, password=validate_password)
