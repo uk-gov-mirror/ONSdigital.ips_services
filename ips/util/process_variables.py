@@ -1,6 +1,9 @@
+import multiprocessing
 import random
+from functools import partial
 
-from ips_common.ips_logging import log
+import pandas
+from ips_common.ips_logging import logging as log
 import ips_common_db.sql as db
 import numpy as np
 # for exec
@@ -10,8 +13,12 @@ random.seed(123456)
 
 count = 1
 
+# NOTE: THis will not work on non Unix like systems due to the way fork() works
+compiled_pv_list = []
+pv_name = []
 
-def modify_values(row, pvs, dataset):
+
+def modify_values(row, dataset):
     """
     Author       : Thomas Mahoney
     Date         : 27 / 03 / 2018
@@ -24,24 +31,23 @@ def modify_values(row, pvs, dataset):
     Dependencies : NA
     """
 
-    for pv in pvs:
-        code = pv[1]
+    for code in compiled_pv_list:
         try:
             exec(code)
         except ValueError:
-            log.error(f"ValueError on PV: {pv[0]}, code: {code}")
+            log.error(f"ValueError on PV: {pv_name[compiled_pv_list.index(code)]}")
             raise ValueError
 
         except KeyError:
-            log.error(f"KeyError on PV: {pv[0]}, code: {code}")
+            log.error(f"KeyError on PV: {pv_name[compiled_pv_list.index(code)]}")
             raise KeyError
 
         except TypeError:
-            log.error(f"TypeError on PV: {pv[0]}, code: {code}")
+            log.error(f"TypeError on PV: {pv_name[compiled_pv_list.index(code)]}")
             raise TypeError
 
         except SyntaxError:
-            log.error(f"SyntaxError on PV: {pv[0]}, code: {code}")
+            log.error(f"SyntaxError on PV: {pv_name[compiled_pv_list.index(code)]}")
             raise SyntaxError
 
     if dataset in ('survey', 'shift'):
@@ -79,6 +85,43 @@ def get_pvs():
         return v.fetchall()
 
 
+def parallel_func(pv_df, dataset=None):
+    return pv_df.apply(modify_values, axis=1, args=(dataset,))
+
+
+def compile_pvs(pv_list):
+    global compiled_pv_list
+    global pv_name
+
+    compiled_pv_list.clear()
+    pv_name.clear()
+
+    for pv in pv_list:
+        compiled_pv_list.append(compile(pv[1], 'pv', 'exec'))
+        pv_name.append(pv[0])
+
+
+def parallelise_pvs(dataframe, dataset=None):
+    # return parallel_func(dataframe, dataset)
+
+    num_partitions = multiprocessing.cpu_count()
+    df_split = np.array_split(dataframe, num_partitions)
+    pool = multiprocessing.Pool(num_partitions)
+
+    res = pandas.concat(
+        pool.map(
+            partial(parallel_func, dataset=dataset),
+            df_split
+        ),
+        sort=True
+    )
+
+    pool.close()
+    pool.join()
+
+    return res
+
+
 def process(in_table_name, out_table_name, in_id, dataset):
     """
     Author       : Thomas Mahoney
@@ -105,12 +148,14 @@ def process(in_table_name, out_table_name, in_id, dataset):
 
     # Get the process variable statements
     process_variables = get_pvs()
+    compile_pvs(process_variables)
 
     if dataset == 'survey':
         df_data = df_data.sort_values('SERIAL')
 
     # Apply process variables
-    df_data = df_data.apply(modify_values, axis=1, args=(process_variables, dataset))
+    # df_data = df_data.apply(modify_values, axis=1, args=(process_variables, dataset))
+    df_data = parallelise_pvs(df_data, dataset)
 
     # Create a list to hold the PV column names
     updated_columns = []

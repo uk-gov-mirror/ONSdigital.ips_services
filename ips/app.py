@@ -4,7 +4,6 @@ import falcon
 from falcon_multipart.middleware import MultipartMiddleware
 from ips_common.ips_logging import log
 
-from ips.api.apply_pvs import ApplyPVsApi
 from ips.api.cancel_api import CancelApi
 from ips.api.dataimport.import_air import ImportAir
 from ips.api.dataimport.import_non_response import ImportNonResponse
@@ -58,8 +57,6 @@ app.add_route("/import/sea/{run_id}", ImportSea(workflow))
 app.add_route("/import/shift/{run_id}", ImportShift(workflow))
 app.add_route("/import/tunnel/{run_id}", ImportTunnel(workflow))
 app.add_route("/import/unsampled/{run_id}", ImportUnsampled(workflow))
-
-app.add_route("/applypvs/{run_id}/{pv_set}", ApplyPVsApi(workflow))
 
 app.add_route("/export/{run_id}/{table_name}", ExportApi(workflow))
 
