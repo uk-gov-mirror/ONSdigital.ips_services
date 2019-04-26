@@ -1,8 +1,9 @@
-from ips.services.calculations.calculate_traffic_weight import do_ips_trafweight_calculation_with_R
 from ips.persistence import data_management as idm
-from ips.util.config.services_configuration import ServicesConfiguration
+from ips.persistence.data_management import get_survey_data
+from ips.persistence.persistence import read_table_values, insert_from_dataframe
+from ips.services.calculations.calculate_traffic_weight import do_ips_trafweight_calculation_with_R
 from ips.util import process_variables
-import ips_common_db.sql as db
+from ips.util.config.services_configuration import ServicesConfiguration
 
 
 def traffic_weight_step(run_id):
@@ -49,15 +50,15 @@ def traffic_weight_step(run_id):
     idm.update_step_data_with_step_pv_output(config)
 
     # Retrieve data from SQL
-    survey_data = db.get_table_values(idm.SAS_SURVEY_SUBSAMPLE_TABLE)
-    traffic_data = db.get_table_values(config["data_table"])
+    survey_data = get_survey_data()
+    traffic_data = read_table_values(config["data_table"])()
 
     # Calculate Traffic Weight
     output_data, summary_data = do_ips_trafweight_calculation_with_R(survey_data, traffic_data)
 
     # Insert data to SQL
-    db.insert_dataframe_into_table(config["temp_table"], output_data)
-    db.insert_dataframe_into_table(config["sas_ps_table"], summary_data)
+    insert_from_dataframe(config["temp_table"])(output_data)
+    insert_from_dataframe(config["sas_ps_table"])(summary_data)
 
     # Update Survey Data With Traffic Wt Results
     idm.update_survey_data_with_step_results(config)

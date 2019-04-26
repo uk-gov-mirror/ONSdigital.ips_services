@@ -1,7 +1,7 @@
-from ips.persistence.persistence import read_table_values, insert_from_dataframe
-from ips.services.calculations import calculate_airmiles
 from ips.persistence import data_management as idm
-
+from ips.persistence.data_management import get_survey_data
+from ips.persistence.persistence import insert_from_dataframe
+from ips.services.calculations import calculate_airmiles
 from ips.util.config.services_configuration import ServicesConfiguration
 
 
@@ -24,7 +24,7 @@ def airmiles_step(run_id):
     idm.populate_survey_data_for_step(run_id, config)
 
     # Retrieve data from SQL
-    survey_data = read_table_values(idm.SAS_SURVEY_SUBSAMPLE_TABLE)()
+    survey_data = get_survey_data()
 
     # Calculate Air Miles
     survey_data_out = calculate_airmiles.do_ips_airmiles_calculation(df_surveydata=survey_data,

@@ -1,7 +1,5 @@
-import os
-
 from ips_common.ips_logging import log
-from ips.persistence.persistence import delete_from_table, insert_into_table, select_data
+from ips.persistence.persistence import delete_from_table, insert_into_table, select_data, read_table_values
 from ips.persistence.persistence import execute_sql as exec_sql
 
 SURVEY_SUBSAMPLE_TABLE = "SURVEY_SUBSAMPLE"
@@ -10,6 +8,7 @@ SAS_PROCESS_VARIABLES_TABLE = "SAS_PROCESS_VARIABLE"
 
 clear_subsample = delete_from_table(SAS_SURVEY_SUBSAMPLE_TABLE)
 execute_sql = exec_sql()
+get_survey_data = read_table_values(SAS_SURVEY_SUBSAMPLE_TABLE)
 
 COLUMNS_TO_MOVE = [
     'SERIAL', 'AGE', 'AM_PM_NIGHT', 'ANYUNDER16', 'APORTLATDEG', 'APORTLATMIN', 'APORTLATSEC',
