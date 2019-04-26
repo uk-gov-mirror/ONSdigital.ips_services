@@ -9,16 +9,14 @@ import numpy as np
 # for exec
 import math
 
+from ips.persistence.persistence import insert_from_dataframe
+
 random.seed(123456)
 
 count = 1
 
-# NOTE: THis will not work on non Unix like systems due to the way fork() works
-compiled_pv_list = []
-pv_name = []
 
-
-def modify_values(row, dataset):
+def modify_values(row, dataset, pvs):
     """
     Author       : Thomas Mahoney
     Date         : 27 / 03 / 2018
@@ -31,23 +29,28 @@ def modify_values(row, dataset):
     Dependencies : NA
     """
 
-    for code in compiled_pv_list:
+    for pv in pvs:
+        code = pv['PROCVAR_RULE']
         try:
             exec(code)
         except ValueError:
-            log.error(f"ValueError on PV: {pv_name[compiled_pv_list.index(code)]}")
+            name = pv['PROCVAR_NAME']
+            log.error(f"ValueError on PV: {name}")
             raise ValueError
 
         except KeyError:
-            log.error(f"KeyError on PV: {pv_name[compiled_pv_list.index(code)]}")
+            name = pv['PROCVAR_NAME']
+            log.error(f"KeyError on PV: {name}")
             raise KeyError
 
         except TypeError:
-            log.error(f"TypeError on PV: {pv_name[compiled_pv_list.index(code)]}")
+            name = pv['PROCVAR_NAME']
+            log.error(f"TypeError on PV: {name}")
             raise TypeError
 
         except SyntaxError:
-            log.error(f"SyntaxError on PV: {pv_name[compiled_pv_list.index(code)]}")
+            name = pv['PROCVAR_NAME']
+            log.error(f"SyntaxError on PV: {name}")
             raise SyntaxError
 
     if dataset in ('survey', 'shift'):
@@ -73,44 +76,29 @@ def get_pvs():
         raise ConnectionError("Cannot get database connection")
 
     with engine.connect() as conn:
-
-        sql = """SELECT 
-                    PROCVAR_NAME,PROCVAR_RULE
-                 FROM 
-                    SAS_PROCESS_VARIABLE
-                 ORDER BY 
-                    PROCVAR_ORDER"""
-
+        sql = "SELECT PROCVAR_NAME,PROCVAR_RULE FROM  SAS_PROCESS_VARIABLE ORDER BY  PROCVAR_ORDER"
         v = conn.engine.execute(sql)
         return v.fetchall()
 
 
-def parallel_func(pv_df, dataset=None):
-    return pv_df.apply(modify_values, axis=1, args=(dataset,))
+def parallel_func(pv_df, pv_list, dataset=None):
+    compile_pvs(pv_list)
+    return pv_df.apply(modify_values, axis=1, args=(dataset, pv_list))
 
 
 def compile_pvs(pv_list):
-    global compiled_pv_list
-    global pv_name
-
-    compiled_pv_list.clear()
-    pv_name.clear()
-
-    for pv in pv_list:
-        compiled_pv_list.append(compile(pv[1], 'pv', 'exec'))
-        pv_name.append(pv[0])
+    for a in pv_list:
+        a['PROCVAR_RULE'] = compile(a['PROCVAR_RULE'], 'pv', 'exec')
 
 
-def parallelise_pvs(dataframe, dataset=None):
-    # return parallel_func(dataframe, dataset)
-
+def parallelise_pvs(dataframe, process_variables, dataset=None):
     num_partitions = multiprocessing.cpu_count()
     df_split = np.array_split(dataframe, num_partitions)
     pool = multiprocessing.Pool(num_partitions)
 
     res = pandas.concat(
         pool.map(
-            partial(parallel_func, dataset=dataset),
+            partial(parallel_func, pv_list=process_variables, dataset=dataset),
             df_split
         ),
         sort=True
@@ -123,20 +111,6 @@ def parallelise_pvs(dataframe, dataset=None):
 
 
 def process(in_table_name, out_table_name, in_id, dataset):
-    """
-    Author       : Thomas Mahoney
-    Date         : 27 / 03 / 2018
-    Purpose      : Runs the process variables step of the IPS calculation process.
-    Parameters   : in_table_name - the table where the data is coming from.
-                   out_table_name - the destination table where the modified data will be sent.
-                   in_id - the column id used in the output dataset (this is used when the data is merged into the main
-                           table later.
-                   dataset - an identifier for the dataset currently being processed.
-    Returns      : NA
-    Requirements : NA
-    Dependencies : NA
-    """
-
     # Ensure the input table name is capitalised
     in_table_name = in_table_name.upper()
 
@@ -148,14 +122,17 @@ def process(in_table_name, out_table_name, in_id, dataset):
 
     # Get the process variable statements
     process_variables = get_pvs()
-    compile_pvs(process_variables)
+
+    pvs = []
+    for a in process_variables:
+        c = dict(a.items())
+        pvs.append(c)
 
     if dataset == 'survey':
         df_data = df_data.sort_values('SERIAL')
 
     # Apply process variables
-    # df_data = df_data.apply(modify_values, axis=1, args=(process_variables, dataset))
-    df_data = parallelise_pvs(df_data, dataset)
+    df_data = parallelise_pvs(df_data, pvs, dataset)
 
     # Create a list to hold the PV column names
     updated_columns = []
@@ -170,9 +147,5 @@ def process(in_table_name, out_table_name, in_id, dataset):
     # Create a new dataframe from the modified data using the columns specified
     df_out = df_data[columns]
 
-    # for column in df_out:
-    #     if df_out[column].dtype == np.int64:
-    #         df_out[column] = df_out[column].astype(int)
-
     # Insert the dataframe to the output table
-    db.insert_dataframe_into_table(out_table_name, df_out)
+    insert_from_dataframe(out_table_name)(df_out)
