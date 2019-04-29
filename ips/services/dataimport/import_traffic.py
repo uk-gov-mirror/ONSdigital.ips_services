@@ -12,13 +12,13 @@ from ips.services.dataimport.schemas import traffic_schema
 
 @service
 def _import_traffic_from_stream(import_type, run_id, data):
-    log.debug("Importing traffic data from stream")
+    log.info("Importing traffic data from stream")
     return _import_traffic(import_type, run_id, io.BytesIO(data))
 
 
 @service
 def _import_traffic_from_file(import_type, run_id, data):
-    log.debug(f"Importing traffic data from file: {data}")
+    log.info(f"Importing traffic data from file: {data}")
     return _import_traffic(import_type, run_id, data)
 
 

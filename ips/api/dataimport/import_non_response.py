@@ -4,6 +4,7 @@ from ips.api.api import Api
 import ips.services.dataimport.import_non_response as imp
 
 
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 class ImportNonResponse(Api):
 
     def on_post(self, req: Request, resp: Response, run_id) -> None:

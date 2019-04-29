@@ -28,8 +28,8 @@ columns = [
     'TOWNCODE1', 'TOWNCODE2', 'TOWNCODE3', 'TOWNCODE4', 'TOWNCODE5',
     'TOWNCODE6', 'TOWNCODE7', 'TOWNCODE8', 'TRANSFER', 'UKFOREIGN',
     'VEHICLE', 'VISITBEGAN', 'WELSHNIGHTS', 'WELSHTOWN', 'FAREKEY',
-    'TYPEINTERVIEW', 'SHIFT_WT'
-]  # TODO: remove shift_wt here this is required for non-response step
+    'TYPEINTERVIEW'
+]
 
 
 @service

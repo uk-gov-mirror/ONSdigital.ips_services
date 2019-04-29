@@ -4,6 +4,7 @@ from ips.api.api import Api
 import ips.services.dataimport.import_survey as imp
 
 
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 class ImportSurvey(Api):
 
     def on_post(self, req: Request, resp: Response, run_id) -> None:

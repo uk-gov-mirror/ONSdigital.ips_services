@@ -1,8 +1,9 @@
-from ips.services.calculations import calculate_stay_imputation
 from ips.persistence import data_management as idm
-from ips.util.config.services_configuration import ServicesConfiguration
+from ips.persistence.data_management import get_survey_data
+from ips.persistence.persistence import insert_from_dataframe
+from ips.services.calculations import calculate_stay_imputation
 from ips.util import process_variables
-import ips_common_db.sql as db
+from ips.util.config.services_configuration import ServicesConfiguration
 
 
 def stay_imputation_step(run_id):
@@ -34,7 +35,7 @@ def stay_imputation_step(run_id):
     idm.update_survey_data_with_step_pv_output(config)
 
     # Retrieve data from SQL
-    survey_data = db.get_table_values(idm.SAS_SURVEY_SUBSAMPLE_TABLE)
+    survey_data = get_survey_data()
 
     # Calculate Stay Imputation
     survey_data_out = calculate_stay_imputation.do_ips_stay_imputation(survey_data,
@@ -43,7 +44,7 @@ def stay_imputation_step(run_id):
                                                                        measure='mean')
 
     # Insert data to SQL
-    db.insert_dataframe_into_table(config["temp_table"], survey_data_out)
+    insert_from_dataframe(config["temp_table"])(survey_data_out)
 
     # Update Survey Data With Stay Imp Results
     idm.update_survey_data_with_step_results(config)

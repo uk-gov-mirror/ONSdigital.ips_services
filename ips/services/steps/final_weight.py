@@ -1,6 +1,7 @@
-from ips.services.calculations import calculate_final_weight
 from ips.persistence import data_management as idm
-import ips_common_db.sql as db
+from ips.persistence.data_management import get_survey_data
+from ips.persistence.persistence import insert_from_dataframe
+from ips.services.calculations import calculate_final_weight
 from ips.util.config.services_configuration import ServicesConfiguration
 
 
@@ -21,7 +22,7 @@ def final_weight_step(run_id):
     idm.populate_survey_data_for_step(run_id, config)
 
     # Retrieve data from SQL
-    survey_data = db.get_table_values(idm.SAS_SURVEY_SUBSAMPLE_TABLE)
+    survey_data = get_survey_data()
 
     # Calculate Final Weight
     survey_data_out, summary_data_out = \
@@ -36,8 +37,8 @@ def final_weight_step(run_id):
                                                            final_weight='FINAL_WT')
 
     # Insert data to SQL
-    db.insert_dataframe_into_table(config["temp_table"], survey_data_out)
-    db.insert_dataframe_into_table(config["sas_ps_table"], summary_data_out)
+    insert_from_dataframe(config["temp_table"])(survey_data_out)
+    insert_from_dataframe(config["sas_ps_table"])(summary_data_out)
 
     # Update Survey Data With Final Wt Results
     idm.update_survey_data_with_step_results(config)

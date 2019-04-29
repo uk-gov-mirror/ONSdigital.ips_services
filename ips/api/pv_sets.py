@@ -5,6 +5,7 @@ from ips.api.api import Api
 from ips.services.pv_sets import create_new_pv_set, get_pv_sets
 
 
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 class PvSetsApi(Api):
 
     def on_post(self, req: Request, resp: Response, ) -> None:
