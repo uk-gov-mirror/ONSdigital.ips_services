@@ -1,7 +1,7 @@
 from ips.services.calculations import calculate_nonresponse_weight
 from ips.util.config.services_configuration import ServicesConfiguration
 from ips.persistence import data_management as idm
-from ips.util import process_variables
+from ips.services.steps import process_variables
 import ips_common_db.sql as db
 
 

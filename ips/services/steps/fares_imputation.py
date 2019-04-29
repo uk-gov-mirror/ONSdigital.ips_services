@@ -2,7 +2,7 @@ import ips_common_db.sql as db
 
 from ips.persistence import data_management as idm
 from ips.services.calculations import calculate_fares_imputation
-from ips.util import process_variables
+from ips.services.steps import process_variables
 from ips.util.config.services_configuration import ServicesConfiguration
 
 
