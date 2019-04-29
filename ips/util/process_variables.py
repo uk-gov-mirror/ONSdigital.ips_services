@@ -1,47 +1,41 @@
+import multiprocessing
 import random
+from functools import partial
 
-from ips_common.ips_logging import log
+import pandas
+from ips_common.ips_logging import logging as log
 import ips_common_db.sql as db
 import numpy as np
 # for exec
 import math
+
+from ips.persistence.persistence import insert_from_dataframe
 
 random.seed(123456)
 
 count = 1
 
 
-def modify_values(row, pvs, dataset):
-    """
-    Author       : Thomas Mahoney
-    Date         : 27 / 03 / 2018
-    Purpose      : Applies the PV rules to the specified dataframe on a row by row basis.
-    Parameters   : row - the row of a dataframe passed to the function through the 'apply' statement called
-                   pvs - a collection of pv names and statements to be applied to the dataframe's rows.
-                   dataset -  and identifier used in the executed pv statements.
-    Returns      : a modified row to be reinserted into the dataframe.
-    Requirements : this function must be called through a pandas apply statement.
-    Dependencies : NA
-    """
+def modify_values(row, dataset, pvs):
 
-    for pv in pvs:
-        code = pv[1]
+    for x in pvs:
+        code = pvs[x]
         try:
             exec(code)
         except ValueError:
-            log.error(f"ValueError on PV: {pv[0]}, code: {code}")
+            log.error(f"ValueError on PV: {x}")
             raise ValueError
 
         except KeyError:
-            log.error(f"KeyError on PV: {pv[0]}, code: {code}")
+            log.error(f"KeyError on PV: {x}")
             raise KeyError
 
         except TypeError:
-            log.error(f"TypeError on PV: {pv[0]}, code: {code}")
+            log.error(f"TypeError on PV: {x}")
             raise TypeError
 
         except SyntaxError:
-            log.error(f"SyntaxError on PV: {pv[0]}, code: {code}")
+            log.error(f"SyntaxError on PV: {x}")
             raise SyntaxError
 
     if dataset in ('survey', 'shift'):
@@ -51,83 +45,53 @@ def modify_values(row, pvs, dataset):
 
 
 def get_pvs():
-    """
-    Author       : Thomas Mahoney
-    Date         : 27 / 03 / 2018
-    Purpose      : Extracts the PV data from the process_variables table.
-    Parameters   : conn - a connection object linking  the database.
-    Returns      : a collection of pv names and statements
-    Requirements : NA
-    Dependencies : NA
-    """
+    return db.execute_sql_statement(
+        "SELECT PROCVAR_NAME, PROCVAR_RULE FROM SAS_PROCESS_VARIABLE ORDER BY PROCVAR_ORDER"
+    ).fetchall()
 
-    engine = db.get_sql_connection()
 
-    if engine is None:
-        raise ConnectionError("Cannot get database connection")
+def parallel_func(pv_df, pv_list, dataset=None):
+    out_dict = {x['PROCVAR_NAME']: compile(x['PROCVAR_RULE'], 'pv', 'exec') for x in pv_list}
+    return pv_df.apply(modify_values, axis=1, args=(dataset, out_dict))
 
-    with engine.connect() as conn:
 
-        sql = """SELECT 
-                    PROCVAR_NAME,PROCVAR_RULE
-                 FROM 
-                    SAS_PROCESS_VARIABLE
-                 ORDER BY 
-                    PROCVAR_ORDER"""
+def parallelise_pvs(dataframe, process_variables, dataset=None):
+    num_partitions = multiprocessing.cpu_count()
+    df_split = np.array_split(dataframe, num_partitions)
+    pool = multiprocessing.Pool(num_partitions)
 
-        v = conn.engine.execute(sql)
-        return v.fetchall()
+    res = pandas.concat(
+        pool.map(
+            partial(parallel_func, pv_list=process_variables, dataset=dataset),
+            df_split
+        ),
+        sort=True
+    )
+
+    pool.close()
+    pool.join()
+
+    return res
 
 
 def process(in_table_name, out_table_name, in_id, dataset):
-    """
-    Author       : Thomas Mahoney
-    Date         : 27 / 03 / 2018
-    Purpose      : Runs the process variables step of the IPS calculation process.
-    Parameters   : in_table_name - the table where the data is coming from.
-                   out_table_name - the destination table where the modified data will be sent.
-                   in_id - the column id used in the output dataset (this is used when the data is merged into the main
-                           table later.
-                   dataset - an identifier for the dataset currently being processed.
-    Returns      : NA
-    Requirements : NA
-    Dependencies : NA
-    """
-
-    # Ensure the input table name is capitalised
     in_table_name = in_table_name.upper()
-
-    # Extract the table's content into a local dataframe
     df_data = db.get_table_values(in_table_name)
-
-    # Fill nan values
     df_data.fillna(value=np.NaN, inplace=True)
 
-    # Get the process variable statements
     process_variables = get_pvs()
+    pvs = [dict(a.items()) for a in process_variables]
 
     if dataset == 'survey':
         df_data = df_data.sort_values('SERIAL')
 
     # Apply process variables
-    df_data = df_data.apply(modify_values, axis=1, args=(process_variables, dataset))
+    df_data = parallelise_pvs(df_data, pvs, dataset)
 
-    # Create a list to hold the PV column names
-    updated_columns = []
-
-    # Loop through the pv's
+    columns = [in_id.upper()]
     for pv in process_variables:
-        updated_columns.append(pv[0].upper())
+        columns.append(pv[0].upper())
 
-    # Generate a column list from the in_id column and the pvs for the current run
-    columns = [in_id] + updated_columns
-    columns = [col.upper() for col in columns]
-    # Create a new dataframe from the modified data using the columns specified
     df_out = df_data[columns]
 
-    # for column in df_out:
-    #     if df_out[column].dtype == np.int64:
-    #         df_out[column] = df_out[column].astype(int)
-
-    # Insert the dataframe to the output table
-    db.insert_dataframe_into_table(out_table_name, df_out)
+    insert_from_dataframe(out_table_name)(df_out)

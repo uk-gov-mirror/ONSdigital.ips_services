@@ -102,6 +102,7 @@ def insert_into_table(table: str) -> Callable[..., None]:
 
     return insert
 
+
 def insert_into_table_id(table: str) -> Callable[..., None]:
     """
         A closure that takes the name of a table to insert into. and returns a function for that table that can be
@@ -143,7 +144,8 @@ def insert_into_table_id(table: str) -> Callable[..., None]:
 
     return insert
 
-def insert_from_dataframe(table: str, if_exists: str) -> Callable[[pd.DataFrame], None]:
+
+def insert_from_dataframe(table: str, if_exists: str = "append") -> Callable[[pd.DataFrame], None]:
     """
         A closure that inserts a pandas DataFrame into a table
     :param table: the name of the table to insert into
@@ -184,4 +186,5 @@ def execute_sql() -> Callable[[str], Any]:
 
 
 def get_identity(table: str, id_column: str) -> str:
-    return str(db.execute_sql_statement(f"SELECT {id_column} FROM {table} ORDER BY {id_column} DESC LIMIT 1").first()[0])
+    return str(
+        db.execute_sql_statement(f"SELECT {id_column} FROM {table} ORDER BY {id_column} DESC LIMIT 1").first()[0])
