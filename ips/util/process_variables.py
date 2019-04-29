@@ -29,28 +29,24 @@ def modify_values(row, dataset, pvs):
     Dependencies : NA
     """
 
-    for pv in pvs:
-        code = pv['PROCVAR_RULE']
+    for x in pvs:
+        code = pvs[x]
         try:
             exec(code)
         except ValueError:
-            name = pv['PROCVAR_NAME']
-            log.error(f"ValueError on PV: {name}")
+            log.error(f"ValueError on PV: {x}")
             raise ValueError
 
         except KeyError:
-            name = pv['PROCVAR_NAME']
-            log.error(f"KeyError on PV: {name}")
+            log.error(f"KeyError on PV: {x}")
             raise KeyError
 
         except TypeError:
-            name = pv['PROCVAR_NAME']
-            log.error(f"TypeError on PV: {name}")
+            log.error(f"TypeError on PV: {x}")
             raise TypeError
 
         except SyntaxError:
-            name = pv['PROCVAR_NAME']
-            log.error(f"SyntaxError on PV: {name}")
+            log.error(f"SyntaxError on PV: {x}")
             raise SyntaxError
 
     if dataset in ('survey', 'shift'):
@@ -82,13 +78,8 @@ def get_pvs():
 
 
 def parallel_func(pv_df, pv_list, dataset=None):
-    compile_pvs(pv_list)
-    return pv_df.apply(modify_values, axis=1, args=(dataset, pv_list))
-
-
-def compile_pvs(pv_list):
-    for a in pv_list:
-        a['PROCVAR_RULE'] = compile(a['PROCVAR_RULE'], 'pv', 'exec')
+    out_dict = {x['PROCVAR_NAME']: compile(x['PROCVAR_RULE'], 'pv', 'exec') for x in pv_list}
+    return pv_df.apply(modify_values, axis=1, args=(dataset, out_dict))
 
 
 def parallelise_pvs(dataframe, process_variables, dataset=None):
