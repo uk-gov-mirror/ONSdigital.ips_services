@@ -2,22 +2,19 @@ import multiprocessing
 import random
 from functools import partial
 
+import ips.persistence.persistence as db
+# noinspection PyUnresolvedReferences
+import math
+import numpy as np
 import pandas
 from ips_common.ips_logging import logging as log
-import ips_common_db.sql as db
-import numpy as np
-# for exec
-import math
 
 from ips.persistence.persistence import insert_from_dataframe
 
 random.seed(123456)
 
-count = 1
-
 
 def modify_values(row, dataset, pvs):
-
     for x in pvs:
         code = pvs[x]
         try:
@@ -45,7 +42,7 @@ def modify_values(row, dataset, pvs):
 
 
 def get_pvs():
-    return db.execute_sql_statement(
+    return db.execute_sql()(
         "SELECT PROCVAR_NAME, PROCVAR_RULE FROM SAS_PROCESS_VARIABLE ORDER BY PROCVAR_ORDER"
     ).fetchall()
 
@@ -75,22 +72,19 @@ def parallelise_pvs(dataframe, process_variables, dataset=None):
 
 
 def process(in_table_name, out_table_name, in_id, dataset):
-    in_table_name = in_table_name.upper()
-    df_data = db.get_table_values(in_table_name)
+    df_data = db.read_table_values(in_table_name)()
     df_data.fillna(value=np.NaN, inplace=True)
 
     process_variables = get_pvs()
     pvs = [dict(a.items()) for a in process_variables]
 
     if dataset == 'survey':
-        df_data = df_data.sort_values('SERIAL')
+        df_data.sort_values('SERIAL', inplace=True)
 
     # Apply process variables
     df_data = parallelise_pvs(df_data, pvs, dataset)
 
-    columns = [in_id.upper()]
-    for pv in process_variables:
-        columns.append(pv[0].upper())
+    columns = [in_id.upper()] + [pv.values()[0].upper() for pv in process_variables]
 
     df_out = df_data[columns]
 

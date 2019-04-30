@@ -50,7 +50,6 @@ def _import_survey_data(run_id, df):
 
     # Insert the imported data into the survey_subsample table on the database.
     insert_ss(df_survey_data)
-    # common_functions.insert_df_into_survey(df_survey_data)
 
 
 def _extract_data(df: pandas.DataFrame) -> pandas.DataFrame:
@@ -86,16 +85,15 @@ def _extract_data(df: pandas.DataFrame) -> pandas.DataFrame:
         'TOWNCODE1', 'TOWNCODE2', 'TOWNCODE3', 'TOWNCODE4', 'TOWNCODE5',
         'TOWNCODE6', 'TOWNCODE7', 'TOWNCODE8', 'TRANSFER', 'UKFOREIGN',
         'VEHICLE', 'VISITBEGAN', 'WELSHNIGHTS', 'WELSHTOWN', 'FAREKEY',
-        'TYPEINTERVIEW', 'SHIFT_WT'
-    ]  # TODO: remove shift_wt here this is required for non-response step
+        'TYPEINTERVIEW'
+    ]
 
     # Set the imported columns to be uppercase
     df.columns = df.columns.str.upper()
 
     # Sort the data by serial number
-    df_new = df.sort_values(by='SERIAL')
+    df.sort_values(by='SERIAL', inplace=True)
 
     # Recreate the dataframe using only the specified columns
-    df_new = df_new.filter(columns, axis=1)
+    return df.filter(columns, axis=1)
 
-    return df_new

@@ -4,9 +4,12 @@ import ips_common_db.sql as db
 import pandas as pd
 from ips_common.ips_logging import log
 
+table_list = set()
+
 
 def clear_memory_table(table: str) -> Callable[[str], None]:
     def clear():
+        table_list.add(table)
         db.clear_memory_table(table)
 
     return clear
@@ -20,9 +23,19 @@ def read_table_values(table: str) -> Callable[[], pd.DataFrame]:
     """
 
     def read():
+        table_list.add(table)
         return db.get_table_values(table)
 
     return read
+
+
+def truncate_table() -> Callable[[str], None]:
+
+    def truncate(table: str):
+        table_list.add(table)
+        db.execute_sql_statement(f"TRUNCATE TABLE {table}")
+
+    return truncate
 
 
 def delete_from_table(table: str) -> Callable[..., None]:
@@ -35,6 +48,7 @@ def delete_from_table(table: str) -> Callable[..., None]:
     """
 
     def delete(**kwargs):
+        table_list.add(table)
         val = f"DELETE FROM {table}"
         if len(kwargs) == 1:
             key, value = kwargs.popitem()
@@ -71,6 +85,7 @@ def insert_into_table(table: str) -> Callable[..., None]:
     """
 
     def insert(**kwargs):
+        table_list.add(table)
         val = f"INSERT INTO {table} ("
         if len(kwargs) == 1:
             key, value = kwargs.popitem()
@@ -113,6 +128,7 @@ def insert_into_table_id(table: str) -> Callable[..., None]:
     """
 
     def insert(**kwargs):
+        table_list.add(table)
         val = f"INSERT INTO {table} ("
         if len(kwargs) == 1:
             key, value = kwargs.popitem()
@@ -154,6 +170,7 @@ def insert_from_dataframe(table: str, if_exists: str = "append") -> Callable[[pd
     """
 
     def insert(d: pd.DataFrame):
+        table_list.add(table)
         db.insert_dataframe_into_table(table, d, if_exists)
 
     return insert
@@ -168,23 +185,27 @@ def insert_from_json(table: str, if_exists: str = "append") -> Callable[[str], N
     """
 
     def insert(data: str):
+        table_list.add(table)
         data_frame = pd.DataFrame(data, index=[0])
         db.insert_dataframe_into_table(table, data_frame, if_exists)
 
     return insert
 
 
-def select_data(column_name: str, table_name: str, condition1: str, condition2: str):
-    return db.select_data(column_name, table_name, condition1, condition2)
+def select_data(column_name: str, table: str, condition1: str, condition2: str):
+    table_list.add(table)
+    return db.select_data(column_name, table, condition1, condition2)
 
 
 def execute_sql() -> Callable[[str], Any]:
     def execute(sql: str):
+        table_list.add(sql)
         return db.execute_sql_statement(sql)
 
     return execute
 
 
 def get_identity(table: str, id_column: str) -> str:
+    table_list.add(table)
     return str(
         db.execute_sql_statement(f"SELECT {id_column} FROM {table} ORDER BY {id_column} DESC LIMIT 1").first()[0])

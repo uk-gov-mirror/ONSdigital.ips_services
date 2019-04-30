@@ -209,3 +209,7 @@ class IPSWorkflow:
             log.info(f"--> End Step: {x}\n")
 
         self._in_progress = False
+
+        # import ips.persistence.persistence as db
+        # for x in db.table_list:
+        #     log.error(x)
