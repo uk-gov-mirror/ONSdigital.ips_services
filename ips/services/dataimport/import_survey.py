@@ -33,9 +33,9 @@ columns = [
 
 
 @service
-def import_survey_stream(run_id, data):
+def import_survey_stream(run_id, data, month, year):
     log.info("Importing survey data from stream")
-    return _import_survey(run_id, io.BytesIO(data))
+    return _import_survey(run_id, io.BytesIO(data), month, year)
 
 
 @service
@@ -44,7 +44,7 @@ def import_survey_file(run_id, survey_data_path):
     return _import_survey(run_id, survey_data_path)
 
 
-def _import_survey(run_id, source):
+def _import_survey(run_id, source, month, year):
     df: pd.DataFrame = pd.read_csv(
         source,
         encoding="ISO-8859-1",
@@ -54,11 +54,21 @@ def _import_survey(run_id, source):
     )
 
     df.columns = df.columns.str.upper()
+    _validate_data(df, month, year)
     df = df.sort_values(by='SERIAL')
-    _validate_data(df)
     db.import_survey_data(run_id, df)
     return df
 
 
-def _validate_data(data: pd.DataFrame) -> bool:
-    pass
+def _validate_data(data: pd.DataFrame, user_month, user_year) -> bool:
+    log.info("Validating survey data...")
+
+    if 'SERIAL' not in data.columns:
+        log.error("'SERIAL' column does not exist")
+        return False
+
+    # Check dates
+    print(user_month)
+    print(user_year)
+    
+    return True

@@ -11,4 +11,7 @@ class ImportSurvey(Api):
         v = req.get_param('ips-file')
         data = v.file.read()
 
-        imp.import_survey_stream(run_id, data)
+        month = req.get_param('month')
+        year = req.get_param('year')
+
+        imp.import_survey_stream(run_id, data, month, year)
