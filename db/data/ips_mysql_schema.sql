@@ -1410,11 +1410,11 @@ create table PS_FINAL
 (
   RUN_ID            varchar(40)    not null,
   SERIAL            decimal(15)    not null,
-  SHIFT_WT          decimal(9, 3)  null,
+  SHIFT_WT          float  null,
   NON_RESPONSE_WT   decimal(9, 3)  null,
   MINS_WT           decimal(9, 3)  null,
   TRAFFIC_WT        decimal(9, 3)  null,
-  UNSAMP_TRAFFIC_WT decimal(9, 3)  null,
+  UNSAMP_TRAFFIC_WT float  null,
   IMBAL_WT          decimal(9, 3)  null,
   FINAL_WT          decimal(12, 3) null
 );
@@ -1484,7 +1484,7 @@ create table PS_SHIFT_DATA
   MEAN_SH_WT        decimal(9, 3)  null,
   MAX_SH_WT         decimal(9, 3)  null,
   COUNT_RESPS       decimal(6)     null,
-  SUM_SH_WT         decimal(12, 3) null
+  SUM_SH_WT         float null
 );
 
 
@@ -1509,8 +1509,8 @@ create table PS_UNSAMPLED_OOH
   UNSAMP_REGION_GRP_PV  varchar(10)    null,
   CASES                 decimal(6)     null,
   SUM_PRIOR_WT          decimal(12, 3) null,
-  SUM_UNSAMP_TRAFFIC_WT decimal(12, 3) null,
-  UNSAMP_TRAFFIC_WT     decimal(9, 3)  null
+  SUM_UNSAMP_TRAFFIC_WT float null,
+  UNSAMP_TRAFFIC_WT     float  null
 );
 
 
@@ -1729,7 +1729,7 @@ create table SAS_NON_RESPONSE_SPV
 create table SAS_NON_RESPONSE_WT
 (
   SERIAL          decimal(15)   not null,
-  NON_RESPONSE_WT decimal(9, 3) null
+  NON_RESPONSE_WT float null
 );
 
 
@@ -1752,11 +1752,11 @@ create table SAS_PROCESS_VARIABLE
 create table SAS_PS_FINAL
 (
   SERIAL            decimal(15)    not null,
-  SHIFT_WT          decimal(9, 3)  null,
-  NON_RESPONSE_WT   decimal(9, 3)  null,
+  SHIFT_WT          float  null,
+  NON_RESPONSE_WT   float  null,
   MINS_WT           decimal(9, 3)  null,
   TRAFFIC_WT        decimal(9, 3)  null,
-  UNSAMP_TRAFFIC_WT decimal(9, 3)  null,
+  UNSAMP_TRAFFIC_WT float  null,
   IMBAL_WT          decimal(9, 3)  null,
   FINAL_WT          decimal(12, 3) null
 );
@@ -1815,7 +1815,7 @@ create table SAS_PS_SHIFT_DATA
   MEAN_SH_WT        decimal(9, 3)  null,
   MAX_SH_WT         decimal(9, 3)  null,
   COUNT_RESPS       decimal(6)     null,
-  SUM_SH_WT         decimal(12, 3) null
+  SUM_SH_WT         float null
 );
 
 
@@ -1838,8 +1838,8 @@ create table SAS_PS_UNSAMPLED_OOH
   UNSAMP_REGION_GRP_PV  varchar(10)    null,
   CASES                 decimal(6)     null,
   SUM_PRIOR_WT          decimal(12, 3) null,
-  SUM_UNSAMP_TRAFFIC_WT decimal(12, 3) null,
-  UNSAMP_TRAFFIC_WT     decimal(9, 3)  null
+  SUM_UNSAMP_TRAFFIC_WT float null,
+  UNSAMP_TRAFFIC_WT     float  null
 );
 
 
@@ -1964,7 +1964,7 @@ create table SAS_SHIFT_SPV
 create table SAS_SHIFT_WT
 (
   SERIAL   decimal(15)   not null,
-  SHIFT_WT decimal(9, 3) null
+  SHIFT_WT float null
 );
 
 
@@ -2232,11 +2232,11 @@ create table SAS_SURVEY_SUBSAMPLE
   UKLEG                  decimal(6)     null,
   VISIT_WT               decimal(6, 3)  null,
   VISIT_WTK              varchar(10)    null,
-  SHIFT_WT               decimal(9, 3)  null,
-  NON_RESPONSE_WT        decimal(9, 3)  null,
+  SHIFT_WT               float  null,
+  NON_RESPONSE_WT        float  null,
   MINS_WT                decimal(9, 3)  null,
   TRAFFIC_WT             decimal(9, 3)  null,
-  UNSAMP_TRAFFIC_WT      decimal(9, 3)  null,
+  UNSAMP_TRAFFIC_WT      float  null,
   IMBAL_WT               decimal(9, 3)  null,
   FINAL_WT               decimal(12, 3) null,
   constraint SAS_SURVEY_SUBSAMPLE_pk
@@ -2355,7 +2355,7 @@ create table SAS_UNSAMPLED_OOH_SPV
 create table SAS_UNSAMPLED_OOH_WT
 (
   SERIAL            decimal(15)   not null,
-  UNSAMP_TRAFFIC_WT decimal(9, 3) null
+  UNSAMP_TRAFFIC_WT float null
 );
 
 
@@ -2644,11 +2644,11 @@ create table SURVEY_SUBSAMPLE
   UKLEG                  decimal(6)     null,
   VISIT_WT               decimal(6, 3)  null,
   VISIT_WTK              varchar(10)    null,
-  SHIFT_WT               decimal(9, 3)  null,
-  NON_RESPONSE_WT        decimal(9, 3)  null,
+  SHIFT_WT               float  null,
+  NON_RESPONSE_WT        float  null,
   MINS_WT                decimal(9, 3)  null,
   TRAFFIC_WT             decimal(9, 3)  null,
-  UNSAMP_TRAFFIC_WT      decimal(9, 3)  null,
+  UNSAMP_TRAFFIC_WT      float null,
   IMBAL_WT               decimal(9, 3)  null,
   FINAL_WT               decimal(12, 3) null
 );
@@ -3165,7 +3165,7 @@ create table survey_unsamp_aux
   SHIFT_WT             float        null,
   NON_RESPONSE_WT      float        null,
   MINS_WT              float        null,
-  UNSAMP_TRAFFIC_WT    varchar(5)   null,
+  UNSAMP_TRAFFIC_WT    float   null,
   OOHDesignWeight      float        null,
   T1                   int          null
 );

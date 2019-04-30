@@ -210,6 +210,6 @@ class IPSWorkflow:
 
         self._in_progress = False
 
-        # import ips.persistence.persistence as db
-        # for x in db.table_list:
-        #     log.error(x)
+        import ips.persistence.persistence as db
+        for x in db.table_list:
+            log.error(x)

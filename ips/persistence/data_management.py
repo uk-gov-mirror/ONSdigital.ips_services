@@ -50,6 +50,7 @@ truncate_table = db.truncate_table()
 execute_sql_statement = db.execute_sql()
 
 
+# noinspection SqlResolve
 def nullify_survey_subsample_values(run_id: str, pv_values):
     """
     Author       : Elinor Thorne
@@ -69,6 +70,7 @@ def nullify_survey_subsample_values(run_id: str, pv_values):
     execute_sql_statement(sql)
 
 
+# noinspection SqlResolve
 def move_survey_subsample_to_sas_table(run_id, step_name):
     """
     Author       : Elinor Thorne
@@ -119,6 +121,7 @@ def populate_survey_data_for_step(run_id, step_configuration):
     move_survey_subsample_to_sas_table(run_id, step_configuration["name"])
 
 
+# noinspection SqlResolve
 def populate_step_data(run_id, step_configuration):
     """
     Author       : Elinor Thorne
@@ -170,6 +173,7 @@ def copy_step_pvs_for_survey_data(run_id, step_configuration):
     count = 0
     for item in step_configuration["pv_columns"]:
         count = count + 1
+        # noinspection SqlResolve
         sql = f"""
             INSERT INTO {SAS_PROCESS_VARIABLES_TABLE}
                 (PROCVAR_NAME, PROCVAR_RULE, PROCVAR_ORDER)(SELECT PV.PV_NAME, PV.PV_DEF, {count}
@@ -197,6 +201,7 @@ def update_survey_data_with_step_pv_output(step_configuration):
     cols = ["SSS." + item + " = CALC." + item for item in cols]
     set_statement = ", ".join(map(str, cols))
 
+    # noinspection SqlResolve
     sql = f"""
         UPDATE {SAS_SURVEY_SUBSAMPLE_TABLE} AS SSS, {spv_table} AS CALC
             SET {set_statement}
@@ -216,6 +221,7 @@ def update_survey_data_with_step_pv_output(step_configuration):
         truncate_table(step_configuration["sas_ps_table"])
 
 
+# noinspection SqlResolve
 def copy_step_pvs_for_step_data(run_id, step_configuration):
     """
     Author       : Elinor Thorne / Nassir Mohammad
@@ -235,6 +241,7 @@ def copy_step_pvs_for_step_data(run_id, step_configuration):
     if step_configuration["name"] == 'UNSAMPLED_WEIGHT':
         order = step_configuration["order"] + 1
         for item in step_configuration["pv_columns2"]:
+
             sql = (f"""
                  INSERT INTO {SAS_PROCESS_VARIABLES_TABLE}
                  (PROCVAR_NAME, PROCVAR_RULE, PROCVAR_ORDER)
@@ -262,6 +269,7 @@ def copy_step_pvs_for_step_data(run_id, step_configuration):
         execute_sql_statement(sql)
 
 
+# noinspection SqlResolve
 def update_step_data_with_step_pv_output(step_configuration):
     """
     Author       : Elinor Thorne / Nassir Mohammad
@@ -296,6 +304,7 @@ def update_step_data_with_step_pv_output(step_configuration):
     truncate_table(step_configuration["sas_ps_table"])
 
 
+# noinspection SqlResolve
 def sql_update_statement(table_to_update_from, columns_to_update):
     """
     Author       : Elinor Thorne
@@ -324,6 +333,7 @@ def update_green(table, results_columns):
     execute_sql_statement(sql1)
 
 
+# noinspection SqlResolve
 def update_imbalance_weights(table, results_columns):
     sql1 = sql_update_statement(table, results_columns)
     sql2 = f"""
@@ -444,6 +454,7 @@ def store_survey_data_with_step_results(run_id, step_configuration):
     set_statement = " , ".join(cols)
 
     # Create SQL statement and execute
+    # noinspection SqlResolve
     sql = f"""
         UPDATE {SURVEY_SUBSAMPLE_TABLE} AS SS, {SAS_SURVEY_SUBSAMPLE_TABLE} AS SSS
             SET {set_statement}
@@ -495,7 +506,7 @@ def store_step_summary(run_id, step_configuration):
     columns = " , ".join(step_configuration["ps_columns"])
     selection = " , ".join(selection)
 
-    # Create and execute SQL statement
+    # noinspection SqlInsertValues
     sql = f"""
         INSERT INTO {ps_table} ({columns})
             SELECT '{run_id}', {selection} FROM {sas_ps_table}
@@ -511,8 +522,10 @@ def store_step_summary(run_id, step_configuration):
 
 
 def is_valid_run_id(run_id: str) -> bool:
+
     sql = f"select run_id from SURVEY_SUBSAMPLE where run_id = '{run_id}'"
     result = execute_sql_statement(sql).first()
+
     if result is not None:
         return True
     else:

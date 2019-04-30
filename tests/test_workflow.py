@@ -42,10 +42,10 @@ def import_reference_data():
     import_tunnel_file(run_id, reference_data['Tunnel'])
     #
     import_shift_file(run_id, reference_data['Shift'])
-    # import_nonresponse_file(run_id, reference_data['Non Response'])
-    # import_unsampled_file(run_id, reference_data['Unsampled'])
+    import_nonresponse_file(run_id, reference_data['Non Response'])
+    import_unsampled_file(run_id, reference_data['Unsampled'])
     #
-    # import_survey_file(run_id, survey_data)
+    import_survey_file(run_id, survey_data)
 
     log.info("-> End data load")
 
@@ -109,7 +109,7 @@ def teardown_module(module):
 
 
 def test_workflow():
-    pass
-    # from ips.services import ips_workflow
-    # workflow = ips_workflow.IPSWorkflow()
-    # workflow.run_calculations(run_id=run_id)
+    # pass
+    from ips.services import ips_workflow
+    workflow = ips_workflow.IPSWorkflow()
+    workflow.run_calculations(run_id=run_id)

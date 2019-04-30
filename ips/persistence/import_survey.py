@@ -17,10 +17,11 @@ def import_survey_from_stream(run_id, data):
 
 def import_survey_from_file(run_id, survey_data_path, schema):
     df: pandas.DataFrame = pandas.read_csv(
-        survey_data_path,
-        encoding="ISO-8859-1",
+        filepath_or_buffer=survey_data_path,
+        encoding="iso8859_1",
         engine="python",
-        dtype=schema
+        dtype=schema,
+        # memory_map=True
     )
     log.debug(f"Importing survey data from file: {survey_data_path}")
     _import_survey_data(run_id, df)
