@@ -15,28 +15,33 @@ def import_survey_from_stream(run_id, data):
     _import_survey_data(run_id, df)
 
 
-def import_survey_from_file(run_id, survey_data_path):
-    df: pandas.DataFrame = pandas.read_csv(survey_data_path, encoding="ISO-8859-1", engine="python")
+def import_survey_from_file(run_id, survey_data_path, schema):
+    df: pandas.DataFrame = pandas.read_csv(
+        survey_data_path,
+        encoding="ISO-8859-1",
+        engine="python",
+        dtype=schema
+    )
     log.debug(f"Importing survey data from file: {survey_data_path}")
     _import_survey_data(run_id, df)
 
 
 def _import_survey_data(run_id, df):
-    """
-    Author       : Thomas Mahoney
-    Date         : 26 / 04 / 2018
-    Purpose      : Loads the dataimport data into a dataframe then appends the data to the 'SURVEY_SUBSAMPLE'
-                   table on the connected database.
-    Parameters   : survey_data_path - the dataframe containing all of the dataimport data.
-                   run_id - the generated run_id for the current run.
-                   version_id - ID indicating the current version
-    Returns      : NA
-    Requirements : Datafile is of type '.csv', '.pkl' or '.sas7bdat'
-    Dependencies : NA
-    """
-
     # Fill left side of INTDATE column with an additional 0 if length less than 8 characters
     df.columns = df.columns.str.upper()
+
+    # replace NaN values and convert to int
+    # df.DVEXPEND.fillna(0, inplace=True)
+    # df.DVEXPEND = df.DVEXPEND.astype(int)
+    #
+    # df.DVEXPEND.fillna(0, inplace=True)
+    # df.DVEXPEND = df.DVEXPEND.astype(int)
+    # df.EXPENDITURE.fillna(0, inplace=True)
+    # df.EXPENDITURE = df.EXPENDITURE.astype(int)
+    #
+    # df.TANDTSI.fillna(0, inplace=True)
+    # df.TANDTSI = df.TANDTSI.astype(int)
+
     if 'INTDATE' in df.columns:
         df['INTDATE'] = df['INTDATE'].astype(str).str.rjust(8, '0')
 

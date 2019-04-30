@@ -1,6 +1,7 @@
 from typing import Callable, Tuple, Any
 
 import ips_common_db.sql as db
+import pandas
 import pandas as pd
 from ips_common.ips_logging import log
 
@@ -171,9 +172,24 @@ def insert_from_dataframe(table: str, if_exists: str = "append") -> Callable[[pd
 
     def insert(d: pd.DataFrame):
         table_list.add(table)
-        db.insert_dataframe_into_table(table, d, if_exists)
+        insert_dataframe_into_table(table, d, if_exists)
 
     return insert
+
+
+def insert_dataframe_into_table(table_name: str,
+                                dataframe: pandas.DataFrame,
+                                if_exists='append') -> None:
+
+    # dataframe = dataframe.where((pandas.notnull(dataframe)), None)
+    # dataframe.columns = dataframe.columns.astype(str)
+
+    try:
+        dataframe.to_sql(table_name, con=db.connection_string, if_exists=if_exists,
+                         chunksize=5000, index=False)
+    except Exception as err:
+        log.error(f"insert_dataframe_into_table failed: {err}")
+        raise err
 
 
 def insert_from_json(table: str, if_exists: str = "append") -> Callable[[str], None]:
