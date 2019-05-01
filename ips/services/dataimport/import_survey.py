@@ -54,7 +54,8 @@ def _import_survey(run_id, source, month, year):
     )
 
     df.columns = df.columns.str.upper()
-    _validate_data(df, month, year)
+    if not _validate_data(df, month, year):
+        log.info("Validation failed. We need to implement an awesome exit strategy!")
     df = df.sort_values(by='SERIAL')
     db.import_survey_data(run_id, df)
     return df
@@ -63,12 +64,32 @@ def _import_survey(run_id, source, month, year):
 def _validate_data(data: pd.DataFrame, user_month, user_year) -> bool:
     log.info("Validating survey data...")
 
+    data_months = []
+    data_years = []
+    for index, row in data.iterrows():
+        data_months.append(row['INTDATE'][-6:][:2])
+        data_years.append(row['INTDATE'][-4:])
+
+    if user_month[0] == 'Q':
+        quarter = user_month[1]
+        if quarter == '1':
+            month = ['1', '2', '3']
+        elif quarter == '2':
+            month = ['4', '5', '6']
+        elif quarter == '3':
+            month = ['7', '8', '9']
+        elif quarter == '4':
+            month = ['10', '11', '12']
+
+    if not all(elem in month for elem in data_months):
+        log.error("Incorrect month select/uploaded")
+        return False
+    elif not all(elem in user_year for elem in data_years):
+        log.error("Incorrect year select/uploaded")
+        return False
+
     if 'SERIAL' not in data.columns:
         log.error("'SERIAL' column does not exist")
         return False
 
-    # Check dates
-    print(user_month)
-    print(user_year)
-    
     return True
