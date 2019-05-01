@@ -31,18 +31,6 @@ def _import_survey_data(run_id, df):
     # Fill left side of INTDATE column with an additional 0 if length less than 8 characters
     df.columns = df.columns.str.upper()
 
-    # replace NaN values and convert to int
-    # df.DVEXPEND.fillna(0, inplace=True)
-    # df.DVEXPEND = df.DVEXPEND.astype(int)
-    #
-    # df.DVEXPEND.fillna(0, inplace=True)
-    # df.DVEXPEND = df.DVEXPEND.astype(int)
-    # df.EXPENDITURE.fillna(0, inplace=True)
-    # df.EXPENDITURE = df.EXPENDITURE.astype(int)
-    #
-    # df.TANDTSI.fillna(0, inplace=True)
-    # df.TANDTSI = df.TANDTSI.astype(int)
-
     if 'INTDATE' in df.columns:
         df['INTDATE'] = df['INTDATE'].astype(str).str.rjust(8, '0')
 

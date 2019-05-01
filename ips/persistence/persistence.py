@@ -26,8 +26,9 @@ def read_table_values(table: str) -> Callable[[], pd.DataFrame]:
     return read
 
 
-def truncate_table() -> Callable[[str], None]:
-    def truncate(table: str):
+def truncate_table(table: str) -> Callable[[str], None]:
+
+    def truncate():
         db.execute_sql_statement(f"TRUNCATE TABLE {table}")
 
     return truncate

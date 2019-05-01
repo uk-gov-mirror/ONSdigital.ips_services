@@ -46,7 +46,6 @@ COLUMNS_TO_MOVE = [
     'FAREKEY', 'TYPEINTERVIEW'
 ]
 
-truncate_table = db.truncate_table()
 execute_sql_statement = db.execute_sql()
 
 
@@ -114,8 +113,8 @@ def populate_survey_data_for_step(run_id, step_configuration):
     """
 
     # Cleanse tables as applicable
-    truncate_table(SAS_SURVEY_SUBSAMPLE_TABLE)
-    [truncate_table(table) for table in step_configuration["delete_tables"]]
+    db.truncate_table(SAS_SURVEY_SUBSAMPLE_TABLE)()
+    [db.truncate_table(table)() for table in step_configuration["delete_tables"]]
 
     nullify_survey_subsample_values(run_id, step_configuration["nullify_pvs"])
     move_survey_subsample_to_sas_table(run_id, step_configuration["name"])
@@ -144,7 +143,7 @@ def populate_step_data(run_id, step_configuration):
     calc_columns = ", ".join(map(str, calc_cols))
 
     # Cleanse temp table
-    truncate_table(data_table)
+    db.truncate_table(data_table)()
 
     # Create and execute SQL statement
     sql = f"INSERT INTO {data_table} ({cols}) SELECT {calc_columns} FROM {table} AS CALC WHERE RUN_ID = '{run_id}'"
@@ -166,8 +165,8 @@ def copy_step_pvs_for_survey_data(run_id, step_configuration):
     spv_table = step_configuration["spv_table"]
 
     # Cleanse tables
-    truncate_table(SAS_PROCESS_VARIABLES_TABLE)
-    truncate_table(spv_table)
+    db.truncate_table(SAS_PROCESS_VARIABLES_TABLE)()
+    db.truncate_table(spv_table)()
 
     # Loops through the pv's and inserts them into the process variable table
     count = 0
@@ -211,14 +210,14 @@ def update_survey_data_with_step_pv_output(step_configuration):
     execute_sql_statement(sql)
 
     # Cleanse temp tables
-    truncate_table(SAS_PROCESS_VARIABLES_TABLE)
-    truncate_table(spv_table)
+    db.truncate_table(SAS_PROCESS_VARIABLES_TABLE)()
+    db.truncate_table(spv_table)()
 
     # code specific to minimums weight function/step
     # TODO: consider moving this out to another function called by minimum weight
     if step_configuration["name"] == "MINIMUMS_WEIGHT":
-        truncate_table(step_configuration["temp_table"])
-        truncate_table(step_configuration["sas_ps_table"])
+        db.truncate_table(step_configuration["temp_table"])()
+        db.truncate_table(step_configuration["sas_ps_table"])()
 
 
 # noinspection SqlResolve
@@ -234,8 +233,8 @@ def copy_step_pvs_for_step_data(run_id, step_configuration):
     """
 
     # Cleanse temp tables
-    truncate_table(SAS_PROCESS_VARIABLES_TABLE)
-    truncate_table(step_configuration["pv_table"])
+    db.truncate_table(SAS_PROCESS_VARIABLES_TABLE)()
+    db.truncate_table(step_configuration["pv_table"])()
 
     # Construct and execute SQL statements as applicable
     if step_configuration["name"] == 'UNSAMPLED_WEIGHT':
@@ -298,10 +297,10 @@ def update_step_data_with_step_pv_output(step_configuration):
     execute_sql_statement(sql)
 
     # Cleanse temporary tables
-    truncate_table(step_configuration["pv_table"])
-    truncate_table(step_configuration["temp_table"])
-    truncate_table(SAS_PROCESS_VARIABLES_TABLE)
-    truncate_table(step_configuration["sas_ps_table"])
+    db.truncate_table(step_configuration["pv_table"])()
+    db.truncate_table(step_configuration["temp_table"])()
+    db.truncate_table(SAS_PROCESS_VARIABLES_TABLE)()
+    db.truncate_table(step_configuration["sas_ps_table"])()
 
 
 # noinspection SqlResolve
@@ -430,7 +429,7 @@ def update_survey_data_with_step_results(step_configuration):
     else:
         update_others(table)
 
-    truncate_table(table)
+    db.truncate_table(table)()
 
 
 def store_survey_data_with_step_results(run_id, step_configuration):
@@ -480,7 +479,7 @@ def store_survey_data_with_step_results(run_id, step_configuration):
     if step in ps_tables_to_delete:
         db.delete_from_table(step_configuration["ps_table"])(run_id=run_id)
 
-    truncate_table(SAS_SURVEY_SUBSAMPLE_TABLE)
+    db.truncate_table(SAS_SURVEY_SUBSAMPLE_TABLE)()
 
 
 def store_step_summary(run_id, step_configuration):
@@ -518,7 +517,7 @@ def store_step_summary(run_id, step_configuration):
         ctf.populate_test_data(ps_table, run_id, step_configuration, dataset='summary')
 
     # Cleanse temporary summary table
-    truncate_table(sas_ps_table)
+    db.truncate_table(sas_ps_table)()
 
 
 def is_valid_run_id(run_id: str) -> bool:
