@@ -5,7 +5,8 @@ import pandas as pd
 from pkg_resources import resource_filename
 
 from ips_common.ips_logging import log
-import ips_common_db.sql as db
+import ips.persistence.traffic_weight as tw
+from ips.services.calculations import log_warnings, THRESHOLD_CAP
 
 SERIAL = 'SERIAL'
 TRAFFIC_WT = 'TRAFFIC_WT'
@@ -34,7 +35,7 @@ POP_TOTALS = "SAS_TRAFFIC_DATA"
 OUTPUT_TABLE_NAME = 'SAS_TRAFFIC_WT'
 SUMMARY_TABLE_NAME = 'SAS_PS_TRAFFIC'
 SURVEY_TRAFFIC_AUX_TABLE = "survey_traffic_aux"
-POP_PROWVEC_TABLE = 'poprowvec_traffic'
+POP_ROWVEC_TABLE = 'poprowvec_traffic'
 R_TRAFFIC_TABLE = "r_traffic"
 
 var_serialNum = 'serial'.upper()
@@ -46,12 +47,6 @@ minCountThresh = 30
 
 SAMP_PORT_GRP_PV = 'SAMP_PORT_GRP_PV'
 PORTROUTE = 'PORTROUTE'
-
-
-# insert dataframe into db and read back to resolve formatting issues
-def convert_dataframe_to_sql_format(table_name, dataframe):
-    db.insert_dataframe_into_table(table_name, dataframe)
-    return db.get_table_values(table_name)
 
 
 # Prepare survey data
@@ -70,10 +65,6 @@ def r_survey_input(df_survey_input):
     # Sort input values
     sort1 = [SAMP_PORT_GRP_PV, ARRIVEDEPART]
     df_survey_input_sorted = df_survey_input.sort_values(sort1)
-
-    # Cleanse data
-    df_survey_input_sorted = df_survey_input_sorted[~df_survey_input_sorted[SAMP_PORT_GRP_PV].isnull()]
-    df_survey_input_sorted = df_survey_input_sorted[~df_survey_input_sorted[ARRIVEDEPART].isnull()]
 
     # Create lookup. Group by and aggregate
     lookup_dataframe = df_survey_input_sorted.copy()
@@ -101,9 +92,7 @@ def r_survey_input(df_survey_input):
     df_r_ges_input = df_r_ges_input[[SERIAL, ARRIVEDEPART, PORTROUTE, SAMP_PORT_GRP_PV, var_shiftWeight,
                                      var_NRWeight, var_minWeight, TRAFDESIGNWEIGHT, T1]]
 
-    df_r_ges_input_imported = convert_dataframe_to_sql_format(SURVEY_TRAFFIC_AUX_TABLE, df_r_ges_input)
-
-    return df_r_ges_input_imported
+    tw.save_survey_traffic_aux(df_r_ges_input)
 
 
 # Prepare population totals to create AUX lookup variables
@@ -128,6 +117,62 @@ def r_population_input(df_survey_input, df_tr_totals):
     # Cleanse data
     df_survey_input_sorted = df_survey_input_sorted[~df_survey_input_sorted[SAMP_PORT_GRP_PV].isnull()]
     df_survey_input_sorted = df_survey_input_sorted[~df_survey_input_sorted[ARRIVEDEPART].isnull()]
+
+    # Check for errors within data before passed into R
+    values = df_survey_input_sorted.SHIFT_WT * df_survey_input_sorted.NON_RESPONSE_WT * df_survey_input_sorted.MINS_WT
+    df_survey_input_check = df_survey_input_sorted
+    df_survey_input_check['TRAFDESIGNWEIGHT'] = values
+
+    df_survey_input_check['C_GROUP'] = np.where(df_survey_input_check['TRAFDESIGNWEIGHT'] > 0, 1, 0)
+    df_ges_input = df_survey_input_check[['SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'TRAFDESIGNWEIGHT', 'C_GROUP', 'SERIAL']]
+    df_ges_input = df_ges_input.sort_values(sort1)
+    df_rsumsamp = df_ges_input.groupby(['SAMP_PORT_GRP_PV', 'ARRIVEDEPART']).agg(
+        {'TRAFDESIGNWEIGHT': 'sum'}).reset_index()
+
+    df_pop_totals_check = df_tr_totals.sort_values(sort1)
+    df_pop_totals_check = df_pop_totals_check[~df_pop_totals_check['SAMP_PORT_GRP_PV'].isnull()]
+    df_pop_totals_check = df_pop_totals_check[~df_pop_totals_check['ARRIVEDEPART'].isnull()]
+    df_pop_totals_check = df_pop_totals_check.groupby(['SAMP_PORT_GRP_PV', 'ARRIVEDEPART']).agg(
+        {'TRAFFICTOTAL': 'sum'}).reset_index()
+
+    df_merge_totals = df_rsumsamp.merge(df_pop_totals_check, on=sort1, how='outer')
+    df_merge_totals = df_merge_totals.sort_values(sort1)
+
+    # Error check 1
+    df_sum_check_1 = df_merge_totals[
+        df_merge_totals['TRAFDESIGNWEIGHT'] > 0 & df_merge_totals['TRAFDESIGNWEIGHT'].notnull()]
+    df_sum_check_2 = df_sum_check_1[df_sum_check_1['TRAFFICTOTAL'] < 0 | df_sum_check_1['TRAFFICTOTAL'].isnull()]
+
+    if len(df_sum_check_2):
+        threshold_string_cap = 4000
+        error_str = "No traffic total but sampled records present for"
+
+        threshold_string = ""
+        for index, record in df_sum_check_2.iterrows():
+            threshold_string += \
+                error_str + " " + 'SAMP_PORT_GRP_PV' + " = " + str(record[0]) \
+                + " " + 'ARRIVEDEPART' + " = " + str(record[1]) + "\n"
+
+        threshold_string_capped = threshold_string[:threshold_string_cap]
+        log.error(threshold_string_capped)
+
+    # Error check 2
+    df_sum_check_1 = df_merge_totals[df_merge_totals['TRAFFICTOTAL'] > 0 & df_merge_totals['TRAFFICTOTAL'].notnull()]
+    df_sum_check_2 = df_sum_check_1[
+        df_sum_check_1['TRAFDESIGNWEIGHT'] < 0 | df_sum_check_1['TRAFDESIGNWEIGHT'].isnull()]
+
+    if len(df_sum_check_2):
+        threshold_string_cap = 4000
+        error_str = "No records to match traffic against for"
+
+        threshold_string = ""
+        for index, record in df_sum_check_2.iterrows():
+            threshold_string += \
+                error_str + " " + 'SAMP_PORT_GRP_PV' + " = " + str(record[0]) \
+                + " " + 'ARRIVEDEPART' + " = " + str(record[1]) + "\n"
+
+        threshold_string_capped = threshold_string[:threshold_string_cap]
+        log.error(threshold_string_capped)
 
     # Sort input values
     df_pop_totals = df_tr_totals.sort_values(sort1)
@@ -179,16 +224,9 @@ def r_population_input(df_survey_input, df_tr_totals):
 
     df_mod_pop_totals = df_mod_pop_totals.reset_index(drop=True)
 
-    con = db.get_sql_connection()
     # recreate proc_vec table
 
-    # note the index gets added so needs to be removed when re-read from SQL
-    df_mod_pop_totals.to_sql(POP_PROWVEC_TABLE, con, if_exists='replace')
-
-    df_mod_pop_totals_import = db.get_table_values(POP_PROWVEC_TABLE)
-    df_mod_pop_totals_import = df_mod_pop_totals_import.drop('index', axis=1)
-
-    return df_mod_pop_totals_import
+    tw.save_pop_rowvec(df_mod_pop_totals)
 
 
 # call R as a subprocess
@@ -197,7 +235,7 @@ def run_r_ges_script():
     Author       : David Powell
     Date         : 07/06/2018
     Purpose      : Calls R Script to run GES Weighting
-    Parameters   : 
+    Parameters   :
     Returns      : Writes GES output to SQL Database
     Requirements : NA
     Dependencies : NA
@@ -207,11 +245,17 @@ def run_r_ges_script():
 
     step4 = resource_filename(__name__, 'r_scripts/step4.R')
 
-    subprocess.call(["Rscript", "--vanilla", step4,
-                     db.username,
-                     db.password,
-                     db.server,
-                     db.database])
+    subprocess.call(
+        [
+            "Rscript",
+            "--vanilla",
+            step4,
+            tw.username,
+            tw.password,
+            tw.server,
+            tw.database
+        ]
+    )
 
     log.info("R process finished.")
 
@@ -275,10 +319,14 @@ def generate_ips_tw_summary(df_survey, df_output_merge_final,
     df_summary_sorted.index = range(df_summary_sorted.shape[0])
 
     # method will possibly be deprecated - may not be an issue
-    df_tmp5 = df_summary_sorted.groupby(STRATA) \
-        .agg({POST_WEIGHT_COLUMN: {COUNT_COLUMN: 'count', POST_SUM_COLUMN: 'sum'},
-              traffic_weight: {traffic_weight: 'mean'},
-              })
+    df_tmp5 = (
+        df_summary_sorted.groupby(STRATA).agg(
+            {
+                POST_WEIGHT_COLUMN: {COUNT_COLUMN: 'count', POST_SUM_COLUMN: 'sum'},
+                traffic_weight: {traffic_weight: 'mean'}
+            }
+        )
+    )
 
     # drop the additional column indexes
     df_tmp5.columns = df_tmp5.columns.droplevel()
@@ -291,12 +339,12 @@ def generate_ips_tw_summary(df_survey, df_output_merge_final,
     df_summary_varpostweight = df_tmp5[col_order]
 
     # add in the traffic totals
-    df_popTotals_stratadef_sort = pop_totals.sort_values(STRATA)
+    df_pop_totals_stratadef_sort = pop_totals.sort_values(STRATA)
 
     # Re-index the data frame
-    df_popTotals_stratadef_sort.index = range(df_popTotals_stratadef_sort.shape[0])
+    df_pop_totals_stratadef_sort.index = range(df_pop_totals_stratadef_sort.shape[0])
 
-    df_merged = pd.merge(df_popTotals_stratadef_sort, df_summary_varpostweight, on=STRATA, how='outer')
+    df_merged = pd.merge(df_pop_totals_stratadef_sort, df_summary_varpostweight, on=STRATA, how='outer')
 
     df_merged[traffic_weight] = df_merged[traffic_weight].apply(lambda x: round(x, 3))
     df_merged[POST_SUM_COLUMN] = df_merged[POST_SUM_COLUMN].apply(lambda x: round(x, 3))
@@ -311,43 +359,30 @@ def generate_ips_tw_summary(df_survey, df_output_merge_final,
     df_sum_check = df_sum_check[STRATA]
 
     if len(df_sum_check) > 0:
-        threshold_string_cap = 4000
-        warning_str = "Respondent count below minimum threshold for"
-
-        # Loop over classificatory variables
-        threshold_string = ""
-        for index, record in df_sum_check.iterrows():
-            threshold_string += \
-                warning_str + " " + STRATA[0] + " = " + str(record[0]) \
-                + " " + STRATA[1] + "=" + str(record[1]) + "\n"
-
-        threshold_string_capped = threshold_string[:threshold_string_cap]
-
-        log.warning(threshold_string_capped)
+        df_sum_check = df_sum_check.head(THRESHOLD_CAP)
+        log_warnings("Respondent count below minimum threshold for")(df_sum_check)
 
     return df_summary_merge_sum_traftot
 
 
 # carry out the traffic weight calculation using R call
-def do_ips_trafweight_calculation_with_R(survey_data, trtotals):
+def do_ips_trafweight_calculation_with_r(survey_data, trtotals):
     # clear the auxillary tables
-    db.delete_from_table(SURVEY_TRAFFIC_AUX_TABLE)
+    tw.truncate_survey_traffic_aux()
 
     # drop aux tables and r created tables
-    # cf.drop_table(POP_PROWVEC_TABLE)
-    # cf.drop_table(R_TRAFFIC_TABLE)
-    db.clear_memory_table(R_TRAFFIC_TABLE)
-    db.clear_memory_table(POP_PROWVEC_TABLE)
+    tw.clear_r_traffic()
+    tw.clear_pop_prowvec()
 
     # inserts into survey_traffic_aux a.k.a. SURVEY_TRAFFIC_AUX_TABLE
-    df_r_ges_input_imported = r_survey_input(survey_data)
+    r_survey_input(survey_data)
     # inserts into POP_PROWVEC_TABLE
-    df_mod_pop_totals_import = r_population_input(survey_data, trtotals)
+    r_population_input(survey_data, trtotals)
 
     run_r_ges_script()
 
     # grab the data from the SQL table and return
-    output_final_import = db.get_table_values(R_TRAFFIC_TABLE)
+    output_final_import = tw.read_r_traffic()
 
     ret_out = output_final_import[[SERIAL, TRAFFIC_WT]]
 
@@ -366,26 +401,36 @@ def do_ips_trafweight_calculation_with_R(survey_data, trtotals):
     # #################################
 
     # perform calculation
-    survey_data[TRAFFIC_DESIGN_WEIGHT_COLUMN] = survey_data[var_shiftWeight] * survey_data[var_NRWeight] * survey_data[
-        var_minWeight]
+    survey_data[TRAFFIC_DESIGN_WEIGHT_COLUMN] = (
+            survey_data[var_shiftWeight]
+            * survey_data[var_NRWeight]
+            * survey_data[var_minWeight]
+    )
 
     # Summarise the population totals over the strata
-    df_PopTotals = trtotals.sort_values(STRATA)
+    df_pop_totals = trtotals.sort_values(STRATA)
 
     # Re-index the data frame
-    df_PopTotals.index = range(df_PopTotals.shape[0])
+    df_pop_totals.index = range(df_pop_totals.shape[0])
 
-    df_popTotals = df_PopTotals.groupby(STRATA)[TRAFFIC_TOTAL_COLUMN] \
-        .agg([(TRAFFIC_TOTAL_COLUMN, 'sum')]) \
-        .reset_index()
+    df_pop_totals = (
+        df_pop_totals.groupby(STRATA)[TRAFFIC_TOTAL_COLUMN].agg(
+            [(TRAFFIC_TOTAL_COLUMN, 'sum')]
+        ).reset_index()
+    )
 
-    # ensure unrounded df_ret_out_final_not_rounded is supplied
-    df_summary_merge_sum_traftot = generate_ips_tw_summary(survey_data, df_ret_out_final_not_rounded,
-                                                           var_serialNum, GWeightVar,
-                                                           df_popTotals, minCountThresh)
+    # ensure un-rounded df_ret_out_final_not_rounded is supplied
+    df_summary_merge_sum_traftot = generate_ips_tw_summary(
+        survey_data,
+        df_ret_out_final_not_rounded,
+        var_serialNum,
+        GWeightVar,
+        df_pop_totals,
+        minCountThresh
+    )
 
     # update the output SQL tables
-    db.insert_dataframe_into_table(OUTPUT_TABLE_NAME, ret_out_final)
-    db.insert_dataframe_into_table(SUMMARY_TABLE_NAME, df_summary_merge_sum_traftot)
+    tw.save_sas_traffic_wt(ret_out_final)
+    tw.save_summary(df_summary_merge_sum_traftot)
 
     return ret_out_final, df_summary_merge_sum_traftot

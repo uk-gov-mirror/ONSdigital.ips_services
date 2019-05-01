@@ -4,6 +4,7 @@ import pandas as pd
 from ips_common.ips_logging import log
 
 # dataimport survey_support
+from ips.services.calculations import log_warnings
 
 NON_RESPONSE_DATA_TABLE_NAME = 'SAS_NON_RESPONSE_DATA'
 OUTPUT_TABLE_NAME = 'SAS_NON_RESPONSE_WT'
@@ -218,13 +219,8 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
     df_merged_thresholds = df_merged_thresholds[NON_RESPONSE_STRATA]
 
     # Collect data outside of specified threshold
-    threshold_string = ""
-    for index, record in df_merged_thresholds.iterrows():
-        threshold_string += "___||___" \
-                            + df_merged_thresholds.columns[0] + " : " + str(record[0]) + " | " \
-                            + df_merged_thresholds.columns[1] + " : " + str(record[1])
     if len(df_merged_thresholds) > 0:
-        log.warning('Respondent count below minimum threshold for : ' + threshold_string)
+        log_warnings("Respondent count below minimum threshold for")(df_merged_thresholds)
 
     # Reduce output to just key value pairs
     df_out = df_out[[var_serial, non_response_weight_column]]
