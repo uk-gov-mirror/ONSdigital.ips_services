@@ -10,6 +10,7 @@ from ips.api.validation.validate import validate
 from ips.services.export_service import get_export_data
 
 
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 class ExportApi(Api):
 
     @validate(run_id=validate_run_id, table_name=validate_table)

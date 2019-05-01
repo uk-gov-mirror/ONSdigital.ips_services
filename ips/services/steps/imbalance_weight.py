@@ -1,8 +1,9 @@
-from ips.services.calculations import calculate_imb_weight
 from ips.persistence import data_management as idm
+from ips.persistence.data_management import get_survey_data
+from ips.persistence.persistence import insert_from_dataframe
+from ips.services.calculations import calculate_imb_weight
+from ips.util import process_variables
 from ips.util.config.services_configuration import ServicesConfiguration
-from ips.services.steps import process_variables
-import ips_common_db.sql as db
 
 
 def imbalance_weight_step(run_id):
@@ -34,7 +35,7 @@ def imbalance_weight_step(run_id):
     idm.update_survey_data_with_step_pv_output(config)
 
     # Retrieve data from SQL
-    survey_data = db.get_table_values(idm.SAS_SURVEY_SUBSAMPLE_TABLE)
+    survey_data = get_survey_data()
 
     # Calculate Imbalance Weight
     survey_data_out, summary_data_out = \
@@ -48,8 +49,8 @@ def imbalance_weight_step(run_id):
                                                           imbalance_weight="IMBAL_WT")
 
     # Insert data to SQL
-    db.insert_dataframe_into_table(config["temp_table"], survey_data_out)
-    db.insert_dataframe_into_table(config["sas_ps_table"], summary_data_out)
+    insert_from_dataframe(config["temp_table"])(survey_data_out)
+    insert_from_dataframe(config["sas_ps_table"])(summary_data_out)
 
     # Update Survey Data With Imbalance Wt Results
     idm.update_survey_data_with_step_results(config)

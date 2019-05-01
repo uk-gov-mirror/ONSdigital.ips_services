@@ -24,9 +24,11 @@ def get_run():
     except ValueError:
         error = f"Could not decode the request body. The JSON was invalid."
         log.error(error)
-        raise falcon.HTTPError(falcon.HTTP_400,
-                               'Invalid JSON',
-                               'Could not decode the request body. The JSON was invalid.')
+        raise falcon.HTTPError(
+            falcon.HTTP_400,
+            'Invalid JSON',
+            'Could not decode the request body. The JSON was invalid.'
+        )
 
 
 def create_run(data):

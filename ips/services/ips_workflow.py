@@ -177,16 +177,21 @@ class IPSWorkflow:
         log.info(f"Calculation 14, [airmiles.airmiles_step], process id: {os.getpid()}")
         airmiles.airmiles_step(run_id)
 
+    # _dag_list: List = {
+    #     1: [_step_1, _step_8, _step_9, _step_14],
+    #     2: [_step_2, _step_3, _step_10],
+    #     3: [_step_4],
+    #     4: [_step_5],
+    #     5: [_step_6],
+    #     6: [_step_7],
+    #     7: [_step_11],
+    #     8: [_step_13],
+    #     9: [_step_12]
+    # }
+
     _dag_list: List = {
-        1: [_step_1, _step_8, _step_9, _step_14],
-        2: [_step_2, _step_3, _step_10],
-        3: [_step_4],
-        4: [_step_5],
-        5: [_step_6],
-        6: [_step_7],
-        7: [_step_11],
-        8: [_step_13],
-        9: [_step_12]
+        1: [_step_1],
+        2: [_step_2]
     }
 
     def _initialize(self) -> None:
@@ -209,4 +214,3 @@ class IPSWorkflow:
             log.info(f"--> End Step: {x}\n")
 
         self._in_progress = False
-

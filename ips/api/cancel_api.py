@@ -10,6 +10,7 @@ from ips.api.validation.validate import validate
 from ips.persistence import data_management as db
 
 
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 class CancelApi(Api):
 
     @validate(run_id=validate_run_id)

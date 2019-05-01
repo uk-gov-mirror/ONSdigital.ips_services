@@ -471,7 +471,7 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     df_summary_high_1 = pd.merge(df_summary_high, df_summary_high_sampled, on=SHIFTS_SUB_STRATA, how='left')
 
     # Append summary and summary high
-    df_summary_3 = pd.concat([df_summary_high_1, df_summary_2], sort=True)
+    df_summary_3 = pd.concat([df_summary_high_1, df_summary_2])
 
     # Set summary columns
     df_summary_4 = df_summary_3[colset4]

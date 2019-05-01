@@ -1,7 +1,7 @@
 from ips.services.calculations import calculate_nonresponse_weight
 from ips.util.config.services_configuration import ServicesConfiguration
 from ips.persistence import data_management as idm
-from ips.services.steps import process_variables
+from ips.util import process_variables
 import ips_common_db.sql as db
 
 
@@ -13,15 +13,15 @@ def non_response_weight_step(run_id):
     Params       : run_id - the id for the current run.
     Returns      : NA
     """
-
+    # TODO: Move this to the correct workflow
+    from ips.persistence import apply_non_response_data_pvs as apply_pvs
+    apply_pvs.apply_pvs_to_non_response_data(run_id)
+    
     # Load configuration variables
     config = ServicesConfiguration().get_non_response()
 
     # Populate Survey Data For Non Response Wt
     idm.populate_survey_data_for_step(run_id, config)
-
-    # Populate Non Response Data
-    idm.populate_step_data(run_id, config)
 
     # Copy Non Response Wt PVs For Survey Data
     idm.copy_step_pvs_for_survey_data(run_id, config)
@@ -34,18 +34,6 @@ def non_response_weight_step(run_id):
 
     # Update Survey Data with Non Response Wt PVs Output
     idm.update_survey_data_with_step_pv_output(config)
-
-    # Copy Non Response Wt PVs for Non Response Data
-    idm.copy_step_pvs_for_step_data(run_id, config)
-
-    # Apply Non Response Wt PVs On Non Response Data
-    process_variables.process(dataset='non_response',
-                              in_table_name='SAS_NON_RESPONSE_DATA',
-                              out_table_name='SAS_NON_RESPONSE_PV',
-                              in_id='REC_ID')
-
-    # Update NonResponse Data With PVs Output
-    idm.update_step_data_with_step_pv_output(config)
 
     # Retrieve data from SQL
     survey_data = db.get_table_values(idm.SAS_SURVEY_SUBSAMPLE_TABLE)

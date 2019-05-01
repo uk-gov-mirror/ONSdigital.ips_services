@@ -1,8 +1,8 @@
-import ips_common_db.sql as db
-
 from ips.persistence import data_management as idm
+from ips.persistence.data_management import get_survey_data
+from ips.persistence.persistence import insert_from_dataframe
 from ips.services.calculations import calculate_fares_imputation
-from ips.services.steps import process_variables
+from ips.util import process_variables
 from ips.util.config.services_configuration import ServicesConfiguration
 
 
@@ -35,7 +35,7 @@ def fares_imputation_step(run_id):
     idm.update_survey_data_with_step_pv_output(config)
 
     # Retrieve data from SQL
-    survey_data = db.get_table_values(idm.SAS_SURVEY_SUBSAMPLE_TABLE)
+    survey_data = get_survey_data()
 
     # Calculate Fares Imputation
     survey_data_out = calculate_fares_imputation.do_ips_fares_imputation(survey_data,
@@ -44,7 +44,7 @@ def fares_imputation_step(run_id):
                                                                          measure='mean')
 
     # Insert data to SQL
-    db.insert_dataframe_into_table(config["temp_table"], survey_data_out)
+    insert_from_dataframe(config["temp_table"])(survey_data_out)
 
     # Update Survey Data With Fares Imp Results
     idm.update_survey_data_with_step_results(config)

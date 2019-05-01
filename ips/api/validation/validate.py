@@ -52,13 +52,6 @@ def validate(*name, **paramrules):
             param_names = set(param_values.keys())
             rule_names = set(paramrules.keys())
 
-            # TODO: for optimization, move this out to a
-            # variable since it's immutable for our purposes
-            # if missing_rules not in [[], ['self']]:
-            #     msg = "Parameter(s) not validated {0}"
-            #     msg = msg.format(missing_rules)
-            #     raise ValidationProgrammingError(msg)
-
             unassigned_rules = list(rule_names - param_names)
 
             if unassigned_rules:

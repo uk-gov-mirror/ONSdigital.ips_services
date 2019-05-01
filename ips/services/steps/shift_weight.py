@@ -1,8 +1,9 @@
-from ips.services.calculations import calculate_shift_weight
 from ips.persistence import data_management as idm
-from ips.services.steps import process_variables
+from ips.persistence.data_management import get_survey_data
+from ips.persistence.persistence import read_table_values, insert_from_dataframe
+from ips.services.calculations import calculate_shift_weight
+from ips.util import process_variables
 from ips.util.config.services_configuration import ServicesConfiguration
-import ips_common_db.sql as db
 
 
 def shift_weight_step(run_id):
@@ -14,15 +15,15 @@ def shift_weight_step(run_id):
                    connection - a connection object pointing at the database.
     Returns      : NA
     """
+    # TODO: Move this to the correct workflow
+    from ips.persistence import apply_shift_data_pvs as apply_pvs
+    apply_pvs.apply_pvs_to_shift_data(run_id, dataset='shift')
 
     # Load configuration variables
     config = ServicesConfiguration().get_shift_weight()
 
     # Populate Survey Data For Shift Wt
     idm.populate_survey_data_for_step(run_id, config)
-
-    # Populate Shift Data
-    idm.populate_step_data(run_id, config)
 
     # Copy Shift Wt PVs For Survey Data
     idm.copy_step_pvs_for_survey_data(run_id, config)
@@ -36,23 +37,9 @@ def shift_weight_step(run_id):
     # Update Survey Data with Shift Wt PV Output
     idm.update_survey_data_with_step_pv_output(config)
 
-    # Copy Shift Wt PVs For Shift Data
-    idm.copy_step_pvs_for_step_data(run_id, config)
-
-    # Apply Shift Wt PVs On Shift Data
-    process_variables.process(dataset='shift',
-                              in_table_name='SAS_SHIFT_DATA',
-                              out_table_name='SAS_SHIFT_PV',
-                              in_id='REC_ID')
-
-    # Update Shift Data with PVs Output
-    idm.update_step_data_with_step_pv_output(config)
-
     # Retrieve data from SQL
-    survey_data = db.get_table_values(idm.SAS_SURVEY_SUBSAMPLE_TABLE)
-    shift_data = db.get_table_values(config["data_table"])
-
-    # shift_data = sas_shift_schema.convert_dtype(shift_data)
+    survey_data = get_survey_data()
+    shift_data = read_table_values(config["data_table"])()
 
     # Calculate Shift Weight
     survey_data_out, summary_data_out = \
@@ -62,8 +49,8 @@ def shift_weight_step(run_id):
                                                                shift_weight='SHIFT_WT')
 
     # Insert data to SQL
-    db.insert_dataframe_into_table(config["temp_table"], survey_data_out)
-    db.insert_dataframe_into_table(config["sas_ps_table"], summary_data_out)
+    insert_from_dataframe(config["temp_table"])(survey_data_out)
+    insert_from_dataframe(config["sas_ps_table"])(summary_data_out)
 
     # Update Survey Data With Shift Wt Results
     idm.update_survey_data_with_step_results(config)

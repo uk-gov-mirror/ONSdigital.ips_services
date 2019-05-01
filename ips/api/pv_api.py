@@ -7,6 +7,7 @@ from ips.api.validation.validate_run_id import validate_run_id
 from ips.services.pv_service import get_process_variables, create_process_variables, delete_process_variables
 
 
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 class PvApi(Api):
 
     @validate(run_id=validate_run_id)

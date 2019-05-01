@@ -1,7 +1,6 @@
 from typing import Callable, Any
 
 import ips_common_db.sql as db
-import pandas
 import pandas as pd
 from ips_common.ips_logging import log
 
@@ -26,14 +25,6 @@ def read_table_values(table: str) -> Callable[[], pd.DataFrame]:
     return read
 
 
-def truncate_table(table: str) -> Callable[[str], None]:
-
-    def truncate():
-        db.execute_sql_statement(f"TRUNCATE TABLE {table}")
-
-    return truncate
-
-
 def delete_from_table(table: str) -> Callable[..., None]:
     """
         A closure that takes the name of a table to delete from and returns a function for that table that can be
@@ -44,25 +35,28 @@ def delete_from_table(table: str) -> Callable[..., None]:
     """
 
     def delete(**kwargs):
-        # noinspection SqlWithoutWhere
-        val = f"DELETE FROM {table}"
-        if len(kwargs) == 1:
-            key, value = kwargs.popitem()
-            if isinstance(value, str):
-                value = '"' + value + '"'
-            val += f' WHERE {key} = {value}'
+        if len(kwargs) == 0:
+            val = f"TRUNCATE {table}"
         else:
-            i = 0
-            for key, value in kwargs.items():
+            val = f"DELETE FROM {table}"
+
+            if len(kwargs) == 1:
+                key, value = kwargs.popitem()
                 if isinstance(value, str):
                     value = '"' + value + '"'
-                if i == 0:
-                    val += f' WHERE {key} = {value}'
-                else:
-                    val += f' {key} = {value}'
-                i = i + 1
-                if i != len(kwargs):
-                    val += ' AND '
+                val += f' WHERE {key} = {value}'
+            else:
+                i = 0
+                for key, value in kwargs.items():
+                    if isinstance(value, str):
+                        value = '"' + value + '"'
+                    if i == 0:
+                        val += f' WHERE {key} = {value}'
+                    else:
+                        val += f' {key} = {value}'
+                    i = i + 1
+                    if i != len(kwargs):
+                        val += ' AND '
 
         log.debug(val)
 
@@ -111,6 +105,7 @@ def insert_into_table(table: str) -> Callable[..., None]:
         db.execute_sql_statement(val)
 
     return insert
+
 
 
 def insert_into_table_id(table: str) -> Callable[..., None]:
@@ -191,8 +186,8 @@ def insert_from_json(table: str, if_exists: str = "append") -> Callable[[str], N
     return insert
 
 
-def select_data(column_name: str, table: str, condition1: str, condition2: str):
-    return db.select_data(column_name, table, condition1, condition2)
+def select_data(column_name: str, table_name: str, condition1: str, condition2: str):
+    return db.select_data(column_name, table_name, condition1, condition2)
 
 
 def execute_sql() -> Callable[[str], Any]:
@@ -205,3 +200,49 @@ def execute_sql() -> Callable[[str], Any]:
 def get_identity(table: str, id_column: str) -> str:
     return str(
         db.execute_sql_statement(f"SELECT {id_column} FROM {table} ORDER BY {id_column} DESC LIMIT 1").first()[0])
+
+
+def insert_into_table_id(table: str) -> Callable[..., None]:
+    """
+        A closure that takes the name of a table to insert into. and returns a function for that table that can be
+        called with any number of key/values that are mapped to table columes and their values as select predicates
+    :param table: the name of the table to insert
+    :return: a function that, when called will insert key/value items into the table
+    """
+
+    def insert(**kwargs):
+        val = f"INSERT INTO {table} ("
+        if len(kwargs) == 1:
+            key, value = kwargs.popitem()
+            if isinstance(value, str):
+                value = '"' + value + '"'
+            val += f' {key}) VALUES({value})'
+        else:
+            i = 0
+            for key, _ in kwargs.items():
+                val += key
+                i = i + 1
+                if i != len(kwargs):
+                    val += ', '
+                else:
+                    val += ') VALUES ('
+            i = 0
+            for _, value in kwargs.items():
+                if isinstance(value, str):
+                    value = '"' + value + '"'
+                val += value
+                i = i + 1
+                if i != len(kwargs):
+                    val += ', '
+                else:
+                    val += ') '
+
+        log.debug(val)
+        return execute_sql_statement_id(val)
+
+    return insert
+
+
+def execute_sql_statement_id(sq):
+    execute_sql()(sq)
+    return execute_sql()("SELECT @@IDENTITY AS id")

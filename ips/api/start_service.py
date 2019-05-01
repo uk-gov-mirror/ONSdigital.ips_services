@@ -11,6 +11,7 @@ from ips.api.validation.validate_run_id import validate_run_id
 from ips.persistence import data_management as db
 
 
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 class StartApi(Api):
 
     @validate(run_id=validate_run_id)
