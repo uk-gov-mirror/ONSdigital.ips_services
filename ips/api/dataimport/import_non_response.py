@@ -11,4 +11,4 @@ class ImportNonResponse(Api):
         v = req.get_param('ips-file')
         data = v.file.read()
 
-        imp.import_nonresponse_stream(data, run_id)
+        imp.import_nonresponse_stream(run_id, data)
