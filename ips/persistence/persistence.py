@@ -107,18 +107,68 @@ def insert_into_table(table: str) -> Callable[..., None]:
     return insert
 
 
-def insert_from_dataframe(table: str, if_exists: str = "append") -> Callable[[pd.DataFrame], None]:
+
+def insert_into_table_id(table: str) -> Callable[..., None]:
     """
-        A closure that inserts a pandas DataFrame into a table
-    :param table: the name of the table to insert into
-    :param if_exists: the pandas if_exists string. One of 'append|fail|replace'
-    :return: a function that when called with a DataFrame, inserts said DataFrame into the table
+        A closure that takes the name of a table to insert into. and returns a function for that table that can be
+        called with any number of key/values that are mapped to table columes and their values as select predicates
+
+    :param table: the name of the table to insert
+    :return: a function that, when called will insert key/value items into the table
     """
 
-    def insert(d: pd.DataFrame):
-        db.insert_dataframe_into_table(table, d, if_exists)
+    def insert(**kwargs):
+        val = f"INSERT INTO {table} ("
+        if len(kwargs) == 1:
+            key, value = kwargs.popitem()
+            if isinstance(value, str):
+                value = '"' + value + '"'
+            val += f' {key}) VALUES({value})'
+        else:
+            i = 0
+            for key, _ in kwargs.items():
+                val += key
+                i = i + 1
+                if i != len(kwargs):
+                    val += ', '
+                else:
+                    val += ') VALUES ('
+            i = 0
+            for _, value in kwargs.items():
+                if isinstance(value, str):
+                    value = '"' + value + '"'
+                val += value
+                i = i + 1
+                if i != len(kwargs):
+                    val += ', '
+                else:
+                    val += ') '
+
+        log.debug(val)
+        return db.execute_sql_statement_id(val)
 
     return insert
+
+
+def insert_from_dataframe(table: str, if_exists: str = "append", index=False) -> Callable[[pd.DataFrame], None]:
+
+    def insert(d: pd.DataFrame):
+        insert_dataframe_into_table(table, d, if_exists, index)
+
+    return insert
+
+
+def insert_dataframe_into_table(table_name: str,
+                                dataframe: pandas.DataFrame,
+                                if_exists='append',
+                                index=False) -> None:
+
+    try:
+        dataframe.to_sql(table_name, con=db.connection_string, if_exists=if_exists,
+                         chunksize=5000, index=index)
+    except Exception as err:
+        log.error(f"insert_dataframe_into_table failed: {err}")
+        raise err
 
 
 def insert_from_json(table: str, if_exists: str = "append") -> Callable[[str], None]:

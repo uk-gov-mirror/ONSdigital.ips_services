@@ -6,6 +6,7 @@ import pandas as pd
 from ips_common.ips_logging import log
 
 # dataimport survey_support
+from ips.services.calculations import log_warnings
 
 OUTPUT_TABLE_NAME = 'SAS_RAIL_IMP'
 ELIGIBLE_VARIABLE = 'FLOW'  # direction of travel (use 5 out uk , 8 in )
@@ -66,19 +67,13 @@ def do_ips_railex_imp(df_input, var_serial, var_final_weight, minimum_count_thre
     # Report any cells with respondent counts below the minCountThreshold
 
     # Create data set for rows below the threshold
-    df_summin_thresholds_check = \
-        df_summin[(df_summin[COUNT_VARIABLE] < minimum_count_threshold)]
-
-    # Collect data below of specified threshold
-    threshold_string = ""
-    for index, record in df_summin_thresholds_check.iterrows():
-        threshold_string += "___||___" \
-                            + df_summin_thresholds_check.columns[0] + " : " + str(record[0]) + " | " \
-                            + df_summin_thresholds_check.columns[1] + " : " + str(record[1])
+    df_summin_thresholds_check = df_summin[
+        (df_summin[COUNT_VARIABLE] < minimum_count_threshold)
+    ]
 
     # Output the values below of the threshold to the logger
     if len(df_summin_thresholds_check) > 0:
-        log.warning('Respondent count below minimum threshold for: ' + threshold_string)
+        log_warnings("Minimums weight outside thresholds for")(df_summin_thresholds_check)
 
     # Calculate each row's rail factor
     def calculate_rail_factor(row):
