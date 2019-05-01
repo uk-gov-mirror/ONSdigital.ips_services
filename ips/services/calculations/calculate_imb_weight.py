@@ -139,17 +139,22 @@ def do_ips_imbweight_calculation(df_survey_data, serial, shift_weight, non_respo
     df_survey_data.loc[df_survey_data[imbalance_weight].isnull(), imbalance_weight] = 1
 
     # Create the summary output
-    df_survey_data[PRIOR_SUM_COLUMN] = pd.Series(df_survey_data[shift_weight]
-                                                 * df_survey_data[non_response_weight]
-                                                 * df_survey_data[min_weight]
-                                                 * df_survey_data[traffic_weight]
-                                                 * df_survey_data[oo_weight])
-    df_survey_data[POST_SUM_COLUMN] = pd.Series(df_survey_data[imbalance_weight]
-                                                * df_survey_data[shift_weight]
-                                                * df_survey_data[non_response_weight]
-                                                * df_survey_data[min_weight]
-                                                * df_survey_data[traffic_weight]
-                                                * df_survey_data[oo_weight])
+    df_survey_data[PRIOR_SUM_COLUMN] = pd.Series(
+        df_survey_data[shift_weight]
+        * df_survey_data[non_response_weight]
+        * df_survey_data[min_weight]
+        * df_survey_data[traffic_weight]
+        * df_survey_data[oo_weight]
+    )
+
+    df_survey_data[POST_SUM_COLUMN] = pd.Series(
+        df_survey_data[imbalance_weight]
+        * df_survey_data[shift_weight]
+        * df_survey_data[non_response_weight]
+        * df_survey_data[min_weight]
+        * df_survey_data[traffic_weight]
+        * df_survey_data[oo_weight]
+    )
 
     df_sliced = df_survey_data[df_survey_data[POST_SUM_COLUMN] > 0]
     df_sliced[imbalance_weight] = df_sliced[imbalance_weight].astype('float').round(decimals=3)
@@ -162,5 +167,3 @@ def do_ips_imbweight_calculation(df_survey_data, serial, shift_weight, non_respo
     df_survey_data.sort_values([serial], inplace=True)
 
     return df_survey_data, df_summary_data
-
-

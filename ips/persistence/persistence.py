@@ -1,6 +1,7 @@
 from typing import Callable, Any
 
 import ips_common_db.sql as db
+import pandas
 import pandas as pd
 from ips_common.ips_logging import log
 
@@ -23,6 +24,14 @@ def read_table_values(table: str) -> Callable[[], pd.DataFrame]:
         return db.get_table_values(table)
 
     return read
+
+
+def truncate_table(table: str) -> Callable[[str], None]:
+
+    def truncate():
+        db.execute_sql_statement(f"TRUNCATE TABLE {table}")
+
+    return truncate
 
 
 def delete_from_table(table: str) -> Callable[..., None]:
@@ -107,51 +116,6 @@ def insert_into_table(table: str) -> Callable[..., None]:
     return insert
 
 
-def insert_from_dataframe(table: str, if_exists: str = "append") -> Callable[[pd.DataFrame], None]:
-    """
-        A closure that inserts a pandas DataFrame into a table
-    :param table: the name of the table to insert into
-    :param if_exists: the pandas if_exists string. One of 'append|fail|replace'
-    :return: a function that when called with a DataFrame, inserts said DataFrame into the table
-    """
-
-    def insert(d: pd.DataFrame):
-        db.insert_dataframe_into_table(table, d, if_exists)
-
-    return insert
-
-
-def insert_from_json(table: str, if_exists: str = "append") -> Callable[[str], None]:
-    """
-        A closure that inserts a json into a table by converting the json into a Dataframe and inserting
-    :param table: the name of the table to insert into
-    :param if_exists: the pandas if_exists string. One of 'append|fail|replace'
-    :return: a function that when called with a DataFrame, inserts said DataFrame into the table
-    """
-
-    def insert(data: str):
-        data_frame = pd.DataFrame(data, index=[0])
-        db.insert_dataframe_into_table(table, data_frame, if_exists)
-
-    return insert
-
-
-def select_data(column_name: str, table_name: str, condition1: str, condition2: str):
-    return db.select_data(column_name, table_name, condition1, condition2)
-
-
-def execute_sql() -> Callable[[str], Any]:
-    def execute(sql: str):
-        return db.execute_sql_statement(sql)
-
-    return execute
-
-
-def get_identity(table: str, id_column: str) -> str:
-    return str(
-        db.execute_sql_statement(f"SELECT {id_column} FROM {table} ORDER BY {id_column} DESC LIMIT 1").first()[0])
-
-
 def insert_into_table_id(table: str) -> Callable[..., None]:
     """
         A closure that takes the name of a table to insert into. and returns a function for that table that can be
@@ -188,10 +152,61 @@ def insert_into_table_id(table: str) -> Callable[..., None]:
                     val += ') '
 
         log.debug(val)
-        return execute_sql_statement_id(val)
+        return db.execute_sql_statement_id(val)
 
     return insert
 
+
+def insert_from_dataframe(table: str, if_exists: str = "append", index=False) -> Callable[[pd.DataFrame], None]:
+
+    def insert(d: pd.DataFrame):
+        insert_dataframe_into_table(table, d, if_exists, index)
+
+    return insert
+
+
+def insert_dataframe_into_table(table_name: str,
+                                dataframe: pandas.DataFrame,
+                                if_exists='append',
+                                index=False) -> None:
+
+    try:
+        dataframe.to_sql(table_name, con=db.connection_string, if_exists=if_exists,
+                         chunksize=5000, index=index)
+    except Exception as err:
+        log.error(f"insert_dataframe_into_table failed: {err}")
+        raise err
+
+
+def insert_from_json(table: str, if_exists: str = "append") -> Callable[[str], None]:
+    """
+        A closure that inserts a json into a table by converting the json into a Dataframe and inserting
+    :param table: the name of the table to insert into
+    :param if_exists: the pandas if_exists string. One of 'append|fail|replace'
+    :return: a function that when called with a DataFrame, inserts said DataFrame into the table
+    """
+
+    def insert(data: str):
+        data_frame = pd.DataFrame(data, index=[0])
+        db.insert_dataframe_into_table(table, data_frame, if_exists)
+
+    return insert
+
+
+def select_data(column_name: str, table: str, condition1: str, condition2: str):
+    return db.select_data(column_name, table, condition1, condition2)
+
+
+def execute_sql() -> Callable[[str], Any]:
+    def execute(sql: str):
+        return db.execute_sql_statement(sql)
+
+    return execute
+
+
+def get_identity(table: str, id_column: str) -> str:
+    return str(
+        db.execute_sql_statement(f"SELECT {id_column} FROM {table} ORDER BY {id_column} DESC LIMIT 1").first()[0])
 
 def execute_sql_statement_id(sq):
     execute_sql()(sq)

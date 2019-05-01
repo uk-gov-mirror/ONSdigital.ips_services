@@ -5,6 +5,8 @@ import pandas as pd
 
 from ips_common.ips_logging import log
 
+from ips.services.calculations import log_warnings
+
 OUTPUT_TABLE_NAME = 'SAS_MINIMUMS_WT'
 SUMMARY_TABLE_NAME = 'SAS_PS_MINIMUMS'
 STRATA = ['MINS_PORT_GRP_PV', 'MINS_CTRY_GRP_PV']
@@ -177,13 +179,8 @@ def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_wei
     df_merged_thresholds = df_merged_thresholds[STRATA]
 
     # Collect data outside of specified threshold
-    threshold_string = ""
-    for index, record in df_merged_thresholds.iterrows():
-        threshold_string += "___||___" \
-                            + df_merged_thresholds.columns[0] + " : " + str(record[0]) + " | " \
-                            + df_merged_thresholds.columns[1] + " : " + str(record[1])
     if len(df_merged_thresholds) > 0:
-        log.warning('Minimums weight outside thresholds for: ' + threshold_string)
+        log_warnings("Minimums weight outside thresholds for")(df_merged_thresholds)
 
     df_out = df_out[[serial_num, min_weight]]
 
