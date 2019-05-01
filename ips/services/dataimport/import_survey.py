@@ -1,9 +1,8 @@
 import io
-
+import falcon
 import pandas as pd
-from ips_common.ips_logging import log
-
 import ips.persistence.import_survey as db
+from ips_common.ips_logging import log
 from ips.services import service
 from ips.services.dataimport.schemas import survey_data_schema
 
@@ -82,14 +81,21 @@ def _validate_data(data: pd.DataFrame, user_month, user_year) -> bool:
             month = ['10', '11', '12']
 
     if not all(elem in month for elem in data_months):
-        log.error("Incorrect month select/uploaded")
+        error = f"Incorrect month select/uploaded."
+        log.error(error)
+        # return falcon.HTTPError(falcon.HTTP_401, 'data error', error)
         return False
     elif not all(elem in user_year for elem in data_years):
-        log.error("Incorrect year select/uploaded")
+        error = f"Incorrect year select/uploaded."
+        log.error(error)
+        # return falcon.HTTPError(falcon.HTTP_401, 'data error', error)
         return False
 
     if 'SERIAL' not in data.columns:
-        log.error("'SERIAL' column does not exist")
+        error = f"'SERIAL' column does not exist in data."
+        log.error(error)
+        # return falcon.HTTPError(falcon.HTTP_401, 'data error', error)
         return False
 
+    # return falcon.HTTPError(falcon.HTTP_401, 'success')
     return True
