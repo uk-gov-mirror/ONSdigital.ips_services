@@ -155,29 +155,22 @@ def insert_into_table_id(table: str) -> Callable[..., None]:
     return insert
 
 
-def insert_from_dataframe(table: str, if_exists: str = "append") -> Callable[[pd.DataFrame], None]:
-    """
-        A closure that inserts a pandas DataFrame into a table
-    :param table: the name of the table to insert into
-    :param if_exists: the pandas if_exists string. One of 'append|fail|replace'
-    :return: a function that when called with a DataFrame, inserts said DataFrame into the table
-    """
+def insert_from_dataframe(table: str, if_exists: str = "append", index=False) -> Callable[[pd.DataFrame], None]:
 
     def insert(d: pd.DataFrame):
-        insert_dataframe_into_table(table, d, if_exists)
+        insert_dataframe_into_table(table, d, if_exists, index)
 
     return insert
 
 
 def insert_dataframe_into_table(table_name: str,
                                 dataframe: pandas.DataFrame,
-                                if_exists='append') -> None:
-    # dataframe = dataframe.where((pandas.notnull(dataframe)), None)
-    # dataframe.columns = dataframe.columns.astype(str)
+                                if_exists='append',
+                                index=False) -> None:
 
     try:
         dataframe.to_sql(table_name, con=db.connection_string, if_exists=if_exists,
-                         chunksize=5000, index=False)
+                         chunksize=5000, index=index)
     except Exception as err:
         log.error(f"insert_dataframe_into_table failed: {err}")
         raise err
