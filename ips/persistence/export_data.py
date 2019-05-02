@@ -10,7 +10,7 @@ insert_downloads = insert_from_dataframe(EXPORT_DATA_DOWNLOAD, "append")
 
 
 def export_from_table(run_id, table):
-    df = select_data(column_name="*", table_name=table, condition1="RUN_ID", condition2=run_id)
+    df = select_data(column_name="*", table=table, condition1="RUN_ID", condition2=run_id)
     csv = df.to_csv(index=False)
     return create_export_data_download(run_id, table, csv)
 
