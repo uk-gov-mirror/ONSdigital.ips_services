@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
 
-# dataimport survey_support
-
 from ips_common.ips_logging import log
 
 from ips.services.calculations import log_warnings
@@ -95,7 +93,7 @@ def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_wei
     else:
         df_summary[min_weight] = np.where(df_summary[PRIOR_WEIGHT_FULL_COLUMN] > 0,
                                           (df_summary[PRIOR_WEIGHT_MINIMUM_COLUMN] +
-                                              df_summary[PRIOR_WEIGHT_FULL_COLUMN]) /
+                                           df_summary[PRIOR_WEIGHT_FULL_COLUMN]) /
                                           df_summary[PRIOR_WEIGHT_FULL_COLUMN],
                                           1)
 
@@ -104,16 +102,17 @@ def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_wei
     df_summary[PRIOR_WEIGHT_FULL_COLUMN].fillna(0, inplace=True)
     df_summary["sumPriorWeightMigs"].fillna(0, inplace=True)
 
-    df_summary[PRIOR_WEIGHT_ALL_COLUMN] = df_summary[PRIOR_WEIGHT_MINIMUM_COLUMN] + \
-                                          df_summary[PRIOR_WEIGHT_FULL_COLUMN] + \
-                                          df_summary["sumPriorWeightMigs"]
+    df_summary[PRIOR_WEIGHT_ALL_COLUMN] = (
+            df_summary[PRIOR_WEIGHT_MINIMUM_COLUMN]
+            + df_summary[PRIOR_WEIGHT_FULL_COLUMN]
+            + df_summary["sumPriorWeightMigs"])
 
     df_summary = df_summary.sort_values(STRATA)
 
     df_summary[min_weight] = np.where(df_summary[PRIOR_WEIGHT_FULL_COLUMN] > 0,
                                       ((df_summary[PRIOR_WEIGHT_MINIMUM_COLUMN] +
-                                           df_summary[PRIOR_WEIGHT_FULL_COLUMN]) / df_summary[
-                                              PRIOR_WEIGHT_FULL_COLUMN]),
+                                        df_summary[PRIOR_WEIGHT_FULL_COLUMN]) / df_summary[
+                                           PRIOR_WEIGHT_FULL_COLUMN]),
                                       df_summary[min_weight])
 
     df_surveydata_sorted.fillna(0, inplace=True)
@@ -151,9 +150,11 @@ def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_wei
 
     df_test_post_2[MINIMUM_FLAG_COLUMN] = df_out[MINIMUM_FLAG_COLUMN]
 
-    df_out['SWNRMINwght'] = df_out[shift_weight] * \
-                            df_out[nr_weight] * \
-                            df_out[min_weight]
+    df_out['SWNRMINwght'] = (
+            df_out[shift_weight]
+            * df_out[nr_weight]
+            * df_out[min_weight]
+    )
 
     df_out_sliced = df_out[df_out[MINIMUM_FLAG_COLUMN] != 1]
     df_postsum = df_out_sliced.groupby(STRATA)['SWNRMINwght'].agg({

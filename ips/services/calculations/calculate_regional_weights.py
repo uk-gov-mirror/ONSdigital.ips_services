@@ -308,13 +308,13 @@ def do_ips_regional_weight_calculation(df_input_data, serial_num, final_weight):
                         & (trunc_segment[level - 1]['KNOWN_STAY'] != 0)
                         & (trunc_segment[level - 1]['KNOWN_FINAL_WEIGHTS'] != 0)
                         & (trunc_segment[level - 1]['KNOWN_FINAL_WEIGHTS'].notnull())
-                        & (((trunc_segment[level - 1]['KNOWN_FINAL_WEIGHTS'] + trunc_segment[level - 1][
-                    'UNKNOWN_FINAL_WEIGHT']) /
-                            trunc_segment[level - 1]['KNOWN_FINAL_WEIGHTS']) <= 2)
-                        & (((trunc_segment[level - 1]['KNOWN_STAY'] + trunc_segment[level - 1]['UNKNOWN_STAY']) /
-                            trunc_segment[level - 1]['KNOWN_STAY']) <= 2)
-                        & (((trunc_segment[level - 1]['KNOWN_EXPEND'] + trunc_segment[level - 1][
-                    'UNKNOWN_EXPEND']) / trunc_segment[level - 1]['KNOWN_EXPEND']) <= 2)
+                        & (((trunc_segment[level - 1]['KNOWN_FINAL_WEIGHTS']
+                             + trunc_segment[level - 1]['UNKNOWN_FINAL_WEIGHT'])
+                            / trunc_segment[level - 1]['KNOWN_FINAL_WEIGHTS']) <= 2)
+                        & (((trunc_segment[level - 1]['KNOWN_STAY'] + trunc_segment[level - 1]['UNKNOWN_STAY'])
+                            / trunc_segment[level - 1]['KNOWN_STAY']) <= 2)
+                        & (((trunc_segment[level - 1]['KNOWN_EXPEND'] + trunc_segment[level - 1]['UNKNOWN_EXPEND'])
+                            / trunc_segment[level - 1]['KNOWN_EXPEND']) <= 2)
                 )
 
                 trunc_segment[level - 1] = trunc_segment[level - 1].loc[condition]

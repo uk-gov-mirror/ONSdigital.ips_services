@@ -21,18 +21,7 @@ def parallelise_dataframe(df, func):
     return df
 
 
-# def log_warnings(warning_str: str) -> Callable[[pd.DataFrame], None]:
-#
-#     def log_message(df: pd.DataFrame):
-#         for index, record in df.iterrows():
-#             warn = f"{warning_str} {df.columns[0]} = {str(record[0])} {df.columns[1]} = {str(record[1])}"
-#             log.warning(warn)
-#
-#     return log_message
-
-
 def log_warnings(warning_str: str) -> Callable[[pd.DataFrame], None]:
-
     def log_message(df: pd.DataFrame, items: int = 2):
         for index, record in df.iterrows():
             warn = f"{warning_str} "
@@ -41,5 +30,13 @@ def log_warnings(warning_str: str) -> Callable[[pd.DataFrame], None]:
                 if i != (items - 1):
                     warn += " : "
             log.warning(warn)
+
+    return log_message
+
+
+def log_errors(error_str: str) -> Callable[[pd.DataFrame], None]:
+    def log_message(df: pd.DataFrame):
+        for index, record in df.iterrows():
+            log(f"{error_str} [{df.columns[0]} = {str(record[0])}]")
 
     return log_message
