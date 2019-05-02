@@ -43,7 +43,7 @@ def import_survey_file(run_id, survey_data_path):
     return _import_survey(run_id, survey_data_path)
 
 
-def _import_survey(run_id, source, month, year):
+def _import_survey(run_id, source, month=None, year=None):
     df: pd.DataFrame = pd.read_csv(
         source,
         encoding="ISO-8859-1",
@@ -53,8 +53,9 @@ def _import_survey(run_id, source, month, year):
     )
 
     df.columns = df.columns.str.upper()
-    if not _validate_data(df, month, year):
-        log.info("Validation failed. We need to implement an awesome exit strategy!")
+    if month is not None and year is not None:
+        if not _validate_data(df, month, year):
+            log.info("Validation failed. We need to implement an awesome exit strategy!")
     df = df.sort_values(by='SERIAL')
     db.import_survey_data(run_id, df)
     return df

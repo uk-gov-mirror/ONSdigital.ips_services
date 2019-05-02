@@ -5,7 +5,7 @@ import pandas as pd
 from pkg_resources import resource_filename
 
 from ips_common.ips_logging import log
-import ips.persistence.traffic_weight as tw
+import ips.persistence.traffic_weight as db
 from ips.services.calculations import log_warnings, THRESHOLD_CAP
 
 SERIAL = 'SERIAL'
@@ -92,7 +92,7 @@ def r_survey_input(df_survey_input):
     df_r_ges_input = df_r_ges_input[[SERIAL, ARRIVEDEPART, PORTROUTE, SAMP_PORT_GRP_PV, var_shiftWeight,
                                      var_NRWeight, var_minWeight, TRAFDESIGNWEIGHT, T1]]
 
-    tw.save_survey_traffic_aux(df_r_ges_input)
+    db.save_survey_traffic_aux(df_r_ges_input)
 
 
 # Prepare population totals to create AUX lookup variables
@@ -226,7 +226,7 @@ def r_population_input(df_survey_input, df_tr_totals):
 
     # recreate proc_vec table
 
-    tw.save_pop_rowvec(df_mod_pop_totals)
+    db.save_pop_rowvec(df_mod_pop_totals)
 
 
 # call R as a subprocess
@@ -245,16 +245,16 @@ def run_r_ges_script():
 
     step4 = resource_filename(__name__, 'r_scripts/step4.R')
 
-    subprocess.call(
+    subprocess.run(
         [
             "Rscript",
             "--vanilla",
             step4,
-            tw.username,
-            tw.password,
-            tw.server,
-            tw.database
-        ]
+            db.username,
+            db.password,
+            db.server,
+            db.database
+        ],capture_output=True
     )
 
     log.info("R process finished.")
@@ -368,11 +368,11 @@ def generate_ips_tw_summary(df_survey, df_output_merge_final,
 # carry out the traffic weight calculation using R call
 def do_ips_trafweight_calculation_with_r(survey_data, trtotals):
     # clear the auxillary tables
-    tw.truncate_survey_traffic_aux()
+    db.truncate_survey_traffic_aux()
 
     # drop aux tables and r created tables
-    tw.clear_r_traffic()
-    tw.clear_pop_prowvec()
+    db.clear_r_traffic()
+    db.clear_pop_prowvec()
 
     # inserts into survey_traffic_aux a.k.a. SURVEY_TRAFFIC_AUX_TABLE
     r_survey_input(survey_data)
@@ -382,7 +382,7 @@ def do_ips_trafweight_calculation_with_r(survey_data, trtotals):
     run_r_ges_script()
 
     # grab the data from the SQL table and return
-    output_final_import = tw.read_r_traffic()
+    output_final_import = db.read_r_traffic()
 
     ret_out = output_final_import[[SERIAL, TRAFFIC_WT]]
 
@@ -430,7 +430,7 @@ def do_ips_trafweight_calculation_with_r(survey_data, trtotals):
     )
 
     # update the output SQL tables
-    tw.save_sas_traffic_wt(ret_out_final)
-    tw.save_summary(df_summary_merge_sum_traftot)
+    db.save_sas_traffic_wt(ret_out_final)
+    db.save_summary(df_summary_merge_sum_traftot)
 
     return ret_out_final, df_summary_merge_sum_traftot
