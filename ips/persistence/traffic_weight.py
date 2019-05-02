@@ -1,4 +1,4 @@
-from ips_common.config.configuration import Configuration
+
 
 from ips.persistence import persistence as db
 
@@ -12,13 +12,6 @@ save_pop_rowvec = db.insert_from_dataframe(table=POP_ROWVEC_TABLE, if_exists='re
 read_pop_rowvec = db.read_table_values(POP_ROWVEC_TABLE)
 
 read_r_traffic = db.read_table_values(R_TRAFFIC_TABLE)
-
-config = Configuration().cfg['database']
-
-username = config['user']
-password = config['password']
-database = config['database']
-server = config['server']
 
 truncate_survey_traffic_aux = db.truncate_table(SURVEY_TRAFFIC_AUX_TABLE)
 clear_r_traffic = db.clear_memory_table(R_TRAFFIC_TABLE)

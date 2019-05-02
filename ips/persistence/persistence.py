@@ -43,6 +43,7 @@ def delete_from_table(table: str) -> Callable[..., None]:
     :return: a function that is called with the run_id
     """
 
+    # noinspection SqlWithoutWhere
     def delete(**kwargs):
         if len(kwargs) == 0:
             val = f"TRUNCATE {table}"

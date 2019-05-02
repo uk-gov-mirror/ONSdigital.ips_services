@@ -4,7 +4,7 @@ import pandas as pd
 from ips_common.ips_logging import log
 
 # dataimport survey_support
-from ips.services.calculations import log_warnings
+from ips.services.calculations import log_warnings, log_errors
 
 NON_RESPONSE_DATA_TABLE_NAME = 'SAS_NON_RESPONSE_DATA'
 OUTPUT_TABLE_NAME = 'SAS_NON_RESPONSE_WT'
@@ -157,13 +157,8 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
     df_gross_resp_is_zero = df_gnr[df_gnr[GROSS_RESP_COLUMN] == 0]
 
     # Collect data outside of specified threshold
-    threshold_string = ""
-    for index, record in df_gross_resp_is_zero.iterrows():
-        threshold_string += "___||___" \
-                            + df_gross_resp_is_zero.columns[0] + " : " + str(record[0])
-
     if len(df_gross_resp_is_zero) > 0:
-        log.error('Gross response is 0.' + threshold_string)
+        log_errors("Gross response is 0")(df_gross_resp_is_zero)
 
     # Sort df_gnr and df_surveydata ready for producing summary
     df_gnr = df_gnr.sort_values(NON_RESPONSE_STRATA)

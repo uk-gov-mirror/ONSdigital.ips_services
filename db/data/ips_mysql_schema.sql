@@ -70,7 +70,7 @@ create table EXPORT_DATA_DETAILS
 create table EXPORT_DATA_DOWNLOAD
 (
   RUN_ID            varchar(40) not null,
-  DOWNLOADABLE_DATA text        null,
+  DOWNLOADABLE_DATA longtext    null,
   FILENAME          varchar(40) null,
   SOURCE_TABLE      varchar(40) null,
   DATE_CREATED      datetime    null

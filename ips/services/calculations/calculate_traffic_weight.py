@@ -2,11 +2,13 @@ import subprocess
 
 import numpy as np
 import pandas as pd
+from ips_common.config.configuration import Configuration
 from pkg_resources import resource_filename
 
 from ips_common.ips_logging import log
 import ips.persistence.traffic_weight as db
 from ips.services.calculations import log_warnings, THRESHOLD_CAP
+from ips.util.config.services_configuration import ServicesConfiguration
 
 SERIAL = 'SERIAL'
 TRAFFIC_WT = 'TRAFFIC_WT'
@@ -245,16 +247,23 @@ def run_r_ges_script():
 
     step4 = resource_filename(__name__, 'r_scripts/step4.R')
 
+    config = Configuration().cfg['database']
+
+    username = config['user']
+    password = config['password']
+    database = config['database']
+    server = config['server']
+
     subprocess.run(
         [
             "Rscript",
             "--vanilla",
             step4,
-            db.username,
-            db.password,
-            db.server,
-            db.database
-        ],capture_output=True
+            username,
+            password,
+            server,
+            database
+        ], capture_output=True
     )
 
     log.info("R process finished.")
