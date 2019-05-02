@@ -54,14 +54,17 @@ def _import_survey(run_id, source, month=None, year=None):
 
     df.columns = df.columns.str.upper()
     if month is not None and year is not None:
-        if not _validate_data(df, month, year):
-            log.info("Validation failed. We need to implement an awesome exit strategy!")
+        validation = _validate_data(df, month, year)
+        if not validation[0]:
+            msg = validation[1]
+            log.info(f"Validation failed: {msg}")
+            return falcon.HTTPError(falcon.HTTP_401, 'data error', msg)
     df = df.sort_values(by='SERIAL')
     db.import_survey_data(run_id, df)
     return df
 
 
-def _validate_data(data: pd.DataFrame, user_month, user_year) -> bool:
+def _validate_data(data: pd.DataFrame, user_month, user_year):
     log.info("Validating survey data...")
 
     data_months = []
@@ -82,21 +85,48 @@ def _validate_data(data: pd.DataFrame, user_month, user_year) -> bool:
             month = ['10', '11', '12']
 
     if not all(elem in month for elem in data_months):
-        error = f"Incorrect month select/uploaded."
-        log.error(error)
-        # return falcon.HTTPError(falcon.HTTP_401, 'data error', error)
-        return False
+        msg = f"Incorrect month select/uploaded."
+        log.error(msg)
+        r = False, msg
     elif not all(elem in user_year for elem in data_years):
-        error = f"Incorrect year select/uploaded."
-        log.error(error)
-        # return falcon.HTTPError(falcon.HTTP_401, 'data error', error)
-        return False
+        msg = f"Incorrect year select/uploaded."
+        log.error(msg)
+        r = False, msg
+    elif 'SERIAL' not in data.columns:
+        msg = f"'SERIAL' column does not exist in data."
+        log.error(msg)
+        r = False, msg
 
-    if 'SERIAL' not in data.columns:
-        error = f"'SERIAL' column does not exist in data."
-        log.error(error)
-        # return falcon.HTTPError(falcon.HTTP_401, 'data error', error)
-        return False
+    def error_message():
+        return r
 
-    # return falcon.HTTPError(falcon.HTTP_401, 'success')
-    return True
+    return error_message()
+
+
+def els_validate(i: int):
+    if i == 1:
+        error_message = 'JUAN!'
+        the_bool = True
+
+    if i == 2:
+        error_message = 'TWOOO-AH!'
+        the_bool = False
+
+    if i == 3:
+        error_message = 'success'
+        the_bool = True
+
+    def get_error_message():
+        return the_bool, error_message
+
+    return get_error_message()
+
+
+
+if __name__ == '__main__':
+    a = els_validate(3)
+    the_bool = a[0]
+    the_msg = a[1]
+    print(the_bool)
+    print(the_msg)
+
