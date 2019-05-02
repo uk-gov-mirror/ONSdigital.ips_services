@@ -209,3 +209,4 @@ class IPSWorkflow:
             log.info(f"--> End Step: {x}\n")
 
         self._in_progress = False
+        self._cancel_run = False
