@@ -1,7 +1,7 @@
 from ips.persistence import data_management as idm
 from ips.persistence.data_management import get_survey_data
 from ips.persistence.persistence import read_table_values, insert_from_dataframe
-from ips.services.calculations.calculate_traffic_weight import do_ips_trafweight_calculation_with_R
+from ips.services.calculations.calculate_traffic_weight import do_ips_trafweight_calculation_with_r
 from ips.util import process_variables
 from ips.util.config.services_configuration import ServicesConfiguration
 
@@ -54,7 +54,7 @@ def traffic_weight_step(run_id):
     traffic_data = read_table_values(config["data_table"])()
 
     # Calculate Traffic Weight
-    output_data, summary_data = do_ips_trafweight_calculation_with_R(survey_data, traffic_data)
+    output_data, summary_data = do_ips_trafweight_calculation_with_r(survey_data, traffic_data)
 
     # Insert data to SQL
     insert_from_dataframe(config["temp_table"])(output_data)

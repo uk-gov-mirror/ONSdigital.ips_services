@@ -3,6 +3,8 @@ import pandas as pd
 
 from ips_common.ips_logging import log
 
+from ips.services.calculations import log_warnings
+
 OUTPUT_TABLE_NAME = 'SAS_SHIFT_WT'
 SUMMARY_TABLE_NAME = 'SAS_PS_SHIFT_DATA'
 
@@ -503,13 +505,10 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     # Collect data outside of specified threshold
 
     if len(df_sw_thresholds_check) > 0:
-        threshold_string = ""
-        for index, record in df_sw_thresholds_check.iterrows():
-            threshold_string += "___||___" \
-                                + df_sw_thresholds_check.columns[0] + " : " + str(record[0]) + " | " \
-                                + df_sw_thresholds_check.columns[1] + " : " + str(record[1]) + " | " \
-                                + df_sw_thresholds_check.columns[2] + " : " + str(record[2]) + " | " \
-                                + df_sw_thresholds_check.columns[3] + " : " + str(record[3])
-        log.warning('Shift weight outside thresholds for: ' + threshold_string)
+        log_warnings("Shift weight outside thresholds for")(df_sw_thresholds_check, 4)
 
     return final_output_data, final_summary_data
+
+
+
+
