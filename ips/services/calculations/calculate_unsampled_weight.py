@@ -200,11 +200,17 @@ def run_r_ges_script() -> None:
 
     step5 = resource_filename(__name__, 'r_scripts/step5.R')
 
-    subprocess.call(["Rscript", "--vanilla", step5,
-                     db.username,
-                     db.password,
-                     db.server,
-                     db.database])
+    subprocess.run(
+        [
+            "Rscript",
+            "--vanilla",
+            step5,
+            db.username,
+            db.password,
+            db.server,
+            db.database
+        ], capture_output=True
+    )
 
     log.info("R process finished.")
 
