@@ -208,6 +208,7 @@ def get_identity(table: str, id_column: str) -> str:
     return str(
         db.execute_sql_statement(f"SELECT {id_column} FROM {table} ORDER BY {id_column} DESC LIMIT 1").first()[0])
 
+
 def execute_sql_statement_id(sq):
     execute_sql()(sq)
     return execute_sql()("SELECT @@IDENTITY AS id")
