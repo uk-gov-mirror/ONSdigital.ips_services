@@ -2,10 +2,12 @@ import subprocess
 
 import numpy as np
 import pandas as pd
+from ips_common.config.configuration import Configuration
 from pkg_resources import resource_filename
 
 from ips_common.ips_logging import log
-import ips_common_db.sql as db
+import ips.persistence.persistence as db
+from ips.services.calculations import log_warnings
 
 OOH_STRATA = [
     'UNSAMP_PORT_GRP_PV',
@@ -68,7 +70,13 @@ def r_survey_input(survey_input: pd.DataFrame) -> None:
                                                                               'ARRIVEDEPART'], how='left')
 
     # Create traffic design weight used within GES weighting
-    values = df_aux_variables.SHIFT_WT * df_aux_variables.NON_RESPONSE_WT * df_aux_variables.MINS_WT * df_aux_variables.TRAFFIC_WT
+    values = (
+            df_aux_variables.SHIFT_WT
+            * df_aux_variables.NON_RESPONSE_WT
+            * df_aux_variables.MINS_WT
+            * df_aux_variables.TRAFFIC_WT
+    )
+
     df_aux_variables['OOHDesignWeight'] = values
     df_aux_variables = df_aux_variables.sort_values(['SERIAL'])
 
@@ -81,7 +89,7 @@ def r_survey_input(survey_input: pd.DataFrame) -> None:
     # # ROUND VALUES - Added to match SAS output
     df_r_ges_input.UNSAMP_REGION_GRP_PV = pd.to_numeric(df_r_ges_input.UNSAMP_REGION_GRP_PV, errors='coerce')
 
-    db.insert_dataframe_into_table("survey_unsamp_aux", df_r_ges_input)
+    db.insert_from_dataframe("survey_unsamp_aux")(df_r_ges_input)
 
     df_aux_variables.drop(columns=['T1', 'OOHDesignWeight'], axis=1)
 
@@ -182,7 +190,7 @@ def r_population_input(survey_input: pd.DataFrame, ustotals: pd.DataFrame) -> No
     df_mod_totals = df_mod_totals.add_prefix('T_')
 
     # TODO: Move to persistence
-    db.insert_dataframe_into_table('poprowvec_unsamp', df_mod_totals, if_exists='replace')
+    db.insert_from_dataframe('poprowvec_unsamp', if_exists='replace')(df_mod_totals)
 
 
 def run_r_ges_script() -> None:
@@ -200,15 +208,22 @@ def run_r_ges_script() -> None:
 
     step5 = resource_filename(__name__, 'r_scripts/step5.R')
 
+    config = Configuration().cfg['database']
+
+    username = config['user']
+    password = config['password']
+    database = config['database']
+    server = config['server']
+
     subprocess.run(
         [
             "Rscript",
             "--vanilla",
             step5,
-            db.username,
-            db.password,
-            db.server,
-            db.database
+            username,
+            password,
+            server,
+            database
         ], capture_output=True
     )
 
@@ -217,12 +232,10 @@ def run_r_ges_script() -> None:
 
 def do_ips_ges_weighting(df_surveydata: pd.DataFrame, df_ustotals: pd.DataFrame):
     # Deletes from poprowvec and survey_unsamp_aux tables
-    db.delete_from_table('survey_unsamp_aux')
+    db.truncate_table('survey_unsamp_aux')()
 
-    # cf.drop_table('poprowvec_unsamp')
-    # cf.drop_table('r_unsampled')
-    db.clear_memory_table('poprowvec_unsamp')
-    db.clear_memory_table('r_unsampled')
+    db.clear_memory_table('poprowvec_unsamp')()
+    db.clear_memory_table('r_unsampled')()
 
     # Call the GES weighting macro
     df_surveydata = df_surveydata.sort_values('SERIAL')
@@ -233,7 +246,7 @@ def do_ips_ges_weighting(df_surveydata: pd.DataFrame, df_ustotals: pd.DataFrame)
 
     run_r_ges_script()
 
-    df_summarydata = db.get_table_values('r_unsampled')
+    df_summarydata = db.read_table_values('r_unsampled')()
     df_summarydata = df_summarydata[['SERIAL', 'UNSAMP_TRAFFIC_WT']]
 
     return df_surveydata, df_summarydata
@@ -390,18 +403,7 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
                    & (df_summary[CASE_COUNT_COLUMN] < min_count_threshold)]
 
     # Collect data outside of specified threshold
-    threshold_string = ""
-    for index, record in df_unsampled_thresholds_check.iterrows():
-        threshold_string += "___||___" \
-                            + str(df_unsampled_thresholds_check.columns[0]) + " : " + str(record[0]) + " | " \
-                            + str(df_unsampled_thresholds_check.columns[1]) + " : " + str(record[1]) + " | " \
-                            + str(df_unsampled_thresholds_check.columns[2]) + " : " + str(record[2]) + " | " \
-                            + str(df_unsampled_thresholds_check.columns[3]) + " : " + str(record[3])
+    if len(df_unsampled_thresholds_check) > 0:
+        log_warnings("Shift weight outside thresholds for")(df_unsampled_thresholds_check, 4)
 
-    # Output the values outside of the threshold to the logger - COMMENTED OUT DUE TO SIZE ISSUE?
-    # if len(df_unsampled_thresholds_check) > 0:
-    #     cf.database_logger().warning(
-    #         'Respondent count below minimum threshold for: ') + str(threshold_string)
-
-    # Return the generated data frames to be appended to oracle
     return df_output, df_summary

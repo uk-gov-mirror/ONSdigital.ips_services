@@ -1,9 +1,6 @@
 import math
-
 import numpy as np
 import pandas as pd
-
-from ips_common.ips_logging import log
 
 # dataimport survey_support
 from ips.services.calculations import log_warnings
@@ -106,5 +103,3 @@ def do_ips_railex_imp(df_input, var_serial, var_final_weight, minimum_count_thre
 
     # Return the generated data frame to be appended to oracle
     return df_output
-
-
