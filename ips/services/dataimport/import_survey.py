@@ -34,8 +34,7 @@ columns = [
 @service
 def import_survey_stream(run_id, data, month, year):
     log.info("Importing survey data from stream")
-    a = _import_survey(run_id, io.BytesIO(data), month, year)
-    return a
+    _import_survey(run_id, io.BytesIO(data), month, year)
 
 
 @service
@@ -54,24 +53,24 @@ def _import_survey(run_id, source, month=None, year=None):
     )
 
     df.columns = df.columns.str.upper()
-    # if month is not None and year is not None:
-    #     validation = _validate_data(df, month, year)
-    #     if not validation[0]:
-    #         msg = validation[1]
-    #         log.info(f"Validation failed: {msg}")
-    #         return falcon.HTTPError(falcon.HTTP_401, 'data error', msg)
+
+    # Validation
+    if month is not None and year is not None:
+        validation = _validate_data(df, month, year)
+        if not validation[0]:
+            msg = validation[1]
+            log.info(f"Validation failed: {msg}")
+            raise falcon.HTTPError(falcon.HTTP_401, 'data error', msg)
+
     df = df.sort_values(by='SERIAL')
     db.import_survey_data(run_id, df)
-    # return falcon.HTTP_200(falcon.HTTP_200, 'success')
-    return falcon.HTTP_200
-    resp.status = falcon.HTTP_201
-    # return df
+    return df
 
 
 def _validate_data(data: pd.DataFrame, user_month, user_year):
     log.info("Validating survey data...")
 
-    r = True, "success"
+    resp = True, "success"
 
     data_months = []
     data_years = []
@@ -93,17 +92,17 @@ def _validate_data(data: pd.DataFrame, user_month, user_year):
     if not all(elem in month for elem in data_months):
         msg = f"Incorrect month select/uploaded."
         log.error(msg)
-        r = False, msg
+        resp = False, msg
     elif not all(elem in user_year for elem in data_years):
         msg = f"Incorrect year select/uploaded."
         log.error(msg)
-        r = False, msg
+        resp = False, msg
     elif 'SERIAL' not in data.columns:
         msg = f"'SERIAL' column does not exist in data."
         log.error(msg)
-        r = False, msg
+        resp = False, msg
 
     def error_message():
-        return r
+        return resp
 
     return error_message()
