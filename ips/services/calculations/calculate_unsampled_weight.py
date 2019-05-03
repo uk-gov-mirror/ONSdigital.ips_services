@@ -224,7 +224,7 @@ def run_r_ges_script() -> None:
             password,
             server,
             database
-        ], capture_output=True
+        ], capture_output=False
     )
 
     log.info("R process finished.")
