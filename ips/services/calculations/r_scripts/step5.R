@@ -36,9 +36,9 @@ population.check(df.population, data = survey_input_aux, calmodel = ~ T_ - 1)
 #call regenesees
 survey_input_aux[, "unsamp_traffic_weight"] <- weights(e.calibrate(des, df.population, calmodel = ~ T_ - 1, calfun = "linear", aggregate.stage = 1))
 
-r_unsampled <- survey_input_aux
-r_unsampled[, "UNSAMP_TRAFFIC_WT"] <- r_unsampled[, "unsamp_traffic_weight"] / r_unsampled[, "OOHDesignWeight"]
+R_UNSAMPLED <- survey_input_aux
+R_UNSAMPLED[, "UNSAMP_TRAFFIC_WT"] <- R_UNSAMPLED[, "unsamp_traffic_weight"] / R_UNSAMPLED[, "OOHDesignWeight"]
 
-dbWriteTable(conn = con, name = SQL('r_unsampled'), value = r_unsampled, append = TRUE, row.names=F)
+dbWriteTable(conn = con, name = SQL('R_UNSAMPLED'), value = R_UNSAMPLED, append = TRUE, row.names=F)
 
 dbDisconnect(con)

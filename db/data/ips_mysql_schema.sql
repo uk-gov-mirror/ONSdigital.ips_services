@@ -3092,7 +3092,7 @@ create table r_traffic
   ARRIVEDEPART     int          null,
   PORTROUTE        int          null,
   SAMP_PORT_GRP_PV varchar(255) null,
-  SHIFT_WT         double       null,
+  SHIFT_WT         float       null,
   NON_RESPONSE_WT  double       null,
   MINS_WT          double       null,
   TRAFFIC_WT       double       null,
@@ -3103,7 +3103,7 @@ create table r_traffic
 );
 
 
-create table r_unsampled
+create table R_UNSAMPLED
 (
   rownames              varchar(255) null,
   SERIAL                float        null,

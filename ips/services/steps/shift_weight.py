@@ -61,7 +61,10 @@ def shift_weight_step(run_id):
                                                                shift_weight='SHIFT_WT')
 
     # Insert data to SQL
-    insert_from_dataframe(config["temp_table"])(survey_data_out)
+    import ips.services.dataimport.schemas.sas_shift_weight as schema
+    insert_from_dataframe(config["temp_table"], dtype=schema.get_schema())(survey_data_out)
+
+    # insert_from_dataframe(config["temp_table"])(survey_data_out)
     insert_from_dataframe(config["sas_ps_table"])(summary_data_out)
 
     # Update Survey Data With Shift Wt Results

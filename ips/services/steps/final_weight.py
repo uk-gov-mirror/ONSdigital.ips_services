@@ -37,8 +37,9 @@ def final_weight_step(run_id):
                                                            final_weight='FINAL_WT')
 
     # Insert data to SQL
+    import ips.services.dataimport.schemas.sas_ps_final as schema
     insert_from_dataframe(config["temp_table"])(survey_data_out)
-    insert_from_dataframe(config["sas_ps_table"])(summary_data_out)
+    insert_from_dataframe(config["sas_ps_table"], dtype=schema.get_schema())(summary_data_out)
 
     # Update Survey Data With Final Wt Results
     idm.update_survey_data_with_step_results(config)

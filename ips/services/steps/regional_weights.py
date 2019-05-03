@@ -47,7 +47,8 @@ def regional_weights_step(run_id):
     )
 
     # Insert data to SQL
-    insert_from_dataframe(config["temp_table"])(survey_data_out)
+    import ips.services.dataimport.schemas.sas_regional_imp as schema
+    insert_from_dataframe(config["temp_table"], dtype=schema.get_schema())(survey_data_out)
 
     # Update Survey Data With Regional Weights Results
     idm.update_survey_data_with_step_results(config)
