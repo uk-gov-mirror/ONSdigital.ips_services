@@ -48,11 +48,16 @@ def _import_survey(run_id, source, month=None, year=None):
         source,
         encoding="ISO-8859-1",
         engine="python",
-        usecols=lambda x: x.upper() in columns,
-        dtype=survey_data_schema.get_schema()
+        usecols=lambda x: x.upper() in columns
     )
 
     df.columns = df.columns.str.upper()
+    # df.fillna(0, inplace=True)
+    #
+    # df.EXPENDITURE = df.EXPENDITURE.astype(int)
+    # df.DVEXPEND = df.DVEXPEND.astype(int)
+    # df.TANDTSI = df.TANDTSI.astype(int)
+
     if month is not None and year is not None:
         if not _validate_data(df, month, year):
             log.info("Validation failed. We need to implement an awesome exit strategy!")

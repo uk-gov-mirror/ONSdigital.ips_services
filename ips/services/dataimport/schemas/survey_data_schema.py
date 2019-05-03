@@ -1,18 +1,19 @@
 import pandas as pd
+import sqlalchemy
 
 
 def get_schema() -> pd.DataFrame.dtypes:
     return {
-        'APORTLATDEG': 'float64',
-        'APORTLATMIN': 'float64',
-        'APORTLATNS': 'str',
-        'APORTLATSEC': 'float64',
-        'APORTLONDEG': 'float64',
-        'APORTLONEW': 'str',
-        'APORTLONMIN': 'float64',
-        'APORTLONSEC': 'str',
-        'ARRIVEDEPART': 'float64',
-        'BABYFARE': 'float64',
+        'APORTLATDEG': sqlalchemy.Numeric(precision=2),
+        'APORTLATMIN': sqlalchemy.Numeric(precision=2),
+        'APORTLATNS': sqlalchemy.CHAR,
+        'APORTLATSEC': sqlalchemy.Numeric(precision=2),
+        'APORTLONDEG': sqlalchemy.Numeric(precision=3),
+        'APORTLONEW': sqlalchemy.CHAR,
+        'APORTLONMIN': sqlalchemy.Numeric(precision=2),
+        'APORTLONSEC': sqlalchemy.Numeric(precision=2),
+        'ARRIVEDEPART': sqlalchemy.Numeric(precision=1),
+        'BABYFARE': sqlalchemy.Numeric(precision=4,2),
         'BEFAF': 'float64',
         'CHANGECODE': 'float64',
         'CHILDFARE': 'float64',
@@ -27,7 +28,7 @@ def get_schema() -> pd.DataFrame.dtypes:
         'CPORTLONSEC': 'str',
         'DAYTYPE': 'float64',
         'DIRECTLEG': 'str',
-        'DVEXPEND': 'Int64',
+        'DVEXPEND': 'int64',
         'DVFARE': 'float64',
         'DVLINECODE': 'float64',
         'DVPACKAGE': 'float64',
@@ -35,7 +36,7 @@ def get_schema() -> pd.DataFrame.dtypes:
         'DVPERSONS': 'float64',
         'DVPORTCODE': 'float64',
         'EXPENDCODE': 'str',
-        'Expenditure': 'Int64',
+        'EXPENDITURE': 'int64',
         'FARE': 'float64',
         'FAREK': 'float64',
         'FLOW': 'float64',
