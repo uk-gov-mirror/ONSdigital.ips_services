@@ -7,6 +7,7 @@ import ips.services.dataimport.import_survey as imp
 # noinspection PyUnusedLocal,PyMethodMayBeStatic
 class ImportSurvey(Api):
 
+    # noinspection PyUnresolvedReferences
     def on_post(self, req: Request, resp: Response, run_id) -> None:
         v = req.get_param('ips-file')
         data = v.file.read()
