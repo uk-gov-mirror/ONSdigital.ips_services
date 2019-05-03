@@ -34,7 +34,8 @@ columns = [
 @service
 def import_survey_stream(run_id, data, month, year):
     log.info("Importing survey data from stream")
-    return _import_survey(run_id, io.BytesIO(data), month, year)
+    a = _import_survey(run_id, io.BytesIO(data), month, year)
+    return a
 
 
 @service
@@ -53,19 +54,24 @@ def _import_survey(run_id, source, month=None, year=None):
     )
 
     df.columns = df.columns.str.upper()
-    if month is not None and year is not None:
-        validation = _validate_data(df, month, year)
-        if not validation[0]:
-            msg = validation[1]
-            log.info(f"Validation failed: {msg}")
-            return falcon.HTTPError(falcon.HTTP_401, 'data error', msg)
+    # if month is not None and year is not None:
+    #     validation = _validate_data(df, month, year)
+    #     if not validation[0]:
+    #         msg = validation[1]
+    #         log.info(f"Validation failed: {msg}")
+    #         return falcon.HTTPError(falcon.HTTP_401, 'data error', msg)
     df = df.sort_values(by='SERIAL')
     db.import_survey_data(run_id, df)
-    return df
+    # return falcon.HTTP_200(falcon.HTTP_200, 'success')
+    return falcon.HTTP_200
+    resp.status = falcon.HTTP_201
+    # return df
 
 
 def _validate_data(data: pd.DataFrame, user_month, user_year):
     log.info("Validating survey data...")
+
+    r = True, "success"
 
     data_months = []
     data_years = []
@@ -101,32 +107,3 @@ def _validate_data(data: pd.DataFrame, user_month, user_year):
         return r
 
     return error_message()
-
-
-def els_validate(i: int):
-    if i == 1:
-        error_message = 'JUAN!'
-        the_bool = True
-
-    if i == 2:
-        error_message = 'TWOOO-AH!'
-        the_bool = False
-
-    if i == 3:
-        error_message = 'success'
-        the_bool = True
-
-    def get_error_message():
-        return the_bool, error_message
-
-    return get_error_message()
-
-
-
-if __name__ == '__main__':
-    a = els_validate(3)
-    the_bool = a[0]
-    the_msg = a[1]
-    print(the_bool)
-    print(the_msg)
-
