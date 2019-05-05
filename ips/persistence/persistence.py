@@ -28,7 +28,7 @@ def read_table_values(table: str) -> Callable[[], pd.DataFrame]:
 
 def truncate_table(table: str) -> Callable[[str], None]:
     def truncate():
-        db.execute_sql_statement(f"TRUNCATE TABLE {table}")
+        delete_from_table(table)()
 
     return truncate
 
@@ -157,21 +157,18 @@ def insert_into_table_id(table: str) -> Callable[..., None]:
     return insert
 
 
-def insert_from_dataframe(table: str, if_exists: str = "append", index=False, dtype=None) \
-        -> Callable[ [pd.DataFrame], None]:
+def insert_from_dataframe(table: str, if_exists: str = "append",
+                          index=False, dtype=None) -> Callable[[pd.DataFrame], None]:
     def insert(d: pd.DataFrame):
         _insert_dataframe_into_table(table, d, if_exists, index, dtype)
 
     return insert
 
 
-def _insert_dataframe_into_table(
-        table_name: str,
-        dataframe: pandas.DataFrame,
-        if_exists='append',
-        index=False,
-        dtype=None
-) -> None:
+def _insert_dataframe_into_table(table_name: str, dataframe: pandas.DataFrame,
+                                 if_exists='append',
+                                 index=False,
+                                 dtype=None) -> None:
     try:
         dataframe.to_sql(
             table_name,
