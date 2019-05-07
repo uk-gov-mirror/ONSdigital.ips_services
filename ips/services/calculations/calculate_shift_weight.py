@@ -379,19 +379,28 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     df_surveydata_merge_sorted = df_surveydata_merge.sort_values(colset1)
 
     # Group by the necessary columns and aggregate df_surveydata_merge shift weight
-    df_surveydata_merge_sorted_grouped = \
-        df_surveydata_merge_sorted.groupby(SHIFTS_STRATA + [MIG_SI_COLUMN])[shift_weight].agg({
-            COUNT_COLUMN: 'count',
-            WEIGHT_SUM_COLUMN: 'sum',
-            MIN_WEIGHT_COLUMN: 'min',
-            AVERAGE_WEIGHT_COLUMN: 'mean',
-            MAX_WEIGHT_COLUMN: 'max'
-        })
+    # df_surveydata_merge_sorted_grouped = \
+    #     df_surveydata_merge_sorted.groupby(SHIFTS_STRATA + [MIG_SI_COLUMN])[shift_weight].agg({
+    #         COUNT_COLUMN: 'count',
+    #         WEIGHT_SUM_COLUMN: 'sum',
+    #         MIN_WEIGHT_COLUMN: 'min',
+    #         AVERAGE_WEIGHT_COLUMN: 'mean',
+    #         MAX_WEIGHT_COLUMN: 'max'
+    #     })
 
-    df_surveydata_merge_sorted_grouped_1 = \
+    df_surveydata_merge_sorted_grouped = (
         df_surveydata_merge_sorted.groupby(SHIFTS_STRATA + [MIG_SI_COLUMN])[shift_weight].agg(
             ['count', 'sum', 'min', 'mean', 'max']
         )
+    )
+
+    df_surveydata_merge_sorted_grouped.columns = [
+        COUNT_COLUMN,
+        WEIGHT_SUM_COLUMN,
+        MIN_WEIGHT_COLUMN,
+        AVERAGE_WEIGHT_COLUMN,
+        MAX_WEIGHT_COLUMN
+    ]
 
     # Flatten summary columns to single row after aggregation
     df_surveydata_merge_sorted_grouped = df_surveydata_merge_sorted_grouped.reset_index()
@@ -441,13 +450,27 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     df_surveydata_merge_3 = df_surveydata_merge.sort_values(colset3)
 
     # Group by the necessary columns and aggregate df_surveydata_merge shift weight
-    df_summary_high = df_surveydata_merge_3.groupby(colset3)[shift_weight].agg({
-        COUNT_COLUMN: 'count',
-        WEIGHT_SUM_COLUMN: 'sum',
-        MIN_WEIGHT_COLUMN: 'min',
-        AVERAGE_WEIGHT_COLUMN: 'mean',
-        MAX_WEIGHT_COLUMN: 'max'
-    })
+    # df_summary_high = df_surveydata_merge_3.groupby(colset3)[shift_weight].agg({
+    #     COUNT_COLUMN: 'count',
+    #     WEIGHT_SUM_COLUMN: 'sum',
+    #     MIN_WEIGHT_COLUMN: 'min',
+    #     AVERAGE_WEIGHT_COLUMN: 'mean',
+    #     MAX_WEIGHT_COLUMN: 'max'
+    # })
+
+    df_summary_high = (
+        df_surveydata_merge_3.groupby(colset3)[shift_weight].agg(
+            ['count', 'sum', 'min', 'mean', 'max']
+        )
+    )
+
+    df_summary_high.columns = [
+        COUNT_COLUMN,
+        WEIGHT_SUM_COLUMN,
+        MIN_WEIGHT_COLUMN,
+        AVERAGE_WEIGHT_COLUMN,
+        MAX_WEIGHT_COLUMN
+    ]
 
     # Flatten summary high columns to single row after aggregation
     df_summary_high = df_summary_high.reset_index()
