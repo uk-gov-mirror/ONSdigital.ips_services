@@ -3493,16 +3493,4 @@ create table user
 
 INSERT INTO user (id, username, password, firstname, surname, role) VALUES (1, 'Admin', 'pbkdf2:sha256:50000$jYlAjFyT$a3990f67a04492fdffae29256cc168caf7becbe33ca6fefb2f89c04b00ef9d27', null, null, 'admin');
 
-CREATE TABLE `PV_Bytes` (
-  `PV_Bytes_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `Run_ID` varchar(255) DEFAULT NULL,
-  `PV_Bytes` text DEFAULT NULL,
-  `PV_ID` int(11) DEFAULT NULL,
-  PRIMARY KEY (`PV_Bytes_ID`),
-  KEY `pv_b_fk` (`PV_ID`),
-  KEY `pv_r_fk` (`Run_ID`),
-  CONSTRAINT `pv_b_fk` FOREIGN KEY (`PV_ID`) REFERENCES `G_PVs` (`PV_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `pv_r_fk` FOREIGN KEY (`Run_ID`) REFERENCES `RUN` (`RUN_ID`) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
 SET FOREIGN_KEY_CHECKS = 1;

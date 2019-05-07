@@ -5,7 +5,7 @@ from ips.persistence.persistence import delete_from_table, execute_sql, get_iden
 
 PV_BUILDER_VARIABLES = 'G_PV_Variables'
 PV_BLOCK = 'PV_Block'
-PV_BYTES = 'PV_Bytes'
+PV_BYTES = 'PROCESS_VARIABLE_PY'
 PV_EXPRESSION = 'PV_Expression'
 PV_ELEMENT = 'PV_Element'
 
@@ -48,11 +48,12 @@ def _delete_pv_build(run_id, pv_id):
 
 
 def _delete_pv_bytes(run_id, pv_id):
-    delete_bytes(RUN_ID=run_id, PV_ID=pv_id)
+    print(pv_id)
+    delete_bytes(RUN_ID=run_id, PROCESS_VARIABLE_ID=pv_id)
 
 
-def _store_pv_bytes(run_id, pv_id, code_bytes):
-    insert_into_pv_bytes(Run_ID=run_id, PV_Bytes=str(code_bytes), PV_ID=pv_id)
+def _store_pv_bytes(run_id, pv_id, code_bytes, pv_name, pv_desc):
+    insert_into_pv_bytes(RUN_ID=run_id, PV_DEF=str(code_bytes), PROCESS_VARIABLE_ID=pv_id, PV_NAME=pv_name, PV_DESC=pv_desc)
 
 
 def _create_expression(block_id, index):
@@ -71,6 +72,8 @@ def _get_index(el):
 def create_pv_build(request, run_id, pv_id=None):
     a = request.get_param_as_json('json')
     pv = request.get_param('pv')
+    pv_name = request.get_param('pv_name')
+    pv_desc = request.get_param('pv_desc')
     _delete_pv_build(run_id, pv_id)
 
     setel = False
@@ -108,15 +111,13 @@ def create_pv_build(request, run_id, pv_id=None):
         pv = pv.replace("\\","\\\\")
         pv = pv.replace("\"", "\\\"")
         pv = pv.replace("%", "%%")
-        _store_pv_bytes(run_id, pv_id, pv)
+        _store_pv_bytes(run_id, pv_id, pv, pv_name, pv_desc)
 
 
 def get_pv_builds(run_id):
-    print(run_id)
     res = _get_pv_build_by_runid(run_id)
     arr = {}
     for row in res:
-        print(row)
         if row['PV_ID'] not in arr.keys():
             arr[row['PV_ID']] = {}
         if row['Block_ID'] not in arr[row['PV_ID']].keys():
