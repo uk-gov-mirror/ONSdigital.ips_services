@@ -34,7 +34,7 @@ columns = [
 @service
 def import_survey_stream(run_id, data, month, year):
     log.info("Importing survey data from stream")
-    return _import_survey(run_id, io.BytesIO(data), month, year)
+    _import_survey(run_id, io.BytesIO(data), month, year)
 
 
 @service
@@ -53,16 +53,26 @@ def _import_survey(run_id, source, month=None, year=None):
     )
 
     df.columns = df.columns.str.upper()
+
+    # Validation
     if month is not None and year is not None:
-        if not _validate_data(df, month, year):
-            log.info("Validation failed. We need to implement an awesome exit strategy!")
+        validation = _validate_data(df, month, year)
+        if not validation[0]:
+            msg = validation[1]
+            log.error(f"Validation failed: {msg}")
+            raise falcon.HTTPError(falcon.HTTP_401, 'data error', msg)
+        else:
+            log.info("Validation complete")
+
     df = df.sort_values(by='SERIAL')
     db.import_survey_data(run_id, df)
     return df
 
 
-def _validate_data(data: pd.DataFrame, user_month, user_year) -> bool:
-    log.info("Validating survey data...")
+def _validate_data(data: pd.DataFrame, user_month, user_year):
+    log.info("Validating Survey data...")
+
+    resp = True, "success"
 
     data_months = []
     data_years = []
@@ -80,23 +90,20 @@ def _validate_data(data: pd.DataFrame, user_month, user_year) -> bool:
             month = ['7', '8', '9']
         elif quarter == '4':
             month = ['10', '11', '12']
+    else:
+        month = [user_month]
 
     if not all(elem in month for elem in data_months):
-        error = f"Incorrect month select/uploaded."
-        log.error(error)
-        # return falcon.HTTPError(falcon.HTTP_401, 'data error', error)
-        return False
+        msg = f"Incorrect month selected or uploaded for Survey data."
+        resp = False, msg
     elif not all(elem in user_year for elem in data_years):
-        error = f"Incorrect year select/uploaded."
-        log.error(error)
-        # return falcon.HTTPError(falcon.HTTP_401, 'data error', error)
-        return False
+        msg = f"Incorrect year selected or uploaded for Survey data."
+        resp = False, msg
+    elif 'SERIAL' not in data.columns:
+        msg = f"'SERIAL' column does not exist in Survey data."
+        resp = False, msg
 
-    if 'SERIAL' not in data.columns:
-        error = f"'SERIAL' column does not exist in data."
-        log.error(error)
-        # return falcon.HTTPError(falcon.HTTP_401, 'data error', error)
-        return False
+    def error_message():
+        return resp
 
-    # return falcon.HTTPError(falcon.HTTP_401, 'success')
-    return True
+    return error_message()
