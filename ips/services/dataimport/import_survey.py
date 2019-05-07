@@ -59,8 +59,10 @@ def _import_survey(run_id, source, month=None, year=None):
         validation = _validate_data(df, month, year)
         if not validation[0]:
             msg = validation[1]
-            log.info(f"Validation failed: {msg}")
+            log.error(f"Validation failed: {msg}")
             raise falcon.HTTPError(falcon.HTTP_401, 'data error', msg)
+        else:
+            log.info("Validation complete")
 
     df = df.sort_values(by='SERIAL')
     db.import_survey_data(run_id, df)
@@ -68,7 +70,7 @@ def _import_survey(run_id, source, month=None, year=None):
 
 
 def _validate_data(data: pd.DataFrame, user_month, user_year):
-    log.info("Validating survey data...")
+    log.info("Validating Survey data...")
 
     resp = True, "success"
 
@@ -92,19 +94,14 @@ def _validate_data(data: pd.DataFrame, user_month, user_year):
         month = [user_month]
 
     if not all(elem in month for elem in data_months):
-        msg = f"Incorrect month select/uploaded."
-        log.error(msg)
+        msg = f"Incorrect month selected or uploaded for Survey data."
         resp = False, msg
     elif not all(elem in user_year for elem in data_years):
-        msg = f"Incorrect year select/uploaded."
-        log.error(msg)
+        msg = f"Incorrect year selected or uploaded for Survey data."
         resp = False, msg
     elif 'SERIAL' not in data.columns:
-        msg = f"'SERIAL' column does not exist in data."
-        log.error(msg)
+        msg = f"'SERIAL' column does not exist in Survey data."
         resp = False, msg
-    else:
-        log.info("Ta-da!")
 
     def error_message():
         return resp
