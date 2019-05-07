@@ -394,13 +394,15 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
         )
     )
 
-    df_surveydata_merge_sorted_grouped.columns = [
-        COUNT_COLUMN,
-        WEIGHT_SUM_COLUMN,
-        MIN_WEIGHT_COLUMN,
-        AVERAGE_WEIGHT_COLUMN,
-        MAX_WEIGHT_COLUMN
-    ]
+    df_surveydata_merge_sorted_grouped.rename(
+        columns={
+            'count': COUNT_COLUMN,
+            'sum': WEIGHT_SUM_COLUMN,
+            'min': MIN_WEIGHT_COLUMN,
+            'mean': AVERAGE_WEIGHT_COLUMN,
+            'max': MAX_WEIGHT_COLUMN
+        }, inplace=True
+    )
 
     # Flatten summary columns to single row after aggregation
     df_surveydata_merge_sorted_grouped = df_surveydata_merge_sorted_grouped.reset_index()
