@@ -88,6 +88,8 @@ def _validate_data(data: pd.DataFrame, user_month, user_year):
             month = ['7', '8', '9']
         elif quarter == '4':
             month = ['10', '11', '12']
+    else:
+        month = [user_month]
 
     if not all(elem in month for elem in data_months):
         msg = f"Incorrect month select/uploaded."
@@ -101,6 +103,8 @@ def _validate_data(data: pd.DataFrame, user_month, user_year):
         msg = f"'SERIAL' column does not exist in data."
         log.error(msg)
         resp = False, msg
+    else:
+        log.info("Ta-da!")
 
     def error_message():
         return resp
