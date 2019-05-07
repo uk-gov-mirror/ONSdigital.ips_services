@@ -388,10 +388,15 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
             MAX_WEIGHT_COLUMN: 'max'
         })
 
+    df_surveydata_merge_sorted_grouped_1 = \
+        df_surveydata_merge_sorted.groupby(SHIFTS_STRATA + [MIG_SI_COLUMN])[shift_weight].agg(
+            ['count', 'sum', 'min', 'mean', 'max']
+        )
+
     # Flatten summary columns to single row after aggregation
     df_surveydata_merge_sorted_grouped = df_surveydata_merge_sorted_grouped.reset_index()
 
-    # PS: round column
+    # PS: round columns
     df_surveydata_merge_sorted_grouped[WEIGHT_SUM_COLUMN] = \
         df_surveydata_merge_sorted_grouped[WEIGHT_SUM_COLUMN].round(3)
     df_surveydata_merge_sorted_grouped[MIN_WEIGHT_COLUMN] = \
@@ -473,7 +478,7 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     df_summary_high_1 = pd.merge(df_summary_high, df_summary_high_sampled, on=SHIFTS_SUB_STRATA, how='left')
 
     # Append summary and summary high
-    df_summary_3 = pd.concat([df_summary_high_1, df_summary_2])
+    df_summary_3 = pd.concat([df_summary_high_1, df_summary_2], sort=False)
 
     # Set summary columns
     df_summary_4 = df_summary_3[colset4]
@@ -508,7 +513,3 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
         log_warnings("Shift weight outside thresholds for")(df_sw_thresholds_check, 4)
 
     return final_output_data, final_summary_data
-
-
-
-

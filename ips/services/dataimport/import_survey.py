@@ -1,6 +1,7 @@
 import io
 import falcon
 import pandas as pd
+import numpy as np
 import ips.persistence.import_survey as db
 from ips_common.ips_logging import log
 from ips.services import service
@@ -48,15 +49,18 @@ def _import_survey(run_id, source, month=None, year=None):
         source,
         encoding="ISO-8859-1",
         engine="python",
-        usecols=lambda x: x.upper() in columns
+        usecols=lambda x: x.upper() in columns,
     )
 
     df.columns = df.columns.str.upper()
-    # df.fillna(0, inplace=True)
-    #
-    # df.EXPENDITURE = df.EXPENDITURE.astype(int)
-    # df.DVEXPEND = df.DVEXPEND.astype(int)
-    # df.TANDTSI = df.TANDTSI.astype(int)
+
+    df['EXPENDITURE'] = df['EXPENDITURE'].fillna(-1)
+    df['EXPENDITURE'] = df['EXPENDITURE'].astype(int)
+    df['EXPENDITURE'] = df['EXPENDITURE'].replace('-1', np.nan)
+
+    # noinspection PyUnresolvedReferences
+    df.EXPENDITURE = df.EXPENDITURE.astype(pd.Int64Dtype())
+    [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'DVEXPEND', 'TANDTSI']]
 
     if month is not None and year is not None:
         if not _validate_data(df, month, year):
@@ -64,6 +68,12 @@ def _import_survey(run_id, source, month=None, year=None):
     df = df.sort_values(by='SERIAL')
     db.import_survey_data(run_id, df)
     return df
+
+
+def convert_col_to_int(df, col):
+    df[col] = df[col].fillna(-1)
+    df[col] = df[col].astype(int)
+    df[col] = df[col].replace('-1', np.nan)
 
 
 def _validate_data(data: pd.DataFrame, user_month, user_year) -> bool:

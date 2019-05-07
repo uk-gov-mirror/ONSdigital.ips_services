@@ -104,7 +104,6 @@ def get_schema() -> pd.DataFrame.dtypes:
         'VISITBEGAN': sqlalchemy.NVARCHAR,
         'WELSHNIGHTS': sqlalchemy.Numeric(precision=3),
         'WELSHTOWN': sqlalchemy.Numeric(precision=6),
-
         'AM_PM_NIGHT_PV': sqlalchemy.Numeric(precision=1),
         'APD_PV': sqlalchemy.Numeric(precision=4),
         'ARRIVEDEPART_PV': sqlalchemy.Numeric(precision=1),

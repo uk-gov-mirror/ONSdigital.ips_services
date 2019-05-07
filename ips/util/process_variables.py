@@ -110,6 +110,11 @@ def parallelise_pvs(dataframe, process_variables, dataset=None):
     return res
 
 
+# PyCharm stops debugging if we use sub processes
+def serial_pvs(dataframe, process_variables, dataset=None):
+    return parallel_func(dataframe, pv_list=process_variables, dataset=dataset)
+
+
 def process(in_table_name, out_table_name, in_id, dataset):
     # Ensure the input table name is capitalised
     in_table_name = in_table_name.upper()
@@ -132,7 +137,17 @@ def process(in_table_name, out_table_name, in_id, dataset):
         df_data = df_data.sort_values('SERIAL')
 
     # Apply process variables
-    df_data = parallelise_pvs(df_data, pvs, dataset)
+    # If we are in the debugger we need to run serially else pycharm stops debugging with a keyboard interrupt
+    import sys
+    gettrace = getattr(sys, 'gettrace', None)
+
+    if gettrace is None:
+        log.error('No sys.gettrace')
+    elif gettrace():
+        log.info("Debugger detected --> PVs will be applied serially")
+        df_data = serial_pvs(df_data, pvs, dataset)
+    else:
+        df_data = parallelise_pvs(df_data, pvs, dataset)
 
     # Create a list to hold the PV column names
     updated_columns = []
