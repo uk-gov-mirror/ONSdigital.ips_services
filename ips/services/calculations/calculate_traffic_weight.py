@@ -8,7 +8,6 @@ from pkg_resources import resource_filename
 from ips_common.ips_logging import log
 import ips.persistence.traffic_weight as db
 from ips.services.calculations import log_warnings, THRESHOLD_CAP
-from ips.util.config.services_configuration import ServicesConfiguration
 
 SERIAL = 'SERIAL'
 TRAFFIC_WT = 'TRAFFIC_WT'
@@ -198,8 +197,10 @@ def r_population_input(df_survey_input, df_tr_totals):
     # Create lookup. Group by and aggregate
     lookup_dataframe = df_survey_input_sorted.copy()
     lookup_dataframe["count"] = ""
-    lookup_dataframe = lookup_dataframe.groupby([SAMP_PORT_GRP_PV,
-                                                 ARRIVEDEPART]).agg({"count": 'count'}).reset_index()
+    lookup_dataframe = (
+        lookup_dataframe.groupby([SAMP_PORT_GRP_PV,
+                                  ARRIVEDEPART]).agg({"count": 'count'}).reset_index()
+    )
 
     # Cleanse data
     # lookup_dataframe.drop(["count"], axis=1)
@@ -208,6 +209,7 @@ def r_population_input(df_survey_input, df_tr_totals):
 
     # Create population totals for current survey data - Cleanse data and merge
     lookup_dataframe_aux = lookup_dataframe[[SAMP_PORT_GRP_PV, ARRIVEDEPART, T1]]
+    pd.options.mode.chained_assignment = None  # default='warn'
     lookup_dataframe_aux[T1] = lookup_dataframe_aux.T1.astype(np.int64)
 
     df_mod_totals = pd.merge(df_traffic_totals, lookup_dataframe_aux, on=[SAMP_PORT_GRP_PV,

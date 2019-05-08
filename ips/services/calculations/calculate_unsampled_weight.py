@@ -248,6 +248,7 @@ def do_ips_ges_weighting(df_surveydata: pd.DataFrame, df_ustotals: pd.DataFrame)
 
     df_summarydata = db.read_table_values('R_UNSAMPLED')()
     df_summarydata = df_summarydata[['SERIAL', 'UNSAMP_TRAFFIC_WT']]
+    df_summarydata['UNSAMP_TRAFFIC_WT'] = df_summarydata['UNSAMP_TRAFFIC_WT'].apply(lambda x: round(x, 3))
 
     return df_surveydata, df_summarydata
 
@@ -405,12 +406,18 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     # respondent count is below the threshold.
 
     # Create unsampled data set for rows outside of the threshold
-    df_unsampled_thresholds_check = \
+    df_unsampled_thresholds_check = (
         df_summary[(df_summary[OOH_WEIGHT_SUM_COLUMN] > df_summary[PRIOR_WEIGHT_SUM_COLUMN])
                    & (df_summary[CASE_COUNT_COLUMN] < min_count_threshold)]
+    )
 
     # Collect data outside of specified threshold
     if len(df_unsampled_thresholds_check) > 0:
         log_warnings("Shift weight outside thresholds for")(df_unsampled_thresholds_check, 4)
+
+    df_summary[PRIOR_WEIGHT_SUM_COLUMN] = df_summary[PRIOR_WEIGHT_SUM_COLUMN].apply(lambda x: round(x, 3))
+    df_summary[OOH_WEIGHT_SUM_COLUMN] = df_summary[OOH_WEIGHT_SUM_COLUMN].apply(lambda x: round(x, 3))
+    df_summary['UNSAMP_TRAFFIC_WT'] = df_summary['UNSAMP_TRAFFIC_WT'].apply(lambda x: round(x, 3))
+    df_output['UNSAMP_TRAFFIC_WT'] = df_output['UNSAMP_TRAFFIC_WT'].apply(lambda x: round(x, 3))
 
     return df_output, df_summary

@@ -178,10 +178,11 @@ def do_ips_regional_weight_calculation(df_input_data, serial_num, final_weight):
 
         # Calculate the number of records in each segment that have previously
         # been uplifted and the total number of records in each segment  
-        df_impute_towns_ext1 = df_impute_towns_ext.groupby(strata)['VISIT_WTK_NONMISS'].agg({
-            'VISIT_WT_COUNT': 'count'})
-        df_impute_towns_ext2 = df_impute_towns_ext.groupby(strata)['VISIT_WTK_ALL'].agg({
-            'TOTAL_COUNT': 'count'})
+        df_impute_towns_ext1 = df_impute_towns_ext.groupby(strata)['VISIT_WTK_NONMISS'].agg(['count'])
+        df_impute_towns_ext1.rename(columns={'count': 'VISIT_WT_COUNT', }, inplace=True)
+
+        df_impute_towns_ext2 = df_impute_towns_ext.groupby(strata)['VISIT_WTK_ALL'].agg(['count'])
+        df_impute_towns_ext2.rename(columns={'count': 'TOTAL_COUNT', }, inplace=True)
 
         # Flatten the column structure after adding the new columns above
         df_impute_towns_ext1 = df_impute_towns_ext1.reset_index()
@@ -210,14 +211,17 @@ def do_ips_regional_weight_calculation(df_input_data, serial_num, final_weight):
         # Replace blank values with -1 as python drops blanks during the aggregation process.  
         df_temp2[level - 1][strata] = df_temp2[level - 1][strata].fillna(-1)
 
-        df_temp2_count = df_temp2[level - 1].groupby(strata)['FIN'].agg({
-            'TOWN_COUNT': 'count'})
-        df_temp2_fin = df_temp2[level - 1].groupby(strata)['FIN'].agg({
-            'KNOWN_FINAL_WEIGHTS': 'sum'})
-        df_temp2_sty = df_temp2[level - 1].groupby(strata)['STY'].agg({
-            'KNOWN_STAY': 'sum'})
-        df_temp2_exp = df_temp2[level - 1].groupby(strata)['EXP'].agg({
-            'KNOWN_EXPEND': 'sum'})
+        df_temp2_count = df_temp2[level - 1].groupby(strata)['FIN'].agg(['count'])
+        df_temp2_count.rename(columns={'count': 'TOWN_COUNT', }, inplace=True)
+
+        df_temp2_fin = df_temp2[level - 1].groupby(strata)['FIN'].agg(['sum'])
+        df_temp2_fin.rename(columns={'sum': 'KNOWN_FINAL_WEIGHTS', }, inplace=True)
+
+        df_temp2_sty = df_temp2[level - 1].groupby(strata)['STY'].agg(['sum'])
+        df_temp2_sty.rename(columns={'sum': 'KNOWN_STAY', }, inplace=True)
+
+        df_temp2_exp = df_temp2[level - 1].groupby(strata)['EXP'].agg(['sum'])
+        df_temp2_exp.rename(columns={'sum': 'KNOWN_EXPEND', }, inplace=True)
 
         # Flatten the column structure after generating the new columns above
         df_temp2_count = df_temp2_count.reset_index()
@@ -239,14 +243,17 @@ def do_ips_regional_weight_calculation(df_input_data, serial_num, final_weight):
         # Replace blank values with -1 as python drops blanks during the aggregation process.  
         df_temp3[level - 1][strata] = df_temp3[level - 1][strata].fillna(-1)
 
-        df_temp3_count = df_temp3[level - 1].groupby(strata)['FIN'].agg({
-            'NO_TOWN_COUNT': 'count'})
-        df_temp3_fin = df_temp3[level - 1].groupby(strata)['FIN'].agg({
-            'UNKNOWN_FINAL_WEIGHT': 'sum'})
-        df_temp3_sty = df_temp3[level - 1].groupby(strata)['STY'].agg({
-            'UNKNOWN_STAY': 'sum'})
-        df_temp3_exp = df_temp3[level - 1].groupby(strata)['EXP'].agg({
-            'UNKNOWN_EXPEND': 'sum'})
+        df_temp3_count = df_temp3[level - 1].groupby(strata)['FIN'].agg(['count'])
+        df_temp3_count.rename(columns={'count': 'NO_TOWN_COUNT', }, inplace=True)
+
+        df_temp3_fin = df_temp3[level - 1].groupby(strata)['FIN'].agg(['sum'])
+        df_temp3_fin.rename(columns={'sum': 'UNKNOWN_FINAL_WEIGHT', }, inplace=True)
+
+        df_temp3_sty = df_temp3[level - 1].groupby(strata)['STY'].agg(['sum'])
+        df_temp3_sty.rename(columns={'sum': 'UNKNOWN_STAY', }, inplace=True)
+
+        df_temp3_exp = df_temp3[level - 1].groupby(strata)['EXP'].agg(['sum'])
+        df_temp3_exp.rename(columns={'sum': 'UNKNOWN_EXPEND', }, inplace=True)
 
         # Flatten the column structure after generating the new columns above
         df_temp3_count = df_temp3_count.reset_index()
@@ -400,12 +407,15 @@ def do_ips_regional_weight_calculation(df_input_data, serial_num, final_weight):
 
     # Fills blanks in the generated columns to be of type float (NIGHTS#) or string (STAY#K)
 
-    df_output_data[night_columns] = df_output_data[night_columns].fillna(np.NaN)
+    df_output_data[night_columns] = df_output_data[night_columns].fillna(0.0).astype(int)
 
     df_output_data[stay_columns] = df_output_data[stay_columns].fillna('')
+
+    # df_output_data[night_columns] = df_output_data[night_columns].apply(lambda y: round(y, 3))
 
     # Sort the output data frame
     df_output_data = df_output_data.sort_values(serial_num)
 
     # Return the generated data frame to be appended to oracle
+
     return df_output_data

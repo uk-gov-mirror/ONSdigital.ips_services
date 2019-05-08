@@ -49,35 +49,33 @@ def _import_survey(run_id, source, month=None, year=None):
         source,
         encoding="ISO-8859-1",
         engine="python",
-        usecols=lambda x: x.upper() in columns,
+        usecols=lambda x: x.upper() in columns
     )
 
+    def convert_col_to_int(df, col):
+        df[col] = df[col].fillna(-1).astype(int).replace('-1', np.nan)
+
     df.columns = df.columns.str.upper()
-
-    df['EXPENDITURE'] = df['EXPENDITURE'].fillna(-1)
-    df['EXPENDITURE'] = df['EXPENDITURE'].astype(int)
-    df['EXPENDITURE'] = df['EXPENDITURE'].replace('-1', np.nan)
-
-    # noinspection PyUnresolvedReferences
-    df.EXPENDITURE = df.EXPENDITURE.astype(pd.Int64Dtype())
     [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'DVEXPEND', 'TANDTSI']]
 
     if month is not None and year is not None:
-        if not _validate_data(df, month, year):
-            log.info("Validation failed. We need to implement an awesome exit strategy!")
+        validation = _validate_data(df, month, year)
+        if not validation[0]:
+            msg = validation[1]
+            log.error(f"Validation failed: {msg}")
+            raise falcon.HTTPError(falcon.HTTP_401, 'data error', msg)
+        else:
+            log.info("Validation complete")
+
     df = df.sort_values(by='SERIAL')
     db.import_survey_data(run_id, df)
     return df
 
 
-def convert_col_to_int(df, col):
-    df[col] = df[col].fillna(-1)
-    df[col] = df[col].astype(int)
-    df[col] = df[col].replace('-1', np.nan)
+def _validate_data(data: pd.DataFrame, user_month, user_year):
+    log.info("Validating Survey data...")
 
-
-def _validate_data(data: pd.DataFrame, user_month, user_year) -> bool:
-    log.info("Validating survey data...")
+    resp = True, "success"
 
     data_months = []
     data_years = []
@@ -85,6 +83,7 @@ def _validate_data(data: pd.DataFrame, user_month, user_year) -> bool:
         data_months.append(row['INTDATE'][-6:][:2])
         data_years.append(row['INTDATE'][-4:])
 
+    month = []
     if user_month[0] == 'Q':
         quarter = user_month[1]
         if quarter == '1':
@@ -95,23 +94,20 @@ def _validate_data(data: pd.DataFrame, user_month, user_year) -> bool:
             month = ['7', '8', '9']
         elif quarter == '4':
             month = ['10', '11', '12']
+    else:
+        month = [user_month]
 
     if not all(elem in month for elem in data_months):
-        error = f"Incorrect month select/uploaded."
-        log.error(error)
-        # return falcon.HTTPError(falcon.HTTP_401, 'data error', error)
-        return False
+        msg = f"Incorrect month selected or uploaded for Survey data."
+        resp = False, msg
     elif not all(elem in user_year for elem in data_years):
-        error = f"Incorrect year select/uploaded."
-        log.error(error)
-        # return falcon.HTTPError(falcon.HTTP_401, 'data error', error)
-        return False
+        msg = f"Incorrect year selected or uploaded for Survey data."
+        resp = False, msg
+    elif 'SERIAL' not in data.columns:
+        msg = f"'SERIAL' column does not exist in Survey data."
+        resp = False, msg
 
-    if 'SERIAL' not in data.columns:
-        error = f"'SERIAL' column does not exist in data."
-        log.error(error)
-        # return falcon.HTTPError(falcon.HTTP_401, 'data error', error)
-        return False
+    def error_message():
+        return resp
 
-    # return falcon.HTTPError(falcon.HTTP_401, 'success')
-    return True
+    return error_message()

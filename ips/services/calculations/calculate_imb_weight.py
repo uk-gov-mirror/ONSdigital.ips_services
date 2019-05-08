@@ -134,8 +134,8 @@ def do_ips_imbweight_calculation(df_survey_data, serial, shift_weight, non_respo
     df_output_data.drop([PORTROUTE_COLUMN + "_y"], axis=1, inplace=True)
 
     # Append the imbalance weight to the input and cleanse
-    df_survey_data_concat = pd.concat([df_survey_data, df_output_data], ignore_index=True)
-    df_survey_data = df_survey_data_concat.reindex_axis(df_survey_data.columns, axis=1)
+    df_survey_data_concat = pd.concat([df_survey_data, df_output_data], ignore_index=True, sort=True)
+    df_survey_data = df_survey_data_concat.reindex(df_survey_data.columns, axis=1)
     df_survey_data.loc[df_survey_data[imbalance_weight].isnull(), imbalance_weight] = 1
 
     # Create the summary output
@@ -164,6 +164,9 @@ def do_ips_imbweight_calculation(df_survey_data, serial, shift_weight, non_respo
 
     # Cleanse dataframes before returning
     df_survey_data = df_output_data[['SERIAL', 'IMBAL_WT']].copy()
+
+    df_survey_data['IMBAL_WT'] = df_survey_data['IMBAL_WT'].apply(lambda x: round(x, 3))
+
     df_survey_data.sort_values([serial], inplace=True)
 
     return df_survey_data, df_summary_data
