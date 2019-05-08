@@ -35,8 +35,6 @@ def run_step(func: [[W, str], None]) -> Callable[[str], None]:
         else:
             self.set_status(run_id, runs.IN_PROGRESS, func.__name__[1:])
             func(self, run_id)
-            self.set_status(run_id, runs.DONE, func.__name__[1:])
-
     return wrapper
 
 
@@ -167,4 +165,8 @@ class IPSWorkflow:
                 percent = round((self.num_done / len(self._dag_list)) * 100)
                 runs.set_percent_done(run_id, percent)
                 self.num_done += 1
+
+        if not self.is_cancelled(run_id):
+            self.set_status(run_id, runs.DONE, "DONE")
+            runs.set_percent_done(run_id, 100)
 
