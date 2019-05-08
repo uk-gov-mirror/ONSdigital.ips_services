@@ -1,6 +1,7 @@
 import io
 import falcon
 import pandas as pd
+import numpy as np
 import ips.persistence.import_survey as db
 from ips_common.ips_logging import log
 from ips.services import service
@@ -34,7 +35,7 @@ columns = [
 @service
 def import_survey_stream(run_id, data, month, year):
     log.info("Importing survey data from stream")
-    _import_survey(run_id, io.BytesIO(data), month, year)
+    return _import_survey(run_id, io.BytesIO(data), month, year)
 
 
 @service
@@ -48,13 +49,15 @@ def _import_survey(run_id, source, month=None, year=None):
         source,
         encoding="ISO-8859-1",
         engine="python",
-        usecols=lambda x: x.upper() in columns,
-        dtype=survey_data_schema.get_schema()
+        usecols=lambda x: x.upper() in columns
     )
 
-    df.columns = df.columns.str.upper()
+    def convert_col_to_int(df, col):
+        df[col] = df[col].fillna(-1).astype(int).replace('-1', np.nan)
 
-    # Validation
+    df.columns = df.columns.str.upper()
+    [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'DVEXPEND', 'TANDTSI']]
+
     if month is not None and year is not None:
         validation = _validate_data(df, month, year)
         if not validation[0]:
@@ -80,6 +83,7 @@ def _validate_data(data: pd.DataFrame, user_month, user_year):
         data_months.append(row['INTDATE'][-6:][:2])
         data_years.append(row['INTDATE'][-4:])
 
+    month = []
     if user_month[0] == 'Q':
         quarter = user_month[1]
         if quarter == '1':

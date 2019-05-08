@@ -27,9 +27,8 @@ def read_table_values(table: str) -> Callable[[], pd.DataFrame]:
 
 
 def truncate_table(table: str) -> Callable[[str], None]:
-
     def truncate():
-        db.execute_sql_statement(f"TRUNCATE TABLE {table}")
+        delete_from_table(table)()
 
     return truncate
 
@@ -158,22 +157,26 @@ def insert_into_table_id(table: str) -> Callable[..., None]:
     return insert
 
 
-def insert_from_dataframe(table: str, if_exists: str = "append", index=False) -> Callable[[pd.DataFrame], None]:
-
+def insert_from_dataframe(table: str, if_exists: str = "append",
+                          index=False, dtype=None) -> Callable[[pd.DataFrame], None]:
     def insert(d: pd.DataFrame):
-        insert_dataframe_into_table(table, d, if_exists, index)
+        _insert_dataframe_into_table(table, d, if_exists, index, dtype)
 
     return insert
 
 
-def insert_dataframe_into_table(table_name: str,
-                                dataframe: pandas.DataFrame,
-                                if_exists='append',
-                                index=False) -> None:
-
+def _insert_dataframe_into_table(table_name: str, dataframe: pandas.DataFrame,
+                                 if_exists='append',
+                                 index=False,
+                                 dtype=None) -> None:
     try:
-        dataframe.to_sql(table_name, con=db.connection_string, if_exists=if_exists,
-                         chunksize=5000, index=index)
+        dataframe.to_sql(
+            table_name,
+            con=db.connection_string,
+            if_exists=if_exists,
+            chunksize=5000,
+            index=index,
+            dtype=dtype)
     except Exception as err:
         log.error(f"insert_dataframe_into_table failed: {err}")
         raise err

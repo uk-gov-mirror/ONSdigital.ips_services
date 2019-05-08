@@ -1,9 +1,10 @@
 import pandas
 
 from ips.persistence.persistence import insert_from_dataframe
+import ips.services.dataimport.schemas.survey_data_schema as schema
 
 SURVEY_SUBSAMPLE = 'SURVEY_SUBSAMPLE'
-insert_ss = insert_from_dataframe(SURVEY_SUBSAMPLE, "append")
+insert_ss = insert_from_dataframe(SURVEY_SUBSAMPLE, if_exists="append", dtype=schema.get_schema())
 
 
 def import_survey_data(run_id, df):

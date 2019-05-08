@@ -8,7 +8,6 @@ from pkg_resources import resource_filename
 from ips_common.ips_logging import log
 import ips.persistence.traffic_weight as db
 from ips.services.calculations import log_warnings, THRESHOLD_CAP
-from ips.util.config.services_configuration import ServicesConfiguration
 
 SERIAL = 'SERIAL'
 TRAFFIC_WT = 'TRAFFIC_WT'
@@ -17,7 +16,7 @@ T1 = "T1"
 
 STRATA = ['SAMP_PORT_GRP_PV', 'ARRIVEDEPART']
 MAX_RULE_LENGTH = '512'
-MODEL_GROUP = 'C_group'
+MODEL_GROUP = 'C_GROUP'
 GES_BOUND_TYPE = 'G'
 GES_UPPER_BOUND = ''
 GES_LOWER_BOUND = '1.0'
@@ -29,16 +28,16 @@ TRAFFIC_TOTAL_COLUMN = 'TRAFFICTOTAL'
 POST_SUM_COLUMN = 'SUM_TRAFFIC_WT'.upper()
 
 TRAFFIC_DESIGN_WEIGHT_COLUMN = 'TRAFDESIGNWEIGHT'
-TRAFDESIGNWEIGHT = 'trafDesignWeight'
+TRAFDESIGNWEIGHT = 'TRAF_DESIGN_WEIGHT'
 
 POST_WEIGHT_COLUMN = 'POSTWEIGHT'
 
 POP_TOTALS = "SAS_TRAFFIC_DATA"
 OUTPUT_TABLE_NAME = 'SAS_TRAFFIC_WT'
 SUMMARY_TABLE_NAME = 'SAS_PS_TRAFFIC'
-SURVEY_TRAFFIC_AUX_TABLE = "survey_traffic_aux"
-POP_ROWVEC_TABLE = 'poprowvec_traffic'
-R_TRAFFIC_TABLE = "r_traffic"
+SURVEY_TRAFFIC_AUX_TABLE = "SURVEY_TRAFFIC_AUX"
+POP_ROWVEC_TABLE = 'POPROWVEC_TRAFFIC'
+R_TRAFFIC_TABLE = "R_TRAFFIC"
 
 var_serialNum = 'serial'.upper()
 var_shiftWeight = 'shift_wt'.upper()
@@ -198,8 +197,10 @@ def r_population_input(df_survey_input, df_tr_totals):
     # Create lookup. Group by and aggregate
     lookup_dataframe = df_survey_input_sorted.copy()
     lookup_dataframe["count"] = ""
-    lookup_dataframe = lookup_dataframe.groupby([SAMP_PORT_GRP_PV,
-                                                 ARRIVEDEPART]).agg({"count": 'count'}).reset_index()
+    lookup_dataframe = (
+        lookup_dataframe.groupby([SAMP_PORT_GRP_PV,
+                                  ARRIVEDEPART]).agg({"count": 'count'}).reset_index()
+    )
 
     # Cleanse data
     # lookup_dataframe.drop(["count"], axis=1)
@@ -208,6 +209,7 @@ def r_population_input(df_survey_input, df_tr_totals):
 
     # Create population totals for current survey data - Cleanse data and merge
     lookup_dataframe_aux = lookup_dataframe[[SAMP_PORT_GRP_PV, ARRIVEDEPART, T1]]
+    pd.options.mode.chained_assignment = None  # default='warn'
     lookup_dataframe_aux[T1] = lookup_dataframe_aux.T1.astype(np.int64)
 
     df_mod_totals = pd.merge(df_traffic_totals, lookup_dataframe_aux, on=[SAMP_PORT_GRP_PV,

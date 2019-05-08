@@ -128,7 +128,7 @@ def reset_test_tables(run_id, step_config):
         db.delete_from_table(tr_calc.SURVEY_TRAFFIC_AUX_TABLE)
 
         # drop aux tables and r created tables
-        db.drop_table(tr_calc.POP_PROWVEC_TABLE)
+        db.drop_table(tr_calc.POP_ROWVEC_TABLE)
         db.drop_table(tr_calc.R_TRAFFIC_TABLE)
 
     # List of tables to cleanse entirely.

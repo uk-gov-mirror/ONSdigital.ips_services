@@ -2,6 +2,7 @@ import time
 import uuid
 
 import ips_common_db.sql as db
+# noinspection PyUnresolvedReferences
 import requests
 from ips_common.ips_logging import log
 

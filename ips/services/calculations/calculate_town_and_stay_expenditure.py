@@ -179,9 +179,18 @@ def do_ips_town_exp_imp(df_survey_data, var_serial, var_final_wt):
                           (df_output_data["TOWNCODE7"].between(70000, 79999)) |
                           (df_output_data["TOWNCODE8"].between(70000, 79999)))
 
-    source_dataframe = df_output_data[[FLOW_COLUMN, PURPOSE_GROUP_COLUMN,
-                                       COUNTRY_GROUP_COLUMN, KNOWN_LONDON_VISIT,
-                                       KNOWN_LONDON_NOT_VISIT]].ix[towncode_condition]
+    source_dataframe = (
+        df_output_data[
+            [
+                FLOW_COLUMN,
+                PURPOSE_GROUP_COLUMN,
+                COUNTRY_GROUP_COLUMN,
+                KNOWN_LONDON_VISIT,
+                KNOWN_LONDON_NOT_VISIT
+            ]
+        ].ix[towncode_condition]
+    )
+
     aggregation_columns = [FLOW_COLUMN, PURPOSE_GROUP_COLUMN, COUNTRY_GROUP_COLUMN]
     df_segment1 = __calculate_ade(var_final_wt, df_output_data, source_dataframe,
                                   aggregation_columns, "ADE1", KNOWN_LONDON_VISIT)
@@ -272,11 +281,11 @@ def do_ips_town_exp_imp(df_survey_data, var_serial, var_final_wt):
         """
         for col in range(1, len(row)):
             if row[col] > 0.0:
-                new_value = decimal.Decimal(str(row[col])).quantize(decimal.Decimal('0'), rounding=decimal.ROUND_HALF_UP)
+                new_value = decimal.Decimal(str(row[col])).quantize(decimal.Decimal('0'),
+                                                                    rounding=decimal.ROUND_HALF_UP)
                 row[col] = round(new_value)
         return row
 
     df_output = df_output.apply(round_number, axis=1)
 
     return df_output
-

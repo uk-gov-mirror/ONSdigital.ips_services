@@ -49,25 +49,24 @@ def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_wei
 
     df_mins.reset_index(inplace=True)
 
-    df_summin = df_mins.groupby(STRATA)['SWNRwght'].agg({
-        PRIOR_WEIGHT_MINIMUM_COLUMN: 'sum',
-        MINIMUM_COUNT_COLUMN: 'count'})
+    df_summin = df_mins.groupby(STRATA)['SWNRwght'].agg(['sum', 'count'])
+    df_summin.rename(columns={'sum': PRIOR_WEIGHT_MINIMUM_COLUMN, 'count': MINIMUM_COUNT_COLUMN}, inplace=True)
 
     df_summin.reset_index(inplace=True)
 
     # Summarise only full responses by strata
     df_fulls = df_surveydata_sorted[df_surveydata_sorted[MINIMUM_FLAG_COLUMN] == 0]
 
-    df_sumfull = df_fulls.groupby(STRATA)['SWNRwght'].agg({
-        PRIOR_WEIGHT_FULL_COLUMN: 'sum',
-        FULL_RESPONSE_COUNT_COLUMN: 'count'})
+    df_sumfull = df_fulls.groupby(STRATA)['SWNRwght'].agg(['sum', 'count'])
+    df_sumfull.rename(columns={'sum': PRIOR_WEIGHT_FULL_COLUMN, 'count': FULL_RESPONSE_COUNT_COLUMN}, inplace=True)
 
     df_sumfull.reset_index(inplace=True)
 
     # Summarise the mig slot interviews by the strata
     df_migs = df_surveydata_sorted[df_surveydata_sorted[MINIMUM_FLAG_COLUMN] == 2]
 
-    df_summig = df_migs.groupby(STRATA)['SWNRwght'].agg({"sumPriorWeightMigs": 'sum'})
+    df_summig = df_migs.groupby(STRATA)['SWNRwght'].agg(['sum'])
+    df_summig.rename(columns={'sum': 'sumPriorWeightMigs'}, inplace=True)
 
     df_summig.reset_index(inplace=True)
 
@@ -157,9 +156,8 @@ def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_wei
     )
 
     df_out_sliced = df_out[df_out[MINIMUM_FLAG_COLUMN] != 1]
-    df_postsum = df_out_sliced.groupby(STRATA)['SWNRMINwght'].agg({
-        POST_WEIGHT_COLUMN: 'sum',
-        CASES_CARRIED_FORWARD_COLUMN: 'count'})
+    df_postsum = df_out_sliced.groupby(STRATA)['SWNRMINwght'].agg(['sum', 'count'])
+    df_postsum.rename(columns={'sum': POST_WEIGHT_COLUMN, 'count': CASES_CARRIED_FORWARD_COLUMN}, inplace=True)
 
     df_postsum.reset_index(inplace=True)
 

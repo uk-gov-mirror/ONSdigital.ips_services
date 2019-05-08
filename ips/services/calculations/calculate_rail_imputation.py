@@ -47,9 +47,11 @@ def do_ips_railex_imp(df_input, var_serial, var_final_weight, minimum_count_thre
     input2[STRATA] = input2[STRATA].fillna(0)
 
     # Generate the aggregated data 
-    gp_summin = input2.groupby(STRATA)[PRESPEND_VARIABLE].agg({GROSS_PRESPEND_VARIABLE: 'sum',
-                                                               COUNT_VARIABLE: 'count'})
-    railexp_summin = input2.groupby(STRATA)[RAIl_FARE_VARIABLE].agg({RAIL_EXPENSE_VARIABLE: 'mean'})
+    gp_summin = input2.groupby(STRATA)[PRESPEND_VARIABLE].agg(['sum', 'count'])
+    gp_summin.rename(columns={'sum': GROSS_PRESPEND_VARIABLE, 'count': COUNT_VARIABLE}, inplace=True)
+
+    railexp_summin = input2.groupby(STRATA)[RAIl_FARE_VARIABLE].agg(['mean'])
+    railexp_summin.rename(columns={'mean': RAIL_EXPENSE_VARIABLE}, inplace=True)
 
     # Reset the data frames index to include the new columns generated
     gp_summin = gp_summin.reset_index()
