@@ -22,6 +22,7 @@ class RunStepsApi(Api):
         create_run_steps(run_id)
 
 
+# noinspection PyUnusedLocal
 class RunStepsValueApi(Api):
 
     @validate(run_id=validate_run_id)

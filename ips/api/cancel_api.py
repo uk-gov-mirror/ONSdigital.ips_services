@@ -23,5 +23,5 @@ class CancelApi(Api):
             resp.body = json.dumps(result)
             return
 
-        self.workflow.cancel_run()
+        self.workflow.cancel_run(run_id)
 

@@ -103,7 +103,9 @@ def insert_into_table(table: str) -> Callable[..., None]:
             for _, value in kwargs.items():
                 if isinstance(value, str):
                     value = '"' + value + '"'
-                val += value
+                if value is None:
+                    value = 'NULL'
+                val += str(value)
                 i = i + 1
                 if i != len(kwargs):
                     val += ', '
@@ -144,7 +146,7 @@ def insert_into_table_id(table: str) -> Callable[..., None]:
             for _, value in kwargs.items():
                 if isinstance(value, str):
                     value = '"' + value + '"'
-                val += value
+                val += str(value)
                 i = i + 1
                 if i != len(kwargs):
                     val += ', '

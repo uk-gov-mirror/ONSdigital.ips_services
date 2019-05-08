@@ -3820,6 +3820,20 @@ create table user
     role      varchar(50)  null
 );
 
+create table RUN_MANAGEMENT
+(
+	RUN_ID varchar(40) charset utf8 not null,
+	STATUS int null,
+	STEP varchar(255) charset utf8 null,
+	PERCENT int default 0 null,
+	constraint RUN_MANAGEMENT_RUN_ID_uindex
+		unique (RUN_ID)
+);
+
+alter table RUN_MANAGEMENT
+	add primary key (RUN_ID);
+
+
 INSERT INTO user (id, username, password, firstname, surname, role)
 VALUES (1, 'Admin', 'pbkdf2:sha256:50000$jYlAjFyT$a3990f67a04492fdffae29256cc168caf7becbe33ca6fefb2f89c04b00ef9d27',
         null, null, 'admin');
