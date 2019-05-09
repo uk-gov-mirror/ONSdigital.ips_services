@@ -2,6 +2,7 @@ import io
 import falcon
 import pandas as pd
 import numpy as np
+from pandas.api.types import is_string_dtype
 import ips.persistence.import_survey as db
 from ips_common.ips_logging import log
 from ips.services import service
@@ -65,7 +66,7 @@ def _import_survey(run_id, source, month=None, year=None):
             log.error(f"Validation failed: {msg}")
             raise falcon.HTTPError(falcon.HTTP_401, 'data error', msg)
         else:
-            log.info("Validation complete")
+            log.info("Validation completed successfully.")
 
     df = df.sort_values(by='SERIAL')
     db.import_survey_data(run_id, df)
@@ -73,10 +74,60 @@ def _import_survey(run_id, source, month=None, year=None):
 
 
 def _validate_data(data: pd.DataFrame, user_month, user_year):
+
+    def error_message():
+        final_msg = ', '.join(map(str, msg))
+        return resp, final_msg
+
     log.info("Validating Survey data...")
+    msg = []
+    resp = True
 
-    resp = True, "success"
+    if 'SERIAL' not in data.columns:
+        msg.append(f"'SERIAL' column does not exist in Survey data.")
+        resp = False
+        return error_message()
 
+    # Validate intdate
+    if 'INTDATE' not in data.columns:
+        msg.append(f"'INTDATE' column does not exist in Survey data.")
+        resp = False
+        return error_message()
+    if not is_string_dtype(data['INTDATE']):
+        data['INTDATE'] = data['INTDATE'].astype(str).str.rjust(8, '0')
+
+    # Get the dates from the dataframe
+    dates = _get_dates(data, user_month)
+    months = list(map(int, dates[0]))
+    data_months = list(map(int, dates[1]))
+    data_years = dates[2]
+
+    if not all(m in range(1, 13) for m in months):
+        msg.append(f"Congratulations, you broke the internet! Invalid month selected.")
+        resp = False
+    if not all(y[:2] == '19' or y[:2] == '20' for y in data_years):
+        msg.append(f"Unexpected year in INTDATE column of Survey data.")
+        resp = False
+    if not all(len(y) == 4 for y in data_years):
+        msg.append(f"Invalid year in INTDATE column of Survey data. Invalid length.")
+        resp = False
+
+    # Do they match?
+    if not all(m in range(1, 13) for m in data_months):
+        msg.append(f"Invalid month in INTDATE column of Survey data.")
+        resp = False
+    elif not all(elem in months for elem in data_months):
+        msg.append(f"Incorrect month selected or uploaded for Survey data.")
+        resp = False
+
+    if not all(elem in user_year for elem in data_years):
+        msg.append(f"Incorrect year selected or uploaded for Survey data.")
+        resp = False
+
+    return error_message()
+
+
+def _get_dates(data, user_month):
     data_months = []
     data_years = []
     for index, row in data.iterrows():
@@ -97,17 +148,4 @@ def _validate_data(data: pd.DataFrame, user_month, user_year):
     else:
         month = [user_month]
 
-    if not all(elem in month for elem in data_months):
-        msg = f"Incorrect month selected or uploaded for Survey data."
-        resp = False, msg
-    elif not all(elem in user_year for elem in data_years):
-        msg = f"Incorrect year selected or uploaded for Survey data."
-        resp = False, msg
-    elif 'SERIAL' not in data.columns:
-        msg = f"'SERIAL' column does not exist in Survey data."
-        resp = False, msg
-
-    def error_message():
-        return resp
-
-    return error_message()
+    return month, data_months, data_years
