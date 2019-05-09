@@ -1,7 +1,8 @@
-from typing import Dict, Callable, List, TypeVar
+from typing import Callable, List, TypeVar
 
 from ips_common.ips_logging import log
 
+import ips.services.run_management as runs
 import ips.services.steps.air_miles as airmiles
 import ips.services.steps.fares_imputation as fares_imputation
 import ips.services.steps.final_weight as final_weight
@@ -18,8 +19,6 @@ import ips.services.steps.traffic_weight as traffic_weight
 import ips.services.steps.unsampled_weight as unsampled_weight
 from ips.persistence.persistence import clear_memory_table
 
-import ips.services.run_management as runs
-
 
 class IPSWorkflow:
     pass
@@ -35,19 +34,24 @@ def run_step(func: [[W, str], None]) -> Callable[[str], None]:
         else:
             self.set_status(run_id, runs.IN_PROGRESS, func.__name__[1:])
             func(self, run_id)
+
     return wrapper
 
 
 # noinspection PyMethodMayBeStatic
 class IPSWorkflow:
-
     num_done: int = 0
+    in_progress = False
 
     def is_in_progress(self, run_id) -> bool:
-        return runs.is_in_progress(run_id)
+        if self.in_progress is True or runs.is_in_progress(run_id):
+            return True
+        else:
+            return False
 
     def cancel_run(self, run_id) -> None:
         runs.cancel_run(run_id)
+        self.in_progress = False
 
     def is_cancelled(self, run_id) -> bool:
         return runs.is_cancelled(run_id)
@@ -57,6 +61,8 @@ class IPSWorkflow:
 
     def set_status(self, run_id: str, status: int, step: str) -> None:
         runs.set_status(run_id, status, step)
+        if status == runs.DONE:
+            self.in_progress = False
         log.debug(f"Step: {step}, status: {status}")
 
     def is_run_complete(self, run_id) -> bool:
@@ -158,6 +164,7 @@ class IPSWorkflow:
     def run_calculations(self, run_id: str) -> None:
         self._initialize(run_id)
         self.num_done = 0
+        self.in_progress = True
 
         for func in self._dag_list:
             if not self.is_cancelled(run_id):
@@ -166,7 +173,8 @@ class IPSWorkflow:
                 runs.set_percent_done(run_id, percent)
                 self.num_done += 1
 
+        self.in_progress = False
+
         if not self.is_cancelled(run_id):
             self.set_status(run_id, runs.DONE, "DONE")
             runs.set_percent_done(run_id, 100)
-

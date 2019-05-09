@@ -188,7 +188,7 @@ def do_ips_town_exp_imp(df_survey_data, var_serial, var_final_wt):
                 KNOWN_LONDON_VISIT,
                 KNOWN_LONDON_NOT_VISIT
             ]
-        ].ix[towncode_condition]
+        ].loc[towncode_condition]
     )
 
     aggregation_columns = [FLOW_COLUMN, PURPOSE_GROUP_COLUMN, COUNTRY_GROUP_COLUMN]
@@ -215,7 +215,7 @@ def do_ips_town_exp_imp(df_survey_data, var_serial, var_final_wt):
 
     # Calculate ade1 without flow
     aggregation_columns = [PURPOSE_GROUP_COLUMN, COUNTRY_GROUP_COLUMN]
-    source_dataframe = df_output_data[aggregation_columns].ix[towncode_condition]
+    source_dataframe = df_output_data[aggregation_columns].loc[towncode_condition]
     df_temp_london = __calculate_ade(var_final_wt, df_output_data, source_dataframe, aggregation_columns, "ADE1")
 
     # Calculate ade2 without flow
