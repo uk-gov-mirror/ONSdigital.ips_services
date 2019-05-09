@@ -6,11 +6,11 @@ import ips_common_db.sql as db
 import requests
 from ips_common.ips_logging import log
 
-from ips.services.dataimport.import_non_response import import_nonresponse_file
-from ips.services.dataimport.import_shift import import_shift_file
-from ips.services.dataimport.import_survey import import_survey_file
-from ips.services.dataimport.import_traffic import import_air_file, import_sea_file, import_tunnel_file
-from ips.services.dataimport.import_unsampled import import_unsampled_file
+from ips.services.dataimport.import_non_response import import_nonresponse
+from ips.services.dataimport.import_shift import import_shift
+from ips.services.dataimport.import_survey import import_survey
+from ips.services.dataimport.import_traffic import import_sea, import_tunnel, import_air
+from ips.services.dataimport.import_unsampled import import_unsampled
 
 reference_data = {
     "Sea": "../tests/data/import_data/dec/Sea Traffic Dec 2017.csv",
@@ -28,6 +28,7 @@ start_time = time.time()
 log.info("Module level start time: {}".format(start_time))
 
 
+# noinspection PyUnusedLocal
 def setup_module(module):
     """ setup any state specific to the execution of the given module."""
     log.info(f"run_id = {run_id}")
@@ -38,15 +39,26 @@ def setup_module(module):
 def import_reference_data():
     log.info("-> Start data load")
 
-    import_sea_file(run_id, reference_data['Sea'])
-    import_air_file(run_id, reference_data['Air'])
-    import_tunnel_file(run_id, reference_data['Tunnel'])
+    with open(survey_data, 'rb') as file:
+        import_survey(run_id, file.read(), None, None)
 
-    import_shift_file(run_id, reference_data['Shift'])
-    import_nonresponse_file(run_id, reference_data['Non Response'])
-    import_unsampled_file(run_id, reference_data['Unsampled'])
+    with open(reference_data['Sea'], 'rb') as file:
+        import_sea(run_id, file.read())
 
-    import_survey_file(run_id, survey_data)
+    with open(reference_data['Air'], 'rb') as file:
+        import_air(run_id, file.read())
+
+    with open(reference_data['Tunnel'], 'rb') as file:
+        import_tunnel(run_id, file.read())
+
+    with open(reference_data['Shift'], 'rb') as file:
+        import_shift(run_id, file.read())
+
+    with open(reference_data['Non Response'], 'rb') as file:
+        import_nonresponse(run_id, file.read())
+
+    with open(reference_data['Unsampled'], 'rb') as file:
+        import_unsampled(run_id, file.read())
 
     log.info("-> End data load")
 
@@ -57,6 +69,7 @@ def setup_pv():
     db.insert_dataframe_into_table('PROCESS_VARIABLE_PY', df)
 
 
+# noinspection PyUnusedLocal
 def teardown_module(module):
     """ teardown any state that was previously setup with a setup_module
         method.

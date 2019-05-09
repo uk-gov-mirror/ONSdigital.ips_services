@@ -11,4 +11,4 @@ class ImportUnsampled(Api):
         v = req.get_param('ips-file')
         data = v.file.read()
 
-        imp.import_unsampled_stream(run_id, data)
+        imp.import_unsampled(run_id, data)

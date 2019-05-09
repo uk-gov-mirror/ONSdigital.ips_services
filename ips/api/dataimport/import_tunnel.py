@@ -11,4 +11,4 @@ class ImportTunnel(Api):
         v = req.get_param('ips-file')
         data = v.file.read()
 
-        imp.import_tunnel_stream(run_id, data)
+        imp.import_tunnel(run_id, data)

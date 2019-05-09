@@ -34,27 +34,17 @@ columns = [
 
 
 @service
-def import_survey_stream(run_id, data, month, year):
-    log.info("Importing survey data from stream")
-    return _import_survey(run_id, io.BytesIO(data), month, year)
-
-
-@service
-def import_survey_file(run_id, survey_data_path):
-    log.info(f"Importing survey data from file: {survey_data_path}")
-    return _import_survey(run_id, survey_data_path)
-
-
-def _import_survey(run_id, source, month=None, year=None):
+def import_survey(run_id, data, month, year):
+    log.info("Importing survey data")
     df: pd.DataFrame = pd.read_csv(
-        source,
+        io.BytesIO(data),
         encoding="ISO-8859-1",
         engine="python",
         usecols=lambda x: x.upper() in columns
     )
 
-    def convert_col_to_int(df, col):
-        df[col] = df[col].fillna(-1).astype(int).replace('-1', np.nan)
+    def convert_col_to_int(data_frame, col):
+        data_frame[col] = data_frame[col].fillna(-1).astype(int).replace('-1', np.nan)
 
     df.columns = df.columns.str.upper()
     [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'DVEXPEND', 'TANDTSI']]

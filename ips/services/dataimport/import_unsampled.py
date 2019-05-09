@@ -9,20 +9,10 @@ from ips.services.dataimport.schemas import unsampled_schema
 
 
 @service
-def import_unsampled_stream(run_id, data):
-    log.info("Importing unsampled data from stream")
-    return _import_unsampled(run_id, io.BytesIO(data))
-
-
-@service
-def import_unsampled_file(run_id, data):
-    log.info(f"Importing unsampled data from file: {data}")
-    return _import_unsampled(run_id, data)
-
-
-def _import_unsampled(run_id, source):
+def import_unsampled(run_id, data):
+    log.info("Importing unsampled data")
     df = pd.read_csv(
-        source,
+        io.BytesIO(data),
         encoding="ISO-8859-1",
         engine="python",
         dtype=unsampled_schema.get_schema()
@@ -33,5 +23,6 @@ def _import_unsampled(run_id, source):
     return df
 
 
+# noinspection PyUnusedLocal
 def _validate_data(data: pd.DataFrame) -> bool:
     pass
