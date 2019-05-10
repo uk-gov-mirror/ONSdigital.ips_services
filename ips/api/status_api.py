@@ -26,7 +26,7 @@ class StatusApi(Api):
 
         result = {
             'status': v,
-            'percentage_done': self.workflow.get_percentage_done()
+            'percentage_done': self.workflow.get_percentage_done(run_id)
         }
 
         resp.body = json.dumps(result)

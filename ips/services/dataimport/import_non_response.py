@@ -9,20 +9,10 @@ from ips.services.dataimport.schemas import non_response_schema
 
 
 @service
-def import_nonresponse_stream(run_id, data):
-    log.info(f"Importing non_response data from stream")
-    return _import_non_response(run_id, io.BytesIO(data))
-
-
-@service
-def import_nonresponse_file(run_id, nr_data_path):
-    log.info(f"Importing non_response data from file {nr_data_path}")
-    return _import_non_response(run_id, nr_data_path)
-
-
-def _import_non_response(run_id, source):
+def import_nonresponse(run_id, data):
+    log.info(f"Importing non_response data")
     df = pd.read_csv(
-        source,
+        io.BytesIO(data),
         encoding="ISO-8859-1",
         engine="python",
         dtype=non_response_schema.get_schema()
@@ -33,5 +23,6 @@ def _import_non_response(run_id, source):
     return df
 
 
+# noinspection PyUnusedLocal
 def _validate_data(data: pd.DataFrame) -> bool:
     pass

@@ -17,7 +17,7 @@ def login(user_name: str, password: str) -> None:
 
     password = b64decode(password.encode('ascii')).decode('ascii')
 
-    if not check_password_hash(user_credentials['password'].values[0], password):
+    if not check_password_hash(user_credentials['PASSWORD'].values[0], password):
         error = f"Invalid password."
         log.error(error)
         raise falcon.HTTPError(falcon.HTTP_401, 'login error', error)

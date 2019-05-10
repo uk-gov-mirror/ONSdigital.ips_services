@@ -69,9 +69,9 @@ def r_survey_input(df_survey_input):
 
     # Create lookup. Group by and aggregate
     lookup_dataframe = df_survey_input_sorted.copy()
+
     lookup_dataframe["count"] = ""
-    lookup_dataframe = lookup_dataframe.groupby([SAMP_PORT_GRP_PV,
-                                                 ARRIVEDEPART]).agg({"count": 'count'}).reset_index()
+    lookup_dataframe = lookup_dataframe.groupby([SAMP_PORT_GRP_PV, ARRIVEDEPART])['count'].count().reset_index()
 
     # Cleanse data
     # lookup_dataframe.drop(["count"], axis=1)
@@ -127,14 +127,16 @@ def r_population_input(df_survey_input, df_tr_totals):
     df_survey_input_check['C_GROUP'] = np.where(df_survey_input_check['TRAFDESIGNWEIGHT'] > 0, 1, 0)
     df_ges_input = df_survey_input_check[['SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'TRAFDESIGNWEIGHT', 'C_GROUP', 'SERIAL']]
     df_ges_input = df_ges_input.sort_values(sort1)
-    df_rsumsamp = df_ges_input.groupby(['SAMP_PORT_GRP_PV', 'ARRIVEDEPART']).agg(
-        {'TRAFDESIGNWEIGHT': 'sum'}).reset_index()
+
+    df_rsumsamp = df_ges_input.groupby(['SAMP_PORT_GRP_PV', 'ARRIVEDEPART'])['TRAFDESIGNWEIGHT'].sum().reset_index()
 
     df_pop_totals_check = df_tr_totals.sort_values(sort1)
     df_pop_totals_check = df_pop_totals_check[~df_pop_totals_check['SAMP_PORT_GRP_PV'].isnull()]
     df_pop_totals_check = df_pop_totals_check[~df_pop_totals_check['ARRIVEDEPART'].isnull()]
-    df_pop_totals_check = df_pop_totals_check.groupby(['SAMP_PORT_GRP_PV', 'ARRIVEDEPART']).agg(
-        {'TRAFFICTOTAL': 'sum'}).reset_index()
+
+    df_pop_totals_check = (
+        df_pop_totals_check.groupby(['SAMP_PORT_GRP_PV', 'ARRIVEDEPART'])['TRAFFICTOTAL'].sum().reset_index()
+    )
 
     df_merge_totals = df_rsumsamp.merge(df_pop_totals_check, on=sort1, how='outer')
     df_merge_totals = df_merge_totals.sort_values(sort1)
@@ -191,16 +193,15 @@ def r_population_input(df_survey_input, df_tr_totals):
 
     # Create traffic totals
     df_pop_totals_match = df_pop_totals_match.sort_values([ARRIVEDEPART, SAMP_PORT_GRP_PV])
-    df_traffic_totals = df_pop_totals_match.groupby([SAMP_PORT_GRP_PV,
-                                                     ARRIVEDEPART]).agg({TRAFFIC_TOTAL_COLUMN: 'sum'}).reset_index()
+
+    df_traffic_totals = (
+        df_pop_totals_match.groupby([SAMP_PORT_GRP_PV, ARRIVEDEPART])[TRAFFIC_TOTAL_COLUMN].sum().reset_index()
+    )
 
     # Create lookup. Group by and aggregate
     lookup_dataframe = df_survey_input_sorted.copy()
     lookup_dataframe["count"] = ""
-    lookup_dataframe = (
-        lookup_dataframe.groupby([SAMP_PORT_GRP_PV,
-                                  ARRIVEDEPART]).agg({"count": 'count'}).reset_index()
-    )
+    lookup_dataframe = lookup_dataframe.groupby([SAMP_PORT_GRP_PV, ARRIVEDEPART])['count'].count().reset_index()
 
     # Cleanse data
     # lookup_dataframe.drop(["count"], axis=1)
@@ -329,21 +330,21 @@ def generate_ips_tw_summary(df_survey, df_output_merge_final,
     # Re-index the data frame
     df_summary_sorted.index = range(df_summary_sorted.shape[0])
 
-    # method will possibly be deprecated - may not be an issue
-    df_tmp5 = (
-        df_summary_sorted.groupby(STRATA).agg(
-            {
-                POST_WEIGHT_COLUMN: {COUNT_COLUMN: 'count', POST_SUM_COLUMN: 'sum'},
-                traffic_weight: {traffic_weight: 'mean'}
-            }
-        )
+    df_tmp5 = df_summary_sorted.groupby(STRATA).agg(
+        {
+            POST_WEIGHT_COLUMN: ['count', 'sum'],
+            traffic_weight: ['mean']
+        }
     )
-
-    # drop the additional column indexes
     df_tmp5.columns = df_tmp5.columns.droplevel()
-
-    # reset indexes to keep them aligned
     df_tmp5 = df_tmp5.reset_index()
+    df_tmp5.rename(
+        columns={
+            'count': COUNT_COLUMN,
+            'sum': POST_SUM_COLUMN,
+            'mean': traffic_weight,
+        }, inplace=True
+    )
 
     # reorder columns for SAS comparison
     col_order = [STRATA[0], STRATA[1], COUNT_COLUMN, POST_SUM_COLUMN, traffic_weight]
@@ -424,11 +425,7 @@ def do_ips_trafweight_calculation_with_r(survey_data, trtotals):
     # Re-index the data frame
     df_pop_totals.index = range(df_pop_totals.shape[0])
 
-    df_pop_totals = (
-        df_pop_totals.groupby(STRATA)[TRAFFIC_TOTAL_COLUMN].agg(
-            [(TRAFFIC_TOTAL_COLUMN, 'sum')]
-        ).reset_index()
-    )
+    df_pop_totals = df_pop_totals.groupby(STRATA)[TRAFFIC_TOTAL_COLUMN].sum().reset_index()
 
     # ensure un-rounded df_ret_out_final_not_rounded is supplied
     df_summary_merge_sum_traftot = generate_ips_tw_summary(

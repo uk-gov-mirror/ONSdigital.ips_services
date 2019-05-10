@@ -15,5 +15,5 @@ class ImportSurvey(Api):
         month = req.get_param('month')
         year = req.get_param('year')
 
-        imp.import_survey_stream(run_id, data, month, year)
+        imp.import_survey(run_id, data, month, year)
 

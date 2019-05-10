@@ -452,14 +452,6 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     df_surveydata_merge_3 = df_surveydata_merge.sort_values(colset3)
 
     # Group by the necessary columns and aggregate df_surveydata_merge shift weight
-    # df_summary_high = df_surveydata_merge_3.groupby(colset3)[shift_weight].agg({
-    #     COUNT_COLUMN: 'count',
-    #     WEIGHT_SUM_COLUMN: 'sum',
-    #     MIN_WEIGHT_COLUMN: 'min',
-    #     AVERAGE_WEIGHT_COLUMN: 'mean',
-    #     MAX_WEIGHT_COLUMN: 'max'
-    # })
-
     df_summary_high = (
         df_surveydata_merge_3.groupby(colset3)[shift_weight].agg(
             ['count', 'sum', 'min', 'mean', 'max']

@@ -1,12 +1,12 @@
 import io
+
 import falcon
-import pandas as pd
 import numpy as np
-from pandas.api.types import is_string_dtype
-import ips.persistence.import_survey as db
+import pandas as pd
 from ips_common.ips_logging import log
+
+import ips.persistence.import_survey as db
 from ips.services import service
-from ips.services.dataimport.schemas import survey_data_schema
 
 columns = [
     'SERIAL', 'AM_PM_NIGHT', 'AGE', 'ANYUNDER16', 'APORTLATDEG',
@@ -34,118 +34,93 @@ columns = [
 
 
 @service
-def import_survey_stream(run_id, data, month, year):
-    log.info("Importing survey data from stream")
-    return _import_survey(run_id, io.BytesIO(data), month, year)
-
-
-@service
-def import_survey_file(run_id, survey_data_path):
-    log.info(f"Importing survey data from file: {survey_data_path}")
-    return _import_survey(run_id, survey_data_path)
-
-
-def _import_survey(run_id, source, month=None, year=None):
+def import_survey(run_id, data, month, year):
+    log.info("Importing survey data")
     df: pd.DataFrame = pd.read_csv(
-        source,
+        io.BytesIO(data),
         encoding="ISO-8859-1",
         engine="python",
         usecols=lambda x: x.upper() in columns
     )
 
-    def convert_col_to_int(df, col):
-        df[col] = df[col].fillna(-1).astype(int).replace('-1', np.nan)
+    def convert_col_to_int(data_frame, col):
+        data_frame[col] = data_frame[col].fillna(-1).astype(int).replace('-1', np.nan)
 
     df.columns = df.columns.str.upper()
     [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'DVEXPEND', 'TANDTSI']]
 
     if month is not None and year is not None:
-        validation = _validate_data(df, month, year)
-        if not validation[0]:
-            msg = validation[1]
-            log.error(f"Validation failed: {msg}")
-            raise falcon.HTTPError(falcon.HTTP_401, 'data error', msg)
-        else:
-            log.info("Validation completed successfully.")
+        errors = Errors()
+        validation = _validate_data(df, month, year, errors)
+        if not validation:
+            log.error(f"Validation failed: {errors.get_messages()}")
+            raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
+
+        log.info("Validation completed successfully.")
 
     df = df.sort_values(by='SERIAL')
     db.import_survey_data(run_id, df)
     return df
 
 
-def _validate_data(data: pd.DataFrame, user_month, user_year):
-
-    def error_message():
-        final_msg = ', '.join(map(str, msg))
-        return resp, final_msg
-
+def _validate_data(data: pd.DataFrame, user_month, user_year, errors):
     log.info("Validating Survey data...")
-    msg = []
-    resp = True
 
+    # Validate SERIAL column exists
     if 'SERIAL' not in data.columns:
-        msg.append(f"'SERIAL' column does not exist in Survey data.")
-        resp = False
-        return error_message()
+        log.error(f"'SERIAL' column does not exist. Exiting validation.")
+        errors.add("'SERIAL' column does not exist in Survey data.")
+        return False
 
-    # Validate intdate
+    # Validate INTDATE column exists
     if 'INTDATE' not in data.columns:
-        msg.append(f"'INTDATE' column does not exist in Survey data.")
-        resp = False
-        return error_message()
-    if not is_string_dtype(data['INTDATE']):
-        data['INTDATE'] = data['INTDATE'].astype(str).str.rjust(8, '0')
+        log.error("'INTDATE' column does not exist. Exiting validation.")
+        errors.add("'INTDATE' column does not exist in Survey data.")
+        return False
 
-    # Get the dates from the dataframe
-    dates = _get_dates(data, user_month)
-    months = list(map(int, dates[0]))
-    data_months = list(map(int, dates[1]))
-    data_years = dates[2]
+    date_column = data['INTDATE'].astype(str).str.rjust(8, '0')
 
-    if not all(m in range(1, 13) for m in months):
-        msg.append(f"Congratulations, you broke the internet! Invalid month selected.")
-        resp = False
-    if not all(y[:2] == '19' or y[:2] == '20' for y in data_years):
-        msg.append(f"Unexpected year in INTDATE column of Survey data.")
-        resp = False
-    if not all(len(y) == 4 for y in data_years):
-        msg.append(f"Invalid year in INTDATE column of Survey data. Invalid length.")
-        resp = False
-
-    # Do they match?
-    if not all(m in range(1, 13) for m in data_months):
-        msg.append(f"Invalid month in INTDATE column of Survey data.")
-        resp = False
-    elif not all(elem in months for elem in data_months):
-        msg.append(f"Incorrect month selected or uploaded for Survey data.")
-        resp = False
-
-    if not all(elem in user_year for elem in data_years):
-        msg.append(f"Incorrect year selected or uploaded for Survey data.")
-        resp = False
-
-    return error_message()
+    return _validate_date(date_column, user_month, user_year, errors)
 
 
-def _get_dates(data, user_month):
-    data_months = []
-    data_years = []
-    for index, row in data.iterrows():
-        data_months.append(row['INTDATE'][-6:][:2])
-        data_years.append(row['INTDATE'][-4:])
+def _validate_date(data, user_month, user_year, errors):
+    valid_quarters = {
+        "Q1": ['1', '2', '3'], "Q2": ['4', '5', '6'], "Q3": ['7', '8', '9'], "Q4": ['10', '11', '12']
+    }
 
-    month = []
-    if user_month[0] == 'Q':
-        quarter = user_month[1]
-        if quarter == '1':
-            month = ['1', '2', '3']
-        elif quarter == '2':
-            month = ['4', '5', '6']
-        elif quarter == '3':
-            month = ['7', '8', '9']
-        elif quarter == '4':
-            month = ['10', '11', '12']
-    else:
-        month = [user_month]
+    for index, row in data.iteritems():
+        year = row[-4:]
+        month = row[-6:][:2]
 
-    return month, data_months, data_years
+        if not str.isdigit(year) or not 2000 <= int(year) <= 2099:
+            errors.add(f"year value [{year}] in data stream is invalid")
+            return False
+
+        if not str.isdigit(user_year) or int(user_year) != int(year):
+            errors.add(f"user supplier year value [{user_year}] is invalid")
+            return False
+
+        if user_month in valid_quarters and month not in valid_quarters[user_month]:
+            errors.add(f"user supplied quarter [{user_month}] does not correspond to valid month in data [{month}]")
+            return False
+
+        if not str.isdigit(month) or not 1 <= int(month) <= 12:
+            errors.add(f"data month value [{month}] in data stream is invalid")
+            return False
+
+        if int(month) != int(user_month):
+            errors.add(f"user supplied month [{user_month}] does not correspond to data month [{month}]")
+            return False
+
+    return True
+
+
+class Errors:
+    error_messages = []
+    status = 0
+
+    def add(self, message):
+        self.error_messages.append(message)
+
+    def get_messages(self):
+        return self.error_messages

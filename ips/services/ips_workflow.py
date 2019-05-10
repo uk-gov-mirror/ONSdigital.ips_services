@@ -1,7 +1,8 @@
-from typing import Dict, Callable, List, TypeVar
+from typing import Callable, List, TypeVar
 
 from ips_common.ips_logging import log
 
+import ips.services.run_management as runs
 import ips.services.steps.air_miles as airmiles
 import ips.services.steps.fares_imputation as fares_imputation
 import ips.services.steps.final_weight as final_weight
@@ -28,65 +29,50 @@ W = TypeVar('W', bound=IPSWorkflow)
 
 def run_step(func: [[W, str], None]) -> Callable[[str], None]:
     def wrapper(self, run_id: str):
-        if self.is_cancelled():
-            self.set_status(func.__name__[1:], self._CANCELLED)
+        if self.is_cancelled(run_id):
             log.info(f"Processing cancelled. Skipping step {func.__name__[1:]}")
         else:
-            self.set_status(func.__name__[1:], self._IN_PROGRESS)
+            self.set_status(run_id, runs.IN_PROGRESS, func.__name__[1:])
             func(self, run_id)
-            self.set_status(func.__name__[1:], self._DONE)
 
     return wrapper
 
 
+# noinspection PyMethodMayBeStatic
 class IPSWorkflow:
-    _current_status: Dict[str, int]
-    _NOT_STARTED: int = 1
-    _IN_PROGRESS: int = 2
-    _DONE: int = 3
-    _CANCELLED: int = 4
+    num_done: int = 0
+    in_progress = False
 
-    _in_progress: bool = False
-    _cancel_run: bool = False
+    def is_in_progress(self, run_id) -> bool:
+        if self.in_progress is True or runs.is_in_progress(run_id):
+            return True
+        else:
+            return False
 
-    def __init__(self):
-        self._current_status = {}
+    def cancel_run(self, run_id) -> None:
+        runs.cancel_run(run_id)
+        self.in_progress = False
 
-    def in_progress(self) -> bool:
-        return self._in_progress
+    def is_cancelled(self, run_id) -> bool:
+        return runs.is_cancelled(run_id)
 
-    def cancel_run(self) -> None:
-        self._cancel_run = True
-        self._in_progress = False
+    def get_status(self, run_id) -> int:
+        return runs.get_status(run_id)
 
-    def is_cancelled(self) -> bool:
-        return self._cancel_run
-
-    def get_status(self) -> Dict[str, int]:
-        return self._current_status
-
-    def set_status(self, step: str, status: int) -> None:
-        self._current_status[step] = status
+    def set_status(self, run_id: str, status: int, step: str) -> None:
+        runs.set_status(run_id, status, step)
+        if status == runs.DONE:
+            self.in_progress = False
         log.debug(f"Step: {step}, status: {status}")
 
-    def run_complete(self) -> bool:
-        if len(self._current_status.keys()) != 14:
-            return False
-        for _, value in self._current_status.items():
-            if value != IPSWorkflow._DONE and value != IPSWorkflow._CANCELLED:
-                return False
-        return True
+    def is_run_complete(self, run_id) -> bool:
+        return runs.is_complete(run_id)
 
-    def get_percentage_done(self) -> int:
-        num_done = 0
-        for key, value in self._current_status.items():
-            if value == IPSWorkflow._DONE or value == IPSWorkflow._CANCELLED:
-                num_done += 1
-        return round((num_done / 14) * 100)
+    def get_percentage_done(self, run_id) -> int:
+        return runs.get_percent_done(run_id)
 
-    def _run_steps(self, func, run_id: str) -> None:
-        func(self, run_id)
-        func(self, run_id)
+    def set_percent_done(self, run_id, percent):
+        runs.set_percent_done(run_id, percent)
 
     @run_step
     def _step_1(self, run_id: str) -> None:
@@ -170,21 +156,25 @@ class IPSWorkflow:
         _step_12
     ]
 
-    def _initialize(self) -> None:
+    def _initialize(self, run_id) -> None:
         clear_memory_table("SURVEY_SUBSAMPLE")()
         clear_memory_table("SAS_SURVEY_SUBSAMPLE")()
-
-        self._current_status = {}
-        for x in range(len(self._dag_list)):
-            self._current_status["step_" + str(x + 1)] = IPSWorkflow._NOT_STARTED
-        log.info("Cleared current_status")
+        runs.create_run(run_id)
 
     def run_calculations(self, run_id: str) -> None:
-        self._initialize()
-        self._in_progress = True
+        self._initialize(run_id)
+        self.num_done = 0
+        self.in_progress = True
 
         for func in self._dag_list:
-            func(self, run_id)
+            if not self.is_cancelled(run_id):
+                func(self, run_id)
+                percent = round((self.num_done / len(self._dag_list)) * 100)
+                runs.set_percent_done(run_id, percent)
+                self.num_done += 1
 
-        self._in_progress = False
-        self._cancel_run = False
+        self.in_progress = False
+
+        if not self.is_cancelled(run_id):
+            self.set_status(run_id, runs.DONE, "DONE")
+            runs.set_percent_done(run_id, 100)

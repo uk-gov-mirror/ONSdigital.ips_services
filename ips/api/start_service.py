@@ -18,7 +18,7 @@ class StartApi(Api):
     def on_put(self, req: Request, resp: Response, run_id: str) -> None:
         # Start a run
 
-        if self.workflow.in_progress():
+        if self.workflow.is_in_progress(run_id):
             error = f"Can only run one instance of a workflow at a time, {run_id} rejected."
             log.error(error)
             raise falcon.HTTPError(falcon.HTTP_403, 'Concurrency Error', error)

@@ -3810,18 +3810,34 @@ CREATE TABLE PV_Element
     CONSTRAINT expression_fk FOREIGN KEY (Expression_ID) REFERENCES PV_Expression (Expression_ID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-create table user
+create table USER
 (
-    id        int auto_increment primary key,
-    username  varchar(80)  null,
-    password  varchar(255) null,
-    firstname varchar(255) null,
-    surname   varchar(255) null,
-    role      varchar(50)  null
+    ID         int auto_increment primary key,
+    USER_NAME  varchar(80)  null,
+    PASSWORD   varchar(255) null,
+    FIRST_NAME varchar(255) null,
+    SURNAME    varchar(255) null,
+    ROLE       varchar(50)  null
 );
 
-INSERT INTO user (id, username, password, firstname, surname, role)
+INSERT INTO USER (ID, USER_NAME, PASSWORD, FIRST_NAME, SURNAME, ROLE)
 VALUES (1, 'Admin', 'pbkdf2:sha256:50000$jYlAjFyT$a3990f67a04492fdffae29256cc168caf7becbe33ca6fefb2f89c04b00ef9d27',
         null, null, 'admin');
+
+create table RUN_MANAGEMENT
+(
+    RUN_ID  varchar(40) charset utf8  not null,
+    STATUS  int                       null,
+    STEP    varchar(255) charset utf8 null,
+    PERCENT int default 0             null,
+    constraint RUN_MANAGEMENT_RUN_ID_uindex
+        unique (RUN_ID)
+);
+
+alter table RUN_MANAGEMENT
+    add primary key (RUN_ID);
+
+
+
 
 SET FOREIGN_KEY_CHECKS = 1;
