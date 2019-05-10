@@ -23,5 +23,6 @@ def import_nonresponse(run_id, data):
     return df
 
 
+# noinspection PyUnusedLocal
 def _validate_data(data: pd.DataFrame) -> bool:
     pass
