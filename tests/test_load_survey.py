@@ -21,37 +21,37 @@ def setup_module(module):
     log.info("Module level start time: {}".format(start_time))
 
 
+def test_invalid_quarter():
+    # valid month, data not matching valid year
+    with open(survey_data, 'rb') as file:
+        with pytest.raises(falcon.HTTPError):
+            import_survey(run_id, file.read(), 'Q5', '2017')
+
+
 def test_month1():
     with open(survey_data, 'rb') as file:
-        with pytest.raises(falcon.HTTPError) as e_info:
+        with pytest.raises(falcon.HTTPError):
             import_survey(run_id, file.read(), '25', '2009')
 
 
 def test_month2():
     # matching year, invalid month
     with open(survey_data, 'rb') as file:
-        with pytest.raises(falcon.HTTPError) as e_info:
+        with pytest.raises(falcon.HTTPError):
             import_survey(run_id, file.read(), '11', '2017')
 
 
 def test_year1():
     # valid month, data not matching valid year
     with open(survey_data, 'rb') as file:
-        with pytest.raises(falcon.HTTPError) as e_info:
+        with pytest.raises(falcon.HTTPError):
             import_survey(run_id, file.read(), '12', '2009')
-
-
-def test_invalid_quarter():
-    # valid month, data not matching valid year
-    with open(survey_data, 'rb') as file:
-        with pytest.raises(falcon.HTTPError) as e_info:
-            import_survey(run_id, file.read(), 'Q5', '2009')
 
 
 def test_valid_quarter():
     # valid month, data not matching valid year
     with open(survey_data, 'rb') as file:
-        with pytest.raises(falcon.HTTPError) as e_info:
+        with pytest.raises(falcon.HTTPError):
             import_survey(run_id, file.read(), 'Q4', '2017')
 
 

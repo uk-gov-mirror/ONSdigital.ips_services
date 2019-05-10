@@ -88,6 +88,8 @@ def _validate_date(data, user_month, user_year, errors):
         "Q1": ['1', '2', '3'], "Q2": ['4', '5', '6'], "Q3": ['7', '8', '9'], "Q4": ['10', '11', '12']
     }
 
+    quarters_found: set = set()
+
     for index, row in data.iteritems():
         year = row[-4:]
         month = row[-6:][:2]
@@ -100,16 +102,28 @@ def _validate_date(data, user_month, user_year, errors):
             errors.add(f"user supplier year value [{user_year}] is invalid")
             return False
 
-        if user_month in valid_quarters and month not in valid_quarters[user_month]:
-            errors.add(f"user supplied quarter [{user_month}] does not correspond to valid month in data [{month}]")
+        if not str.isdigit(user_month) and user_month not in valid_quarters:
+            errors.add(f"[{user_month}] is not a valid quarter")
             return False
+
+        if user_month in valid_quarters:
+            if month not in valid_quarters[user_month]:
+                errors.add(f"user supplied quarter [{user_month}] does not correspond to valid month in data [{month}]")
+                return False
+            quarters_found.add(month)
+        else:
+            if int(month) != int(user_month):
+                errors.add(f"user supplied month [{user_month}] does not correspond to data month [{month}]")
+                return False
 
         if not str.isdigit(month) or not 1 <= int(month) <= 12:
             errors.add(f"data month value [{month}] in data stream is invalid")
             return False
 
-        if int(month) != int(user_month):
-            errors.add(f"user supplied month [{user_month}] does not correspond to data month [{month}]")
+    if user_month in valid_quarters:
+        qf = list(quarters_found).sort()
+        if qf != valid_quarters[user_month]:
+            errors.add(f"Months missing. user supplied quarter [{user_month}] does not contain all valid months")
             return False
 
     return True

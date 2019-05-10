@@ -8,7 +8,7 @@ INVALID_RUN: int = 5
 
 
 def create_run(run_id: str):
-    db.create_run(run_id=run_id, status=NOT_STARTED)
+    db.create_run(run_id=run_id, run_status=NOT_STARTED)
 
 
 def is_in_progress(run_id: str) -> bool:
