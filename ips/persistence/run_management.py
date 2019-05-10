@@ -1,4 +1,5 @@
 import ips.persistence.persistence as db
+from ips.services.run_management import NOT_STARTED
 
 RUN_MANAGEMENT = 'RUN_MANAGEMENT'
 create_new_run = db.insert_into_table(RUN_MANAGEMENT)
@@ -23,6 +24,9 @@ def get_run_status(run_id: str) -> int:
     row = db.execute_sql()(
         f"SELECT STATUS FROM {RUN_MANAGEMENT} WHERE RUN_ID='{run_id}' "
     ).fetchone()
+
+    if row is None:
+        return NOT_STARTED
 
     return row['STATUS']
 
