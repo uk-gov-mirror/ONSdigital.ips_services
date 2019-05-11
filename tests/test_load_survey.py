@@ -2,7 +2,7 @@ import time
 import uuid
 
 import falcon
-import ips_common_db.sql as db
+import ips.persistence.persistence as db
 from ips_common.ips_logging import log
 
 from ips.persistence.import_survey import SURVEY_SUBSAMPLE
@@ -14,6 +14,7 @@ survey_data = "data/import_data/dec/surveydata.csv"
 
 run_id = str(uuid.uuid4())
 start_time = time.time()
+delete_survey_subsample = db.delete_from_table(SURVEY_SUBSAMPLE)
 
 
 # noinspection PyUnusedLocal
@@ -63,4 +64,4 @@ def test_valid_import():
 # noinspection PyUnusedLocal
 def teardown_module(module):
     log.info("Duration: {}".format(time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time))))
-    db.delete_from_table(SURVEY_SUBSAMPLE, 'RUN_ID', '=', run_id)
+    delete_survey_subsample(run_id=run_id)
