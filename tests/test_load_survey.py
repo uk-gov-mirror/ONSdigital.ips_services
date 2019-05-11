@@ -41,7 +41,7 @@ def test_month2():
             import_survey(run_id, file.read(), '11', '2017')
 
 
-def test_year1():
+def test_year():
     # valid month, data not matching valid year
     with open(survey_data, 'rb') as file:
         with pytest.raises(falcon.HTTPError):

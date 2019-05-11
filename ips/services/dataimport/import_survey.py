@@ -90,10 +90,7 @@ def _validate_date(data, user_month, user_year, errors):
 
     quarters_found: set = set()
 
-    for index, row in data.iteritems():
-        year = row[-4:]
-        month = row[-6:][:2]
-
+    def valid_year():
         if not str.isdigit(year) or not 2000 <= int(year) <= 2099:
             errors.add(f"year value [{year}] in data stream is invalid")
             return False
@@ -101,37 +98,50 @@ def _validate_date(data, user_month, user_year, errors):
         if not str.isdigit(user_year) or int(user_year) != int(year):
             errors.add(f"user supplier year value [{user_year}] is invalid")
             return False
+        return True
 
-        if not str.isdigit(user_month) and user_month not in valid_quarters:
-            errors.add(f"[{user_month}] is not a valid quarter")
-            return False
-
-        if user_month in valid_quarters:
-            if month not in valid_quarters[user_month]:
-                errors.add(f"user supplied quarter [{user_month}] does not correspond to valid month in data [{month}]")
-                return False
-            quarters_found.add(month)
-        else:
+    def valid_month():
+        if str.isdigit(user_month):
             if int(month) != int(user_month):
                 errors.add(f"user supplied month [{user_month}] does not correspond to data month [{month}]")
                 return False
 
-        if not str.isdigit(month) or not 1 <= int(month) <= 12:
-            errors.add(f"data month value [{month}] in data stream is invalid")
+            if not 1 <= int(month) <= 12:
+                errors.add(f"data month value [{month}] in data stream is invalid")
+                return False
+        else:
+            if user_month in valid_quarters:
+                if month not in valid_quarters[user_month]:
+                    errors.add(
+                        f"user supplied quarter [{user_month}] does not correspond to valid month in data [{month}]"
+                    )
+                    return False
+                quarters_found.add(month)
+            else:
+                errors.add(f"[{user_month}] is not a valid quarter")
+                return False
+        return True
+
+    for index, row in data.iteritems():
+        year = row[-4:]
+        month = row[-6:][:2]
+
+        if not valid_year() or not valid_month():
             return False
 
     if user_month in valid_quarters:
         qf = list(quarters_found).sort()
         if qf != valid_quarters[user_month]:
-            errors.add(f"Months missing. user supplied quarter [{user_month}] does not contain all valid months")
+            errors.add(f"Data for the quarter, [{user_month}], does not contain all valid months")
             return False
 
     return True
 
 
 class Errors:
-    error_messages = []
-    status = 0
+
+    def __init__(self):
+        self.error_messages = []
 
     def add(self, message):
         self.error_messages.append(message)
