@@ -1,6 +1,7 @@
 import math
 
 import numpy as np
+import pandas as pd
 from pandas import DataFrame, Series
 
 from ips.services.calculations import ips_impute
@@ -98,7 +99,6 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
 
     log.debug("before compute_additional_spend")
     df_output = df_output.apply(compute_additional_spend, axis=1)
-
     log.debug("after compute_additional_spend")
 
     final_output_column_list = [var_serial, SPEND_VARIABLE, SPEND_REASON_KEY_VARIABLE, OUTPUT_VARIABLE,
@@ -132,9 +132,7 @@ def compute_additional_fares(row: Series):
     # Sort out child/baby fares
     if row[IMPUTATION_FLAG_VARIABLE] == 0 or row[ELIGIBLE_FLAG_VARIABLE] == 0:
         row[OUTPUT_VARIABLE] = row[DONOR_VARIABLE]
-        log.debug("One")
     else:
-        log.debug("Two")
         # Separate intdate column into usable integer values.
         day = int(row[DATE_VARIABLE][:2])
         month = int(row[DATE_VARIABLE][2:4])
@@ -143,7 +141,6 @@ def compute_additional_fares(row: Series):
         # Ensure date is on or later than the 1st of May 2016
         # This is because APD for under 16's was removed from this date.
         if year >= 2016 and month >= 5 and day >= 1:
-            log.debug("Three")
             if row[AGE_FARE_VARIABLE] == 1:
                 non_pack_fare = row[BABY_FARE_VARIABLE] * (row[OUTPUT_VARIABLE] - row[APD_VARIABLE])
 
@@ -154,7 +151,6 @@ def compute_additional_fares(row: Series):
                 non_pack_fare = row[OUTPUT_VARIABLE]
 
         else:
-            log.debug("Four")
             if row[AGE_FARE_VARIABLE] == 1:
                 non_pack_fare = row[BABY_FARE_VARIABLE] * (row[OUTPUT_VARIABLE] - row[APD_VARIABLE])
 
@@ -167,86 +163,80 @@ def compute_additional_fares(row: Series):
 
         # Compute package versions of fare
         if row[PACKAGE_VARIABLE] in (1, 2):
-            log.debug("Five")
             if math.isnan(non_pack_fare) or math.isnan(row[FARE_DISCOUNT_VARIABLE]):
                 row[OUTPUT_VARIABLE] = np.NaN
             else:
                 row[OUTPUT_VARIABLE] = round(non_pack_fare * row[FARE_DISCOUNT_VARIABLE])
 
         else:
-            log.debug("6")
             row[OUTPUT_VARIABLE] = round(non_pack_fare, 0)
 
     # Test for Queen Mary fare
-    log.debug("7")
     if row[OUTPUT_VARIABLE] == np.nan and row[QM_FARE_VARIABLE] != np.nan:
         row[OUTPUT_VARIABLE] = row[QM_FARE_VARIABLE]
 
-    # Ensure the fare is rounded to nearest integer
-    row[OUTPUT_VARIABLE] = round(row[OUTPUT_VARIABLE], 0)
+        # Ensure the fare is rounded to nearest integer
+        row[OUTPUT_VARIABLE] = round(row[OUTPUT_VARIABLE], 0)
 
     return row
 
 
-def compute_additional_spend(row):
+def compute_additional_spend(row: Series):
     # Compute spend per person per visit
     # For package holidays, spend is imputed if the package cost is less
     # than the cost of the fares. If all relevant fields are 0, participant
     # is assumed to have spent no money.
+
+    row[SPEND_VARIABLE] = np.NaN
+
     if row[PACKAGE_VARIABLE] == 1:
-        log.debug("1")
         if not row['DISCNT_PACKAGE_COST_PV']:
             row['DISCNT_PACKAGE_COST_PV'] = np.NaN
 
         if row[PACKAGE_COST_VARIABLE] == 0 and row[EXPENDITURE_VARIABLE] == 0 and row[BEFAF_VARIABLE] == 0:
             row[SPEND_VARIABLE] = 0
 
-        elif (row[PACKAGE_COST_VARIABLE] == 999999 or row[PACKAGE_COST_VARIABLE] == np.nan
-              or row[DISCOUNTED_PACKAGE_COST_VARIABLE] == np.nan
-              or row[PERSONS_VARIABLE] == np.nan
-              or row[OUTPUT_VARIABLE] == np.nan
+        elif (row[PACKAGE_COST_VARIABLE] == 999999 or pd.isnull(row[PACKAGE_COST_VARIABLE])
+              or pd.isnull(row[DISCOUNTED_PACKAGE_COST_VARIABLE])
+              or pd.isnull(row[PERSONS_VARIABLE])
+              or pd.isnull(row[OUTPUT_VARIABLE])
               or row[EXPENDITURE_VARIABLE] == 999999
-              or row[EXPENDITURE_VARIABLE] == np.nan
-              or row[BEFAF_VARIABLE] == np.nan
+              or pd.isnull(row[EXPENDITURE_VARIABLE])
+              or pd.isnull(row[BEFAF_VARIABLE])
               or row[BEFAF_VARIABLE] == 999999):
-            log.debug("1.1")
             row[SPEND_VARIABLE] = np.nan
 
         elif (((row[DISCOUNTED_PACKAGE_COST_VARIABLE] + row[EXPENDITURE_VARIABLE] +
                 row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]) < (row[OUTPUT_VARIABLE] * 2)):
-            log.debug("1.2")
             log.info(row['SERIAL'])
             row[SPEND_VARIABLE] = np.nan
             row[SPEND_REASON_KEY_VARIABLE] = 1
 
         else:
-            log.debug("1.3")
             row[SPEND_VARIABLE] = ((row[DISCOUNTED_PACKAGE_COST_VARIABLE] + row[EXPENDITURE_VARIABLE]
                                     + row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]) - (row[OUTPUT_VARIABLE] - 2)
 
     # DVPackage is 0
 
     else:
-        log.debug("2")
         if row[OLD_PACKAGE_VARIABLE] == 9:
             row[SPEND_VARIABLE] = np.nan
 
         elif row[EXPENDITURE_VARIABLE] == 0 and row[BEFAF_VARIABLE] == 0:
             row[SPEND_VARIABLE] = 0
 
-        elif row[EXPENDITURE_VARIABLE] == 999999 or row[EXPENDITURE_VARIABLE] == np.nan \
-                or row[BEFAF_VARIABLE] == 999999 or row[BEFAF_VARIABLE] == np.nan \
-                or row[PERSONS_VARIABLE] == np.nan:
+        elif row[EXPENDITURE_VARIABLE] == 999999 or pd.isnull(row[EXPENDITURE_VARIABLE]) \
+                or row[BEFAF_VARIABLE] == 999999 or pd.isnull(row[BEFAF_VARIABLE]) \
+                or pd.isnull(row[PERSONS_VARIABLE]):
             row[SPEND_VARIABLE] = np.nan
 
         else:
-            row[SPEND_VARIABLE] = (row[EXPENDITURE_VARIABLE] + row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]
+            if not pd.isnull(row[PERSONS_VARIABLE]):
+                row[SPEND_VARIABLE] = (row[EXPENDITURE_VARIABLE] + row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]
 
-    log.debug("3")
-    if row[SPEND_VARIABLE] != np.nan:
-        row[SPEND_VARIABLE] = row[SPEND_VARIABLE] + row[DUTY_FREE_VARIABLE]
-
-    # Ensure the spend values are integers
-    row[SPEND_VARIABLE] = round(row[SPEND_VARIABLE], 0)
+    if not pd.isnull(row[SPEND_VARIABLE]) and not pd.isnull(row[DUTY_FREE_VARIABLE]):
+        row[SPEND_VARIABLE] = row[DUTY_FREE_VARIABLE] + row[DUTY_FREE_VARIABLE]
+        # Ensure the spend values are integers
+        row[SPEND_VARIABLE] = round(row[SPEND_VARIABLE], 7)
 
     return row
