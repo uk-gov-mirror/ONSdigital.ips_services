@@ -65,12 +65,14 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
     df_eligible = df_input.loc[df_input[ELIGIBLE_FLAG_VARIABLE] == 1.0]
 
     # Perform the imputation on eligible dataset
+    log.debug("before ips_impute")
     df_output = ips_impute.ips_impute(df_eligible, var_serial,
                                       STRATA_BASE_LIST, THRESH_BASE_LIST,
                                       num_levels, DONOR_VARIABLE, OUTPUT_VARIABLE,
                                       measure, IMPUTATION_FLAG_VARIABLE,
                                       IMPUTATION_LEVEL_VARIABLE)
 
+    log.debug("after ips_impute")
     # Merge df_output_final and df_input by var_serial_num
     df_output.sort_values(var_serial, inplace=True)
 
@@ -90,13 +92,21 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
     # Re-sort columns by column name in alphabetical order (may not be required)
     df_output.sort_index(axis=1, inplace=True)
 
+    log.debug("before compute_additional_fares")
     df_output = df_output.apply(compute_additional_fares, axis=1)
+    log.debug("after compute_additional_fares")
+
+    log.debug("before compute_additional_spend")
     df_output = df_output.apply(compute_additional_spend, axis=1)
+
+    log.debug("after compute_additional_spend")
 
     final_output_column_list = [var_serial, SPEND_VARIABLE, SPEND_REASON_KEY_VARIABLE, OUTPUT_VARIABLE,
                                 IMPUTATION_LEVEL_VARIABLE]
 
     df_output = df_output[final_output_column_list]
+
+    log.debug("before return in do_ips_fares_imputation")
 
     return df_output
 
@@ -122,9 +132,9 @@ def compute_additional_fares(row: Series):
     # Sort out child/baby fares
     if row[IMPUTATION_FLAG_VARIABLE] == 0 or row[ELIGIBLE_FLAG_VARIABLE] == 0:
         row[OUTPUT_VARIABLE] = row[DONOR_VARIABLE]
-
+        log.debug("One")
     else:
-
+        log.debug("Two")
         # Separate intdate column into usable integer values.
         day = int(row[DATE_VARIABLE][:2])
         month = int(row[DATE_VARIABLE][2:4])
@@ -133,6 +143,7 @@ def compute_additional_fares(row: Series):
         # Ensure date is on or later than the 1st of May 2016
         # This is because APD for under 16's was removed from this date.
         if year >= 2016 and month >= 5 and day >= 1:
+            log.debug("Three")
             if row[AGE_FARE_VARIABLE] == 1:
                 non_pack_fare = row[BABY_FARE_VARIABLE] * (row[OUTPUT_VARIABLE] - row[APD_VARIABLE])
 
@@ -143,6 +154,7 @@ def compute_additional_fares(row: Series):
                 non_pack_fare = row[OUTPUT_VARIABLE]
 
         else:
+            log.debug("Four")
             if row[AGE_FARE_VARIABLE] == 1:
                 non_pack_fare = row[BABY_FARE_VARIABLE] * (row[OUTPUT_VARIABLE] - row[APD_VARIABLE])
 
@@ -155,15 +167,18 @@ def compute_additional_fares(row: Series):
 
         # Compute package versions of fare
         if row[PACKAGE_VARIABLE] in (1, 2):
+            log.debug("Five")
             if math.isnan(non_pack_fare) or math.isnan(row[FARE_DISCOUNT_VARIABLE]):
                 row[OUTPUT_VARIABLE] = np.NaN
             else:
                 row[OUTPUT_VARIABLE] = round(non_pack_fare * row[FARE_DISCOUNT_VARIABLE])
 
         else:
+            log.debug("6")
             row[OUTPUT_VARIABLE] = round(non_pack_fare, 0)
 
     # Test for Queen Mary fare
+    log.debug("7")
     if row[OUTPUT_VARIABLE] == np.nan and row[QM_FARE_VARIABLE] != np.nan:
         row[OUTPUT_VARIABLE] = row[QM_FARE_VARIABLE]
 
@@ -179,6 +194,7 @@ def compute_additional_spend(row):
     # than the cost of the fares. If all relevant fields are 0, participant
     # is assumed to have spent no money.
     if row[PACKAGE_VARIABLE] == 1:
+        log.debug("1")
         if not row['DISCNT_PACKAGE_COST_PV']:
             row['DISCNT_PACKAGE_COST_PV'] = np.NaN
 
@@ -193,20 +209,25 @@ def compute_additional_spend(row):
               or row[EXPENDITURE_VARIABLE] == np.nan
               or row[BEFAF_VARIABLE] == np.nan
               or row[BEFAF_VARIABLE] == 999999):
+            log.debug("1.1")
             row[SPEND_VARIABLE] = np.nan
 
         elif (((row[DISCOUNTED_PACKAGE_COST_VARIABLE] + row[EXPENDITURE_VARIABLE] +
                 row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]) < (row[OUTPUT_VARIABLE] * 2)):
+            log.debug("1.2")
             log.info(row['SERIAL'])
             row[SPEND_VARIABLE] = np.nan
             row[SPEND_REASON_KEY_VARIABLE] = 1
 
         else:
+            log.debug("1.3")
             row[SPEND_VARIABLE] = ((row[DISCOUNTED_PACKAGE_COST_VARIABLE] + row[EXPENDITURE_VARIABLE]
                                     + row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]) - (row[OUTPUT_VARIABLE] - 2)
 
     # DVPackage is 0
+
     else:
+        log.debug("2")
         if row[OLD_PACKAGE_VARIABLE] == 9:
             row[SPEND_VARIABLE] = np.nan
 
@@ -221,6 +242,7 @@ def compute_additional_spend(row):
         else:
             row[SPEND_VARIABLE] = (row[EXPENDITURE_VARIABLE] + row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]
 
+    log.debug("3")
     if row[SPEND_VARIABLE] != np.nan:
         row[SPEND_VARIABLE] = row[SPEND_VARIABLE] + row[DUTY_FREE_VARIABLE]
 
