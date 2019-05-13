@@ -42,7 +42,7 @@ services:
     container_name: ips-services
     restart: unless-stopped
     ports:
-      - "8000:8000" # for testing
+      - "5000:5000" # for testing
 
     networks:
       - ips-net

@@ -234,8 +234,8 @@ def do_ips_ges_weighting(df_surveydata: pd.DataFrame, df_ustotals: pd.DataFrame)
     # Deletes from poprowvec and survey_unsamp_aux tables
     db.truncate_table('SURVEY_UNSAMP_AUX')()
 
-    db.clear_memory_table('POPROWVEC_UNSAMP')()
-    db.clear_memory_table('R_UNSAMPLED')()
+    db.truncate_table('POPROWVEC_UNSAMP')()
+    db.truncate_table('R_UNSAMPLED')()
 
     # Call the GES weighting macro
     df_surveydata = df_surveydata.sort_values('SERIAL')

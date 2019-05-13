@@ -17,7 +17,7 @@ import ips.services.steps.stay_imputation as stay_imputation
 import ips.services.steps.town_stay_expenditure as town_stay_expenditure
 import ips.services.steps.traffic_weight as traffic_weight
 import ips.services.steps.unsampled_weight as unsampled_weight
-from ips.persistence.persistence import clear_memory_table
+from ips.persistence.persistence import truncate_table
 
 
 class IPSWorkflow:
@@ -157,8 +157,7 @@ class IPSWorkflow:
     ]
 
     def _initialize(self, run_id) -> None:
-        clear_memory_table("SURVEY_SUBSAMPLE")()
-        clear_memory_table("SAS_SURVEY_SUBSAMPLE")()
+        truncate_table("SAS_SURVEY_SUBSAMPLE")()
         runs.create_run(run_id)
 
     def run_calculations(self, run_id: str) -> None:

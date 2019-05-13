@@ -2,14 +2,6 @@
 # http://dev.mysql.com/doc/refman/8.0/en/server-configuration-defaults.html
 
 [mysqld]
-innodb_buffer_pool_size = 10G # (adjust value here, 50%-70% of total RAM)
-innodb_log_file_size = 256M
-innodb_flush_log_at_trx_commit = 1 # may change to 2 or 0
-max_heap_table_size = 5G
-
-tmp_table_size=2G
-max_heap_table_size=10G
-max_allowed_packet=1G
 
 local-infile=1
 default-time-zone='+00:00'
