@@ -27,8 +27,7 @@ def import_nonresponse(run_id, data, month, year):
         log.error(f"Validation failed: {errors.get_messages()}")
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
 
-        log.info("Validation completed successfully.")
-
+    log.info("Validation completed successfully.")
     nr.import_non_response(run_id, df)
     return df
 
