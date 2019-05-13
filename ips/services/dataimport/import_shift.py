@@ -1,11 +1,12 @@
+import falcon
 import io
 import pandas as pd
-import falcon
 import ips.persistence.import_shift as db
+
+from ips.services.dataimport import validate_reference_data
 from ips_common.ips_logging import log
 from ips.services import service
 from ips.services.dataimport.schemas import shift_schema
-from ips.services.dataimport import validate_reference_data
 
 
 @service
@@ -18,10 +19,10 @@ def import_shift(run_id, data, month, year):
         dtype=shift_schema.get_schema()
     )
 
-    df.columns = df.columns.str.upper()
-
     errors = Errors()
-    validation = _validate_data(df, month, year, errors)
+    validate_df = df.copy()
+
+    validation = _validate_data(validate_df, month, year, errors)
     if not validation:
         log.error(f"Validation failed: {errors.get_messages()}")
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
@@ -32,10 +33,11 @@ def import_shift(run_id, data, month, year):
     return df
 
 
-def _validate_data(data: pd.DataFrame, user_month, user_year, errors):
+# noinspection PyUnusedLocal
+def _validate_data(data: pd.DataFrame, month, year, errors) -> bool:
     log.info("Validating shift data...")
     reference_type = 'SHIFT'
-    return validate_reference_data.validate_data(reference_type, data, user_month, user_year, errors)
+    return validate_reference_data.validate_data(reference_type, data, month, year, errors)
 
 
 class Errors:
