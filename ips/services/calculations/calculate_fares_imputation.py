@@ -48,6 +48,8 @@ STRATA_BASE_LIST = [
     ['INTMONTH', 'TYPE_PV', 'OSPORT4_PV']
 ]
 
+np.seterr(all='raise')
+
 
 def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: int, measure: str) -> DataFrame:
     """
@@ -176,7 +178,7 @@ def compute_additional_fares(row: Series):
         row[OUTPUT_VARIABLE] = row[QM_FARE_VARIABLE]
 
         # Ensure the fare is rounded to nearest integer
-        row[OUTPUT_VARIABLE] = round(row[OUTPUT_VARIABLE], 0)
+    row[OUTPUT_VARIABLE] = round(row[OUTPUT_VARIABLE], 0)
 
     return row
 
@@ -237,6 +239,7 @@ def compute_additional_spend(row: Series):
     if not pd.isnull(row[SPEND_VARIABLE]) and not pd.isnull(row[DUTY_FREE_VARIABLE]):
         row[SPEND_VARIABLE] = row[DUTY_FREE_VARIABLE] + row[DUTY_FREE_VARIABLE]
         # Ensure the spend values are integers
-        row[SPEND_VARIABLE] = round(row[SPEND_VARIABLE], 7)
+
+    row[SPEND_VARIABLE] = round(row[SPEND_VARIABLE], 0)
 
     return row
