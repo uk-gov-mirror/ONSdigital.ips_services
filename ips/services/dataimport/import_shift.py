@@ -36,6 +36,8 @@ def import_shift(run_id, data, month, year):
 # noinspection PyUnusedLocal
 def _validate_data(data: pd.DataFrame, month, year, errors) -> bool:
     log.info("Validating shift data...")
+
+    # TODO: Get DATA_SOURCE_NAME from DATA_SOURCE
     reference_type = 'SHIFT'
     return validate_reference_data.validate_data(reference_type, data, month, year, errors)
 
