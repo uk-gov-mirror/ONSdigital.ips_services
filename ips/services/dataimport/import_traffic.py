@@ -11,7 +11,7 @@ from ips.services.dataimport.schemas import traffic_schema
 
 
 @service
-def _import_traffic(import_type, run_id, data):
+def _import_traffic(import_type, run_id, data, month, year):
     log.info("Importing traffic data")
     df: pd.DataFrame = pd.read_csv(
         io.BytesIO(data),
