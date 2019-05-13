@@ -43,8 +43,8 @@ class IPSWorkflow:
     num_done: int = 0
     in_progress = False
 
-    def is_in_progress(self, run_id) -> bool:
-        if self.in_progress is True or runs.is_in_progress(run_id):
+    def is_in_progress(self) -> bool:
+        if self.in_progress is True:
             return True
         else:
             return False

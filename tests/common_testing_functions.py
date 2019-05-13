@@ -6,11 +6,11 @@ import pandas as pd
 
 from ips.persistence import data_management as idm
 from ips.services.calculations import calculate_traffic_weight as tr_calc
-from ips.services.dataimport.import_non_response import import_nonresponse_file
-from ips.services.dataimport.import_shift import import_shift_file
-from ips.services.dataimport.import_survey import import_survey_file
-from ips.services.dataimport.import_traffic import import_sea_file, import_air_file, import_tunnel_file
-from ips.services.dataimport.import_unsampled import import_unsampled_file
+from ips.services.dataimport.import_non_response import import_nonresponse
+from ips.services.dataimport.import_shift import import_shift
+from ips.services.dataimport.import_survey import import_survey
+from ips.services.dataimport.import_traffic import import_sea, import_air, import_tunnel
+from ips.services.dataimport.import_unsampled import import_unsampled
 
 
 def import_survey_data_into_database(survey_data_path, run_id):
@@ -75,16 +75,16 @@ def import_test_data_into_database(import_data_dir, run_id, load_survey_data=Tru
     if load_survey_data:
         db.delete_from_table(idm.SURVEY_SUBSAMPLE_TABLE, 'RUN_ID', '=', run_id)
         survey_data_path = os.path.join(import_data_dir, 'surveydata.csv')
-        import_survey_file(survey_data_path=survey_data_path, run_id=run_id)
+        import_survey(survey_data_path=survey_data_path, run_id=run_id)
 
-    import_sea_file(run_id=run_id, file_name=sea_data_path)
-    import_air_file(run_id=run_id, file_name=air_data_path)
-    import_tunnel_file(run_id=run_id, file_name=tunnel_data_path)
+    import_sea(run_id=run_id, file_name=sea_data_path)
+    import_air(run_id=run_id, file_name=air_data_path)
+    import_tunnel(run_id=run_id, file_name=tunnel_data_path)
 
-    import_nonresponse_file(frun_id=run_id, file_name=nr_data_path)
+    import_nonresponse(frun_id=run_id, file_name=nr_data_path)
 
-    import_shift_file(run_id=run_id, file_name=shift_data_path)
-    import_unsampled_file(run_id=run_id, file_name=unsampled_data_path)
+    import_shift(run_id=run_id, file_name=shift_data_path)
+    import_unsampled(run_id=run_id, file_name=unsampled_data_path)
 
 
 def populate_test_pv_table(conn, run_id, pv_run_id):

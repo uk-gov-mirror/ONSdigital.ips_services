@@ -85,7 +85,8 @@ def _validate_data(data: pd.DataFrame, user_month, user_year, errors):
 
 def _validate_date(data, user_month, user_year, errors):
     valid_quarters = {
-        "Q1": ['1', '2', '3'], "Q2": ['4', '5', '6'], "Q3": ['7', '8', '9'], "Q4": ['10', '11', '12']
+        "Q1": ['1', '2', '3'], "Q2": ['4', '5', '6'],
+        "Q3": ['7', '8', '9'], "Q4": ['10', '11', '12']
     }
 
     quarters_found: set = set()
