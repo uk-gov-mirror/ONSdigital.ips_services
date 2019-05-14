@@ -43,22 +43,22 @@ def import_reference_data():
         import_survey(run_id, file.read(), None, None)
 
     with open(reference_data['Sea'], 'rb') as file:
-        import_sea(run_id, file.read())
+        import_sea(run_id, file.read(), None, None)
 
     with open(reference_data['Air'], 'rb') as file:
-        import_air(run_id, file.read())
+        import_air(run_id, file.read(), None, None)
 
     with open(reference_data['Tunnel'], 'rb') as file:
-        import_tunnel(run_id, file.read())
+        import_tunnel(run_id, file.read(), None, None)
 
     with open(reference_data['Shift'], 'rb') as file:
-        import_shift(run_id, file.read())
+        import_shift(run_id, file.read(), None, None)
 
     with open(reference_data['Non Response'], 'rb') as file:
-        import_nonresponse(run_id, file.read())
+        import_nonresponse(run_id, file.read(), None, None)
 
     with open(reference_data['Unsampled'], 'rb') as file:
-        import_unsampled(run_id, file.read())
+        import_unsampled(run_id, file.read(), None, None)
 
     log.info("-> End data load")
 

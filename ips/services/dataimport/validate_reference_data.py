@@ -15,6 +15,9 @@ def validate_data(reference_type: str, data: pd.DataFrame, user_month: str, user
             errors.add(f"Data does not match {reference_type}.")
             return False
 
+    if user_month is None or user_year is None:
+        return True
+
     return _validate_date(data, user_month, user_year, errors)
 
 
