@@ -7,6 +7,7 @@ from ips.services.dataimport import validate_reference_data
 from ips_common.ips_logging import log
 from ips.services import service
 from ips.services.dataimport.schemas import shift_schema
+from ips.services.dataimport import CSVType
 
 
 @service
@@ -27,16 +28,15 @@ def import_shift(run_id, data, month, year):
         log.error(f"Validation failed: {errors.get_messages()}")
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
 
-        log.info("Validation completed successfully.")
-
+    log.info(f"{CSVType.Shift.name} validation completed successfully.")
     db.import_shift_data(run_id, df)
     return df
 
 
 # noinspection PyUnusedLocal
 def _validate_data(data: pd.DataFrame, month, year, errors) -> bool:
-    log.info("Validating shift data...")
-    reference_type = 'SHIFT'
+    reference_type = CSVType.Shift.name
+    log.info(f"Validating {reference_type} data...")
     return validate_reference_data.validate_data(reference_type, data, month, year, errors)
 
 
@@ -49,4 +49,3 @@ class Errors:
 
     def get_messages(self):
         return self.error_messages
-
