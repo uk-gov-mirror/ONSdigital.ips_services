@@ -28,15 +28,15 @@ def import_nonresponse(run_id, data, month, year):
         log.error(f"Validation failed: {errors.get_messages()}")
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
 
-    log.info("Validation completed successfully.")
+    log.info(f"{CSVType.NonResponse.name} validation completed successfully.")
     nr.import_non_response(run_id, df)
     return df
 
 
 # noinspection PyUnusedLocal
 def _validate_data(data: pd.DataFrame, month, year, errors) -> bool:
-    log.info("Validating non response data...")
     reference_type = CSVType.NonResponse.name
+    log.info(f"Validating {reference_type} data...")
     return validate_reference_data.validate_data(reference_type, data, month, year, errors)
 
 

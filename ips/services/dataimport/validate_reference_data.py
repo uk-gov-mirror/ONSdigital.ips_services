@@ -4,6 +4,8 @@ from ips_common.ips_logging import log
 
 def validate_data(reference_type: str, data: pd.DataFrame, user_month: str, user_year: str, errors):
     data.columns = data.columns.str.upper()
+    data.columns = data.columns.str.replace(' ', '')
+    data['DATASOURCE'] = data['DATASOURCE'].str.replace(' ', '')
 
     for index, row in data.iterrows():
         datasource = row['DATASOURCE']

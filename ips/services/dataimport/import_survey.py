@@ -49,14 +49,13 @@ def import_survey(run_id, data, month, year):
     df.columns = df.columns.str.upper()
     [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'DVEXPEND', 'TANDTSI']]
 
-    if month is not None and year is not None:
-        errors = Errors()
-        validation = _validate_data(df, month, year, errors)
-        if not validation:
-            log.error(f"Validation failed: {errors.get_messages()}")
-            raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
+    errors = Errors()
+    validation = _validate_data(df, month, year, errors)
+    if not validation:
+        log.error(f"Validation failed: {errors.get_messages()}")
+        raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
 
-        log.info("Validation completed successfully.")
+    log.info("Survey validation completed successfully.")
 
     df = df.sort_values(by='SERIAL')
     db.import_survey_data(run_id, df)
@@ -66,13 +65,11 @@ def import_survey(run_id, data, month, year):
 def _validate_data(data: pd.DataFrame, user_month, user_year, errors):
     log.info("Validating Survey data...")
 
-    # Validate SERIAL column exists
     if 'SERIAL' not in data.columns:
         log.error(f"'SERIAL' column does not exist. Exiting validation.")
         errors.add("'SERIAL' column does not exist in Survey data.")
         return False
 
-    # Validate INTDATE column exists
     if 'INTDATE' not in data.columns:
         log.error("'INTDATE' column does not exist. Exiting validation.")
         errors.add("'INTDATE' column does not exist in Survey data.")

@@ -30,7 +30,7 @@ def _import_traffic(import_type, run_id, data, month, year):
         log.error(f"Validation failed: {errors.get_messages()}")
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
 
-    log.info("Validation completed successfully.")
+    log.info(f"{import_type.name} validation completed successfully.")
     db.import_traffic_data(import_type, df, run_id)
     return df
 
@@ -38,8 +38,7 @@ def _import_traffic(import_type, run_id, data, month, year):
 # noinspection PyUnusedLocal
 def _validate_data(data: pd.DataFrame, month, year, errors, import_type=None) -> bool:
     log.info(f"Validating {import_type.name} data...")
-    reference_type = import_type.name
-    return validate_reference_data.validate_data(reference_type, data, month, year, errors)
+    return validate_reference_data.validate_data(import_type.name, data, month, year, errors)
 
 
 class Errors:
