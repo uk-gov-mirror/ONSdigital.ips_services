@@ -1,17 +1,16 @@
 import time
 import uuid
+
 import falcon
-import pytest
 import ips_common_db.sql as db
 from ips_common.ips_logging import log
+
 from ips.persistence.import_unsampled import UNSAMPLED_OOH_DATA
 from ips.services.dataimport.import_unsampled import import_unsampled
 
+import pytest
+
 unsampled_data = "data/import_data/dec/Unsampled Traffic Dec 2017.csv"
-
-run_id = str(uuid.uuid4())
-start_time = time.time()
-
 
 run_id = str(uuid.uuid4())
 start_time = time.time()
