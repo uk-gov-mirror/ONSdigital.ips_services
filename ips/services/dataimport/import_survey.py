@@ -76,6 +76,8 @@ def _validate_data(data: pd.DataFrame, user_month, user_year, errors):
         return False
 
     date_column = data['INTDATE'].astype(str).str.rjust(8, '0')
+    if user_month is None or user_year is None:
+        return True
 
     return _validate_date(date_column, user_month, user_year, errors)
 
