@@ -7,6 +7,7 @@ import ips.persistence.import_non_response as nr
 from ips.services import service
 from ips.services.dataimport.schemas import non_response_schema
 from ips.services.dataimport import validate_reference_data
+from ips.services.dataimport import CSVType
 
 
 @service
@@ -35,9 +36,7 @@ def import_nonresponse(run_id, data, month, year):
 # noinspection PyUnusedLocal
 def _validate_data(data: pd.DataFrame, month, year, errors) -> bool:
     log.info("Validating non response data...")
-
-    # TODO: Get DATA_SOURCE_NAME from DATA_SOURCE
-    reference_type = 'NON RESPONSE'
+    reference_type = CSVType.NonResponse.name
     return validate_reference_data.validate_data(reference_type, data, month, year, errors)
 
 
