@@ -6,7 +6,7 @@ import ips_common_db.sql as db
 from ips_common.ips_logging import log
 
 from ips.persistence.import_shift import SHIFT_TABLE
-from ips.services.dataimport.import_shift import  import_shift
+from ips.services.dataimport.import_shift import import_shift
 
 import pytest
 

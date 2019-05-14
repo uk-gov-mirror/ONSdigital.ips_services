@@ -31,7 +31,6 @@ def _import_traffic(import_type, run_id, data, month, year):
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
 
     log.info("Validation completed successfully.")
-
     db.import_traffic_data(import_type, df, run_id)
     return df
 
