@@ -6,6 +6,8 @@ from ips_common.ips_logging import log
 # dataimport survey_support
 from ips.services.calculations import log_warnings, log_errors
 
+np.seterr(all='raise')
+
 NON_RESPONSE_DATA_TABLE_NAME = 'SAS_NON_RESPONSE_DATA'
 OUTPUT_TABLE_NAME = 'SAS_NON_RESPONSE_WT'
 SUMMARY_TABLE_NAME = 'SAS_PS_NON_RESPONSE'

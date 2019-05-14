@@ -3,9 +3,19 @@
 # Created by: paul
 # Created on: 06/03/2019
 
-suppressMessages(library(DBI))
-suppressMessages(library(RMySQL))
+library(DBI)
+library(RMySQL)
+
+# hide annoying regenesees output
+if (.Platform$OS.type == "unix") {
+    sink("/dev/null")
+} else {
+    sink("nul:")
+}
+
 suppressMessages(library(ReGenesees))
+
+sink()
 
 args = commandArgs(trailingOnly = TRUE)
 
@@ -19,14 +29,21 @@ survey_input_aux <- dbReadTable(con, "SURVEY_TRAFFIC_AUX")
 poprowvec$C_GROUP <- NULL
 poprowvec$index <- NULL
 
-#delete records with missing design weight
+# delete records with missing design weight
 survey_input_aux$TRAF_DESIGN_WEIGHT[survey_input_aux$TRAF_DESIGN_WEIGHT == 0] <- NA
 survey_input_aux <- survey_input_aux[complete.cases(survey_input_aux$TRAF_DESIGN_WEIGHT),]
 
 # declare factors
 survey_input_aux[, "T_"] <- factor(survey_input_aux[, "T1"])
 
-#set up survey design
+# hide annoying regenesees output
+if (.Platform$OS.type == "unix") {
+    sink("/dev/null")
+} else {
+    sink("nul:")
+}
+
+# set up survey design
 des <- e.svydesign(data = survey_input_aux, ids = ~ SERIAL, weights = ~ TRAF_DESIGN_WEIGHT)
 
 df.population <- as.data.frame(poprowvec)
@@ -34,11 +51,13 @@ df.population <- as.data.frame(poprowvec)
 pop.template(data = survey_input_aux, calmodel = ~ T_ - 1)
 population.check(df.population, data = survey_input_aux, calmodel = ~ T_ - 1)
 
-#call regenesees
+# call regenesees
 survey_input_aux[, "TW_WEIGHT"] <- weights(e.calibrate(des, df.population, calmodel = ~ T_ - 1, calfun = "linear", aggregate.stage = 1))
+
+sink()
 
 survey_input_aux[, "TRAFFIC_WT"] <- survey_input_aux[, "TW_WEIGHT"] / survey_input_aux[, "TRAF_DESIGN_WEIGHT"]
 
-dbWriteTable(conn = con, name = SQL('R_TRAFFIC'), value = survey_input_aux, append = TRUE, row.names=F)
+dbWriteTable(conn = con, name = 'R_TRAFFIC', value = survey_input_aux, append = TRUE, row.names=F)
 
 dbDisconnect(con)

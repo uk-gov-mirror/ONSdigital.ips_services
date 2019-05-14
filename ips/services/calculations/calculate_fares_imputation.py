@@ -4,7 +4,6 @@ import numpy as np
 from pandas import DataFrame, Series
 
 from ips.services.calculations import ips_impute
-from ips_common.ips_logging import log
 
 # dataimport survey_support
 
@@ -91,6 +90,7 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
     df_output.sort_index(axis=1, inplace=True)
 
     df_output = df_output.apply(compute_additional_fares, axis=1)
+
     df_output = df_output.apply(compute_additional_spend, axis=1)
 
     final_output_column_list = [var_serial, SPEND_VARIABLE, SPEND_REASON_KEY_VARIABLE, OUTPUT_VARIABLE,
@@ -122,9 +122,7 @@ def compute_additional_fares(row: Series):
     # Sort out child/baby fares
     if row[IMPUTATION_FLAG_VARIABLE] == 0 or row[ELIGIBLE_FLAG_VARIABLE] == 0:
         row[OUTPUT_VARIABLE] = row[DONOR_VARIABLE]
-
     else:
-
         # Separate intdate column into usable integer values.
         day = int(row[DATE_VARIABLE][:2])
         month = int(row[DATE_VARIABLE][2:4])
@@ -197,7 +195,6 @@ def compute_additional_spend(row):
 
         elif (((row[DISCOUNTED_PACKAGE_COST_VARIABLE] + row[EXPENDITURE_VARIABLE] +
                 row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]) < (row[OUTPUT_VARIABLE] * 2)):
-            log.info(row['SERIAL'])
             row[SPEND_VARIABLE] = np.nan
             row[SPEND_REASON_KEY_VARIABLE] = 1
 
@@ -206,7 +203,9 @@ def compute_additional_spend(row):
                                     + row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]) - (row[OUTPUT_VARIABLE] - 2)
 
     # DVPackage is 0
+
     else:
+
         if row[OLD_PACKAGE_VARIABLE] == 9:
             row[SPEND_VARIABLE] = np.nan
 

@@ -4,3 +4,5 @@
 [mysqld]
 
 local-infile=1
+default-time-zone='+00:00'
+lower_case_table_names = 2

@@ -137,8 +137,9 @@ def _validate_date(data, user_month, user_year, errors):
 
 
 class Errors:
-    error_messages = []
-    status = 0
+
+    def __init__(self):
+        self.error_messages = []
 
     def add(self, message):
         self.error_messages.append(message)
