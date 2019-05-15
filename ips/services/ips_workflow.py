@@ -161,18 +161,29 @@ class IPSWorkflow:
         runs.create_run(run_id)
 
     def run_calculations(self, run_id: str) -> None:
-        self._initialize(run_id)
-        self.num_done = 0
-        self.in_progress = True
+        if not runs.process_variables_exist(run_id):
+            log.error(f"cannot start run: {run_id} as process variables for the run don't exist")
+            return
 
-        for func in self._dag_list:
-            if not self.is_cancelled(run_id):
-                func(self, run_id)
-                percent = round((self.num_done / len(self._dag_list)) * 100)
-                runs.set_percent_done(run_id, percent)
-                self.num_done += 1
+        try:
+            self._initialize(run_id)
+            self.num_done = 0
+            self.in_progress = True
 
-        self.in_progress = False
+            for func in self._dag_list:
+                if not self.is_cancelled(run_id):
+                    func(self, run_id)
+                    percent = round((self.num_done / len(self._dag_list)) * 100)
+                    runs.set_percent_done(run_id, percent)
+                    self.num_done += 1
+
+        except Exception as e:
+            log.warn(f"Run {run_id} has failed")
+            self.set_status(run_id, runs.FAILED, str(e))
+            runs.set_percent_done(run_id, 100)
+
+        finally:
+            self.in_progress = False
 
         if not self.is_cancelled(run_id):
             self.set_status(run_id, runs.DONE, "DONE")

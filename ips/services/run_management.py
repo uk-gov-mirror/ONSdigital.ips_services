@@ -5,6 +5,11 @@ IN_PROGRESS: int = 2
 DONE: int = 3
 CANCELLED: int = 4
 INVALID_RUN: int = 5
+FAILED: int = 6
+
+
+def process_variables_exist(run_id: str) -> bool:
+    return db.process_variables_exist(run_id)
 
 
 def create_run(run_id: str):

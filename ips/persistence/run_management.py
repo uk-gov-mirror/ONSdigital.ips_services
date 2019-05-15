@@ -1,15 +1,25 @@
 import ips.persistence.persistence as db
 import ips.services.run_management as status
 
-RUN_MANAGEMENT = 'RUN_MANAGEMENT'
-create_new_run = db.insert_into_table(RUN_MANAGEMENT)
-delete_run = db.delete_from_table(RUN_MANAGEMENT)
+RUN_MANAGEMENT = 'RUN'
+PROCESS_VARIABLES = 'PROCESS_VARIABLE_PY'
 
 
 def create_run(run_id: str, run_status: int) -> None:
-    if is_existing_run(run_id):
-        delete_run(run_id=run_id)
-    create_new_run(run_id=run_id, status=run_status, step=None, percent=0)
+    db.execute_sql()(
+        f"UPDATE {RUN_MANAGEMENT} SET RUN_STATUS = {run_status} WHERE RUN_ID='{run_id}' "
+    )
+
+
+def process_variables_exist(run_id: str) -> bool:
+    row = db.execute_sql()(
+        f"SELECT RUN_ID FROM {PROCESS_VARIABLES} WHERE RUN_ID='{run_id}' "
+    ).fetchone()
+
+    if row is None:
+        return False
+
+    return True
 
 
 def is_existing_run(run_id: str) -> bool:
@@ -19,29 +29,30 @@ def is_existing_run(run_id: str) -> bool:
 
     if row is None:
         return False
+
     return True
 
 
-def set_status(run_id: str, status: int, step: str = None) -> None:
+def set_status(run_id: str, run_status: int, step: str = None) -> None:
     if step is None:
         db.execute_sql()(
-            f"UPDATE {RUN_MANAGEMENT} SET status = '{status}' WHERE RUN_ID='{run_id}' "
+            f"UPDATE {RUN_MANAGEMENT} SET RUN_STATUS = '{status}' WHERE RUN_ID='{run_id}' "
         )
     else:
         db.execute_sql()(
-            f"UPDATE {RUN_MANAGEMENT} SET status = '{status}', STEP='{step}' WHERE RUN_ID='{run_id}' "
+            f"UPDATE {RUN_MANAGEMENT} SET RUN_STATUS = '{run_status}', STEP='{step}' WHERE RUN_ID='{run_id}' "
         )
 
 
 def get_run_status(run_id: str) -> int:
     row = db.execute_sql()(
-        f"SELECT STATUS FROM {RUN_MANAGEMENT} WHERE RUN_ID='{run_id}' "
+        f"SELECT RUN_STATUS FROM {RUN_MANAGEMENT} WHERE RUN_ID='{run_id}' "
     ).fetchone()
 
     if row is None:
         return status.NOT_STARTED
 
-    return row['STATUS']
+    return row['RUN_STATUS']
 
 
 def get_step(run_id: str) -> str:
