@@ -23,17 +23,19 @@ def validate_survey_data(data: pd.DataFrame, user_month, user_year, errors):
 
 def validate_reference_data(reference_type: str, data: pd.DataFrame, user_month: str, user_year: str, errors):
     log.info(f"Validating {reference_type} data...")
-
     data.columns = data.columns.str.upper()
     data.columns = data.columns.str.replace(' ', '')
+
+    if 'DATASOURCE' not in data.columns:
+        errors.add(f"Invalid data uploaded.")
+
     data['DATASOURCE'] = data['DATASOURCE'].str.replace(' ', '')
 
     for index, row in data.iterrows():
         datasource = row['DATASOURCE']
 
         if reference_type not in datasource:
-            log.error(f"Data does not match {reference_type}. Exiting validation.")
-            errors.add(f"Data does not match {reference_type}.")
+            errors.add(f"{datasource} uploaded instead of {reference_type}. Exiting validation.")
             return False
 
     if user_month is None or user_year is None:
@@ -92,7 +94,6 @@ def _validate_date(data, user_month, user_year, errors):
         if not valid_year() or not valid_month():
             return False
     else:
-
         for index, row in data.iterrows():
             year = str(row['YEAR'])
             month = str(row['MONTH'])
