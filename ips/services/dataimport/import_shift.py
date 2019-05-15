@@ -3,7 +3,7 @@ import io
 import pandas as pd
 import ips.persistence.import_shift as db
 
-from ips.services.dataimport import validate_reference_data
+from ips.services.dataimport import validate
 from ips_common.ips_logging import log
 from ips.services import service
 from ips.services.dataimport.schemas import shift_schema
@@ -23,7 +23,7 @@ def import_shift(run_id, data, month, year):
     errors = Errors()
     validate_df = df.copy()
 
-    validation = _validate_data(validate_df, month, year, errors)
+    validation = validate.validate_reference_data(CSVType.Shift.name, validate_df, month, year, errors)
     if not validation:
         log.error(f"Validation failed: {errors.get_messages()}")
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
@@ -31,13 +31,6 @@ def import_shift(run_id, data, month, year):
     log.info(f"{CSVType.Shift.name} validation completed successfully.")
     db.import_shift_data(run_id, df)
     return df
-
-
-# noinspection PyUnusedLocal
-def _validate_data(data: pd.DataFrame, month, year, errors) -> bool:
-    reference_type = CSVType.Shift.name
-    log.info(f"Validating {reference_type} data...")
-    return validate_reference_data.validate_data(reference_type, data, month, year, errors)
 
 
 class Errors:

@@ -5,7 +5,7 @@ import ips.persistence.import_unsampled as db
 from ips_common.ips_logging import log
 from ips.services import service
 from ips.services.dataimport.schemas import unsampled_schema
-from ips.services.dataimport import validate_reference_data
+from ips.services.dataimport import validate
 from ips.services.dataimport import CSVType
 
 
@@ -22,7 +22,7 @@ def import_unsampled(run_id, data, month, year):
     errors = Errors()
     validate_df = df.copy()
 
-    validation = _validate_data(validate_df, month, year, errors)
+    validation = validate.validate_reference_data(CSVType.Unsampled.name, validate_df, month, year, errors)
     if not validation:
         log.error(f"Validation failed: {errors.get_messages()}")
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
@@ -30,13 +30,6 @@ def import_unsampled(run_id, data, month, year):
     log.info(f"{CSVType.Unsampled.name} validation completed successfully.")
     db.import_unsampled(run_id, df)
     return df
-
-
-# noinspection PyUnusedLocal
-def _validate_data(data: pd.DataFrame, month, year, errors) -> bool:
-    reference_type = CSVType.Unsampled.name
-    log.info(f"Validating {reference_type} data...")
-    return validate_reference_data.validate_data(reference_type, data, month, year, errors)
 
 
 class Errors:
