@@ -5,7 +5,7 @@ from functools import partial
 import pandas as pd
 from ips_common.ips_logging import log
 
-from ips.services.dataimport import validate_reference_data
+from ips.services.dataimport import validate
 import ips.persistence.import_traffic as db
 from ips.services import service
 from ips.services.dataimport import CSVType
@@ -25,7 +25,7 @@ def _import_traffic(import_type, run_id, data, month, year):
     errors = Errors()
     validate_df = df.copy()
 
-    validation = _validate_data(validate_df, month, year, errors, import_type)
+    validation = validate.validate_reference_data(import_type.name, validate_df, month, year, errors)
     if not validation:
         log.error(f"Validation failed: {errors.get_messages()}")
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
@@ -33,12 +33,6 @@ def _import_traffic(import_type, run_id, data, month, year):
     log.info(f"{import_type.name} validation completed successfully.")
     db.import_traffic_data(import_type, df, run_id)
     return df
-
-
-# noinspection PyUnusedLocal
-def _validate_data(data: pd.DataFrame, month, year, errors, import_type=None) -> bool:
-    log.info(f"Validating {import_type.name} data...")
-    return validate_reference_data.validate_data(import_type.name, data, month, year, errors)
 
 
 class Errors:

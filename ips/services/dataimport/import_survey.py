@@ -7,6 +7,7 @@ from ips_common.ips_logging import log
 
 import ips.persistence.import_survey as db
 from ips.services import service
+from ips.services.dataimport import validate
 
 columns = [
     'SERIAL', 'AM_PM_NIGHT', 'AGE', 'ANYUNDER16', 'APORTLATDEG',
@@ -50,7 +51,7 @@ def import_survey(run_id, data, month, year):
     [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'DVEXPEND', 'TANDTSI']]
 
     errors = Errors()
-    validation = _validate_data(df, month, year, errors)
+    validation = validate.validate_survey_data(df, month, year, errors)
     if not validation:
         log.error(f"Validation failed: {errors.get_messages()}")
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
@@ -60,82 +61,6 @@ def import_survey(run_id, data, month, year):
     df = df.sort_values(by='SERIAL')
     db.import_survey_data(run_id, df)
     return df
-
-
-def _validate_data(data: pd.DataFrame, user_month, user_year, errors):
-    log.info("Validating Survey data...")
-
-    if 'SERIAL' not in data.columns:
-        log.error(f"'SERIAL' column does not exist. Exiting validation.")
-        errors.add("'SERIAL' column does not exist in Survey data.")
-        return False
-
-    if 'INTDATE' not in data.columns:
-        log.error("'INTDATE' column does not exist. Exiting validation.")
-        errors.add("'INTDATE' column does not exist in Survey data.")
-        return False
-
-    date_column = data['INTDATE'].astype(str).str.rjust(8, '0')
-    if user_month is None or user_year is None:
-        return True
-
-    return _validate_date(date_column, user_month, user_year, errors)
-
-
-def _validate_date(data, user_month, user_year, errors):
-    valid_quarters = {
-        "Q1": ['1', '2', '3'], "Q2": ['4', '5', '6'],
-        "Q3": ['7', '8', '9'], "Q4": ['10', '11', '12']
-    }
-
-    quarters_found: set = set()
-
-    def valid_year():
-        if not str.isdigit(year) or not 2000 <= int(year) <= 2099:
-            errors.add(f"year value [{year}] in data stream is invalid")
-            return False
-
-        if not str.isdigit(user_year) or int(user_year) != int(year):
-            errors.add(f"user supplier year value [{user_year}] is invalid")
-            return False
-        return True
-
-    def valid_month():
-        if str.isdigit(user_month):
-            if int(month) != int(user_month):
-                errors.add(f"user supplied month [{user_month}] does not correspond to data month [{month}]")
-                return False
-
-            if not 1 <= int(month) <= 12:
-                errors.add(f"data month value [{month}] in data stream is invalid")
-                return False
-        else:
-            if user_month in valid_quarters:
-                if month not in valid_quarters[user_month]:
-                    errors.add(
-                        f"user supplied quarter [{user_month}] does not correspond to valid month in data [{month}]"
-                    )
-                    return False
-                quarters_found.add(month)
-            else:
-                errors.add(f"[{user_month}] is not a valid quarter")
-                return False
-        return True
-
-    for index, row in data.iteritems():
-        year = row[-4:]
-        month = row[-6:][:2]
-
-        if not valid_year() or not valid_month():
-            return False
-
-    if user_month in valid_quarters:
-        qf = list(quarters_found).sort()
-        if qf != valid_quarters[user_month]:
-            errors.add(f"Data for the quarter, [{user_month}], does not contain all valid months")
-            return False
-
-    return True
 
 
 class Errors:
