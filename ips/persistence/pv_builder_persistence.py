@@ -111,7 +111,7 @@ def create_pv_build(request, run_id, pv_id=None):
         pv = pv.replace("\\","\\\\")
         pv = pv.replace("\"", "\\\"")
         pv = pv.replace("%", "%%")
-        _store_pv_bytes(run_id, pv_id, pv, pv_name, pv_desc)
+        _store_pv_bytes(run_id.strip(), pv_id.strip(), pv.strip(), pv_name.strip(), pv_desc.strip())
 
 
 def get_pv_builds(run_id):
