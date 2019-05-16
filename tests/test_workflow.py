@@ -74,7 +74,7 @@ def teardown_module(module):
     """ teardown any state that was previously setup with a setup_module
         method.
     """
-    db.delete_from_table('SURVEY_SUBSAMPLE')
+    # db.delete_from_table('SURVEY_SUBSAMPLE')
 
     # List of tables to cleanse where [RUN_ID] = RUN_ID
     tables_to_cleanse = [

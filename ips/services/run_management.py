@@ -1,3 +1,5 @@
+from ips_common.ips_logging import log
+
 import ips.persistence.run_management as db
 
 NOT_STARTED: int = 1
@@ -6,6 +8,14 @@ DONE: int = 3
 CANCELLED: int = 4
 INVALID_RUN: int = 5
 FAILED: int = 6
+
+
+# set all in_progress runs to failed.
+# called from the IPSWorkflow __init__ method at start up
+
+def clear_existing_status():
+    log.debug("Clearing IN_PROGRESS runs to FAILED")
+    db.clear_existing_status()
 
 
 def process_variables_exist(run_id: str) -> bool:

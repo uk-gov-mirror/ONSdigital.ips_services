@@ -415,9 +415,9 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     if len(df_unsampled_thresholds_check) > 0:
         log_warnings("Shift weight outside thresholds for")(df_unsampled_thresholds_check, 4)
 
-    df_summary[PRIOR_WEIGHT_SUM_COLUMN] = df_summary[PRIOR_WEIGHT_SUM_COLUMN].apply(lambda x: round(x, 3))
-    df_summary[OOH_WEIGHT_SUM_COLUMN] = df_summary[OOH_WEIGHT_SUM_COLUMN].apply(lambda x: round(x, 3))
-    df_summary['UNSAMP_TRAFFIC_WT'] = df_summary['UNSAMP_TRAFFIC_WT'].apply(lambda x: round(x, 3))
-    df_output['UNSAMP_TRAFFIC_WT'] = df_output['UNSAMP_TRAFFIC_WT'].apply(lambda x: round(x, 3))
+    df_summary[PRIOR_WEIGHT_SUM_COLUMN] = df_summary[PRIOR_WEIGHT_SUM_COLUMN].round(3)
+    df_summary[OOH_WEIGHT_SUM_COLUMN] = df_summary[OOH_WEIGHT_SUM_COLUMN].round(3)
+    df_summary['UNSAMP_TRAFFIC_WT'] = df_summary['UNSAMP_TRAFFIC_WT'].round(3)
+    df_output['UNSAMP_TRAFFIC_WT'] = df_output['UNSAMP_TRAFFIC_WT'].round(3)
 
     return df_output, df_summary

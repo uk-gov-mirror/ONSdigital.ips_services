@@ -5,6 +5,12 @@ RUN_MANAGEMENT = 'RUN'
 PROCESS_VARIABLES = 'PROCESS_VARIABLE_PY'
 
 
+def clear_existing_status():
+    db.execute_sql()(
+        f"UPDATE {RUN_MANAGEMENT} SET RUN_STATUS = {status.FAILED} WHERE RUN_STATUS={status.IN_PROGRESS} "
+    )
+
+
 def create_run(run_id: str, run_status: int) -> None:
     db.execute_sql()(
         f"UPDATE {RUN_MANAGEMENT} SET RUN_STATUS = {run_status} WHERE RUN_ID='{run_id}' "

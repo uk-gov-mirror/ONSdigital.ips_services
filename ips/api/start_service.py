@@ -9,6 +9,7 @@ from ips.api.api import Api
 from ips.api.validation.validate import validate
 from ips.api.validation.validate_run_id import validate_run_id
 from ips.persistence import data_management as db
+import ips.services.run_management as runs
 
 
 # noinspection PyUnusedLocal,PyMethodMayBeStatic
@@ -31,6 +32,11 @@ class StartApi(Api):
                 resp.status = falcon.HTTP_401
                 resp.body = json.dumps(result)
                 return
+
+            if not runs.process_variables_exist(run_id):
+                error = f"cannot start run: {run_id} as process variables for the run don't exist"
+                log.error(error)
+                raise falcon.HTTPError(falcon.HTTP_400, 'Invalid request', error)
 
             thr = threading.Thread(target=self.workflow.run_calculations, args=(run_id,))
 

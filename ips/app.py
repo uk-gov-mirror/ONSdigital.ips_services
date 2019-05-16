@@ -23,10 +23,11 @@ from ips.api.start_service import StartApi
 from ips.api.status_api import StatusApi
 from ips.services import ips_workflow
 
+
 workflow = ips_workflow.IPSWorkflow()
 
 app = falcon.API(middleware=MultipartMiddleware())
-app.req_options.auto_parse_form_urlencoded = True;
+app.req_options.auto_parse_form_urlencoded = True
 
 log.setLevel(logging.DEBUG)
 
@@ -59,6 +60,7 @@ app.add_route("/import/tunnel/{run_id}", ImportTunnel(workflow))
 app.add_route("/import/unsampled/{run_id}", ImportUnsampled(workflow))
 
 app.add_route("/export/{run_id}/{table_name}", ExportApi(workflow))
+
 
 # from waitress import serve
 #

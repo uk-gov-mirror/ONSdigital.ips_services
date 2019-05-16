@@ -17,7 +17,7 @@ import ips.services.steps.stay_imputation as stay_imputation
 import ips.services.steps.town_stay_expenditure as town_stay_expenditure
 import ips.services.steps.traffic_weight as traffic_weight
 import ips.services.steps.unsampled_weight as unsampled_weight
-from ips.persistence.persistence import truncate_table
+from ips.persistence.persistence import truncate_table, delete_from_table
 
 
 class IPSWorkflow:
@@ -42,6 +42,10 @@ def run_step(func: [[W, str], None]) -> Callable[[str], None]:
 class IPSWorkflow:
     num_done: int = 0
     in_progress = False
+
+    def __init__(self):
+        log.info("IPSWorkflow starting")
+        runs.clear_existing_status()
 
     def is_in_progress(self) -> bool:
         if self.in_progress is True:
@@ -158,12 +162,25 @@ class IPSWorkflow:
 
     def _initialize(self, run_id) -> None:
         truncate_table("SAS_SURVEY_SUBSAMPLE")()
+        tables_to_cleanse = [
+            'TRAFFIC_DATA',
+            'SHIFT_DATA',
+            'NON_RESPONSE_DATA',
+            'UNSAMPLED_OOH_DATA'
+        ]
+
+        # Try to delete from each table in the list. If exception occurs,
+        # assume table is already empty, and continue deleting from tables in list.
+        for table in tables_to_cleanse:
+            # noinspection PyBroadException
+            try:
+                delete_from_table(table)(run_id=run_id)
+            except Exception:
+                continue
+
         runs.create_run(run_id)
 
     def run_calculations(self, run_id: str) -> None:
-        if not runs.process_variables_exist(run_id):
-            log.error(f"cannot start run: {run_id} as process variables for the run don't exist")
-            return
 
         try:
             self._initialize(run_id)
