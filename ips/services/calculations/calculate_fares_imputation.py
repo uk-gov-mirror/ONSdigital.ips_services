@@ -220,7 +220,7 @@ def compute_additional_spend(row):
         else:
             row[SPEND_VARIABLE] = (row[EXPENDITURE_VARIABLE] + row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]
 
-    if row[SPEND_VARIABLE] != np.nan:
+    if row[SPEND_VARIABLE] != np.nan and row[DUTY_FREE_VARIABLE] != np.nan:
         row[SPEND_VARIABLE] = row[SPEND_VARIABLE] + row[DUTY_FREE_VARIABLE]
 
     # Ensure the spend values are integers
