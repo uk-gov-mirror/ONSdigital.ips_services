@@ -162,22 +162,6 @@ class IPSWorkflow:
 
     def _initialize(self, run_id) -> None:
         truncate_table("SAS_SURVEY_SUBSAMPLE")()
-        tables_to_cleanse = [
-            'TRAFFIC_DATA',
-            'SHIFT_DATA',
-            'NON_RESPONSE_DATA',
-            'UNSAMPLED_OOH_DATA'
-        ]
-
-        # Try to delete from each table in the list. If exception occurs,
-        # assume table is already empty, and continue deleting from tables in list.
-        for table in tables_to_cleanse:
-            # noinspection PyBroadException
-            try:
-                delete_from_table(table)(run_id=run_id)
-            except Exception:
-                continue
-
         runs.create_run(run_id)
 
     def run_calculations(self, run_id: str) -> None:
@@ -195,9 +179,14 @@ class IPSWorkflow:
                     self.num_done += 1
 
         except Exception as e:
-            log.warn(f"Run {run_id} has failed")
-            self.set_status(run_id, runs.FAILED, str(e))
+            if hasattr(e, 'message'):
+                mesg = e.message
+            else:
+                mesg = str(e).strip("'")
+            self.set_status(run_id, runs.FAILED, mesg)
+            log.error(f"Run {run_id} has failed : {mesg}")
             runs.set_percent_done(run_id, 100)
+            return
 
         finally:
             self.in_progress = False

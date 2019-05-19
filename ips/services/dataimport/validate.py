@@ -2,17 +2,40 @@ import pandas as pd
 from ips_common.ips_logging import log
 
 
-def validate_data(reference_type: str, data: pd.DataFrame, user_month: str, user_year: str, errors):
+def validate_survey_data(data: pd.DataFrame, user_month, user_year, errors):
+    log.info("Validating Survey data...")
+
+    if 'SERIAL' not in data.columns:
+        log.error(f"'SERIAL' column does not exist. Exiting validation.")
+        errors.add("'SERIAL' column does not exist in Survey data.")
+        return False
+
+    if 'INTDATE' not in data.columns:
+        log.error("'INTDATE' column does not exist. Exiting validation.")
+        errors.add("'INTDATE' column does not exist in Survey data.")
+        return False
+
+    if user_month is None or user_year is None:
+        return True
+
+    return _validate_date(data, user_month, user_year, errors)
+
+
+def validate_reference_data(reference_type: str, data: pd.DataFrame, user_month: str, user_year: str, errors):
+    log.info(f"Validating {reference_type} data...")
     data.columns = data.columns.str.upper()
     data.columns = data.columns.str.replace(' ', '')
+
+    if 'DATASOURCE' not in data.columns:
+        errors.add(f"Invalid data uploaded.")
+
     data['DATASOURCE'] = data['DATASOURCE'].str.replace(' ', '')
 
     for index, row in data.iterrows():
         datasource = row['DATASOURCE']
 
         if reference_type not in datasource:
-            log.error(f"Data does not match {reference_type}. Exiting validation.")
-            errors.add(f"Data does not match {reference_type}.")
+            errors.add(f"{datasource} uploaded instead of {reference_type}. Exiting validation.")
             return False
 
     if user_month is None or user_year is None:
@@ -30,7 +53,6 @@ def _validate_date(data, user_month, user_year, errors):
     quarters_found: set = set()
 
     def valid_year():
-
         if not str.isdigit(year) or not 2000 <= int(year) <= 2099:
             errors.add(f"year value [{year}] in data stream is invalid")
             return False
@@ -62,12 +84,22 @@ def _validate_date(data, user_month, user_year, errors):
                 return False
         return True
 
-    for index, row in data.iterrows():
-        year = str(row['YEAR'])
-        month = str(row['MONTH'])
+    if 'INTDATE' in data.columns:
+        date_column = data['INTDATE'].astype(str).str.rjust(8, '0')
+
+        for index, row in date_column.iteritems():
+            year = row[-4:]
+            month = row[-6:][:2]
 
         if not valid_year() or not valid_month():
             return False
+    else:
+        for index, row in data.iterrows():
+            year = str(row['YEAR'])
+            month = str(row['MONTH'])
+
+            if not valid_year() or not valid_month():
+                return False
 
     if user_month in valid_quarters:
         qf = list(quarters_found).sort()

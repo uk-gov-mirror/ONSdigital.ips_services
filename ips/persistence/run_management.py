@@ -42,11 +42,11 @@ def is_existing_run(run_id: str) -> bool:
 def set_status(run_id: str, run_status: int, step: str = None) -> None:
     if step is None:
         db.execute_sql()(
-            f"UPDATE {RUN_MANAGEMENT} SET RUN_STATUS = '{status}' WHERE RUN_ID='{run_id}' "
+            f"UPDATE {RUN_MANAGEMENT} SET RUN_STATUS = {status} WHERE RUN_ID='{run_id}' "
         )
     else:
         db.execute_sql()(
-            f"UPDATE {RUN_MANAGEMENT} SET RUN_STATUS = '{run_status}', STEP='{step}' WHERE RUN_ID='{run_id}' "
+            f"UPDATE {RUN_MANAGEMENT} SET RUN_STATUS = {run_status}, STEP='{step}' WHERE RUN_ID='{run_id}' "
         )
 
 

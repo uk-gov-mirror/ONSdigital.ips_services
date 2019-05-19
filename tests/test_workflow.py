@@ -23,7 +23,7 @@ reference_data = {
 
 survey_data = "../tests/data/import_data/dec/surveydata.csv"
 
-run_id = str(uuid.uuid4())
+run_id = 'IPS-TEST'
 start_time = time.time()
 log.info("Module level start time: {}".format(start_time))
 
