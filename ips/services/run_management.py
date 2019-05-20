@@ -46,8 +46,20 @@ def set_status(run_id: str, status: int, step: str = None) -> None:
     db.set_status(run_id, status, step)
 
 
+def set_step_status(run_id: str, status: int, step: str) -> None:
+    db.set_step_status(run_id, status, step)
+
+
+def reset_all_step_status(run_id):
+    db.reset_steps(run_id)
+
+
 def get_status(run_id: str) -> int:
     return db.get_run_status(run_id)
+
+
+def get_step_status(run_id: str, step: str):
+    return db.get_step_status(run_id, step)
 
 
 def get_step(run_id) -> str:

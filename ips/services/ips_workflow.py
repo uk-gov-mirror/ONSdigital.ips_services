@@ -32,9 +32,10 @@ def run_step(func: [[W, str], None]) -> Callable[[str], None]:
         if self.is_cancelled(run_id):
             log.info(f"Processing cancelled. Skipping step {func.__name__[1:]}")
         else:
+            self.set_step_status(run_id, runs.IN_PROGRESS, func.__name__[6:])
             self.set_status(run_id, runs.IN_PROGRESS, func.__name__[1:])
             func(self, run_id)
-
+            self.set_step_status(run_id, runs.DONE, func.__name__[6:])
     return wrapper
 
 
@@ -69,6 +70,15 @@ class IPSWorkflow:
             self.in_progress = False
         log.debug(f"Step: {step}, status: {status}")
 
+    def get_step_status(self, run_id: str, step: str):
+        return runs.get_step_status(run_id, step)
+
+    def set_step_status(self, run_id: str, status: int, step: str) -> None:
+        runs.set_step_status(run_id, status, step)
+
+    def reset_steps(self, run_id: str):
+        runs.reset_all_step_status(run_id)
+
     def is_run_complete(self, run_id) -> bool:
         return runs.is_complete(run_id)
 
@@ -77,6 +87,9 @@ class IPSWorkflow:
 
     def set_percent_done(self, run_id, percent):
         runs.set_percent_done(run_id, percent)
+
+    def get_step(self, run_id):
+        return runs.get_step(run_id);
 
     @run_step
     def _step_1(self, run_id: str) -> None:
@@ -133,9 +146,10 @@ class IPSWorkflow:
         log.info("Calculation 11 --> rail_imputation")
         rail_imputation.rail_imputation_step(run_id)
 
+
     @run_step
     def _step_12(self, run_id: str) -> None:
-        log.info("Calculation 12 --> regional_weights")
+        self.set_step_status(run_id, runs.IN_PROGRESS, '12')
         regional_weights.regional_weights_step(run_id)
 
     @run_step
@@ -149,15 +163,20 @@ class IPSWorkflow:
         airmiles.airmiles_step(run_id)
 
     _dag_list: List = [
-        _step_1, _step_8, _step_9, _step_14,
-        _step_2, _step_3, _step_10,
+        _step_1,
+        _step_2,
+        _step_3,
         _step_4,
         _step_5,
         _step_6,
         _step_7,
+        _step_8,
+        _step_9,
+        _step_10,
         _step_11,
+        _step_12,
         _step_13,
-        _step_12
+        _step_14
     ]
 
     def _initialize(self, run_id) -> None:
@@ -167,6 +186,7 @@ class IPSWorkflow:
     def run_calculations(self, run_id: str) -> None:
 
         try:
+            self.reset_steps(run_id)
             self._initialize(run_id)
             self.num_done = 0
             self.in_progress = True
@@ -174,15 +194,16 @@ class IPSWorkflow:
             for func in self._dag_list:
                 if not self.is_cancelled(run_id):
                     func(self, run_id)
+                    self.num_done += 1
                     percent = round((self.num_done / len(self._dag_list)) * 100)
                     runs.set_percent_done(run_id, percent)
-                    self.num_done += 1
 
         except Exception as e:
             if hasattr(e, 'message'):
                 mesg = e.message
             else:
                 mesg = str(e).strip("'")
+            self.set_step_status(run_id, runs.FAILED, runs.get_step(run_id)[-1:])
             self.set_status(run_id, runs.FAILED, mesg)
             log.error(f"Run {run_id} has failed : {mesg}")
             runs.set_percent_done(run_id, 100)

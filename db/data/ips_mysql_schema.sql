@@ -1585,15 +1585,15 @@ create table PS_UNSAMPLED_OOH
 -- );
 
 
--- create table RESPONSE
--- (
---     RUN_ID        varchar(40)   not null,
---     STEP_NUMBER   int           not null,
---     RESPONSE_CODE int           not null,
---     MESSAGE       varchar(250)  null,
---     OUTPUT        varchar(4000) null,
---     TIME_STAMP    datetime      null
--- );
+create table RESPONSE
+(
+    RUN_ID        varchar(40)   not null,
+    STEP_NUMBER   int           not null,
+    RESPONSE_CODE int           not null,
+    MESSAGE       varchar(250)  null,
+    OUTPUT        varchar(4000) null,
+    TIME_STAMP    datetime      null
+);
 
 
 -- create table RESPONSE_ARCHIVE

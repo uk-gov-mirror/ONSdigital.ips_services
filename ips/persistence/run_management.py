@@ -1,6 +1,7 @@
 import ips.persistence.persistence as db
 import ips.services.run_management as status
 
+RUN_STEPS = 'RUN_STEPS'
 RUN_MANAGEMENT = 'RUN'
 PROCESS_VARIABLES = 'PROCESS_VARIABLE_PY'
 
@@ -50,6 +51,29 @@ def set_status(run_id: str, run_status: int, step: str = None) -> None:
         )
 
 
+def set_step_status(run_id: str, step_status: int, step: str = None) -> None:
+    if step is not None:
+        db.execute_sql()(
+            f"UPDATE {RUN_STEPS} SET STEP_STATUS = {step_status} WHERE RUN_ID='{run_id}' AND STEP_NUMBER = '{step}'"
+        )
+
+
+def reset_steps(run_id: str) -> None:
+    db.execute_sql()(
+        f"UPDATE {RUN_STEPS} SET STEP_STATUS = 0 WHERE RUN_ID='{run_id}'"
+    )
+
+
+def get_step_status(run_id: str, step: str) -> int:
+    row = db.execute_sql()(
+        f"SELECT STEP_STATUS FROM {RUN_STEPS} WHERE RUN_ID='{run_id}' AND STEP_NUMBER = '{step}'"
+    ).fetchone()
+
+    if row is None:
+        return status.NOT_STARTED
+    return row['STEP_STATUS']
+
+
 def get_run_status(run_id: str) -> int:
     row = db.execute_sql()(
         f"SELECT RUN_STATUS FROM {RUN_MANAGEMENT} WHERE RUN_ID='{run_id}' "
@@ -57,7 +81,6 @@ def get_run_status(run_id: str) -> int:
 
     if row is None:
         return status.NOT_STARTED
-
     return row['RUN_STATUS']
 
 

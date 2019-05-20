@@ -22,11 +22,14 @@ class StatusApi(Api):
             resp.body = json.dumps(result)
             return
 
-        v = json.dumps(self.workflow.get_status())
+        v = str(self.workflow.get_status(run_id))
 
         result = {
             'status': v,
-            'percentage_done': self.workflow.get_percentage_done(run_id)
+            'percentage_done': self.workflow.get_percentage_done(run_id),
+            'steps': {}
         }
+        for x in range(1, 15):
+            result['steps'][str(x)] = str(self.workflow.get_step_status(run_id, str(x)))
 
         resp.body = json.dumps(result)
