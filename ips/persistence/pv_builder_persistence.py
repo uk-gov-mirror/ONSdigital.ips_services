@@ -48,7 +48,6 @@ def _delete_pv_build(run_id, pv_id):
 
 
 def _delete_pv_bytes(run_id, pv_id):
-    print(pv_id)
     delete_bytes(RUN_ID=run_id, PROCESS_VARIABLE_ID=pv_id)
 
 
@@ -77,16 +76,13 @@ def create_pv_build(request, run_id, pv_id=None):
     _delete_pv_build(run_id, pv_id)
 
     setel = False
-    print(a)
     for block in a:
         if type(a[block]) is dict:
             first = True
             pv += "\n"
             block_id = _create_block(run_id, _get_index(block), pv_id)
-            print(block_id)
             for expression in a[block]:
                 expression_id = _create_expression(block_id, _get_index(expression))
-                print(expression_id)
                 for element in a[block][expression]:
                     if a[block][expression][element] == "undefined":
                         continue
@@ -104,8 +100,6 @@ def create_pv_build(request, run_id, pv_id=None):
                             pv += " "
                         pv += a[block][expression][element]
                     first = False
-        else:
-            print(a[block])
     _delete_pv_bytes(run_id, pv_id)
     if pv != "":
         pv = pv.replace("\\","\\\\")

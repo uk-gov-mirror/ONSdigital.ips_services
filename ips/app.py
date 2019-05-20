@@ -36,6 +36,7 @@ app.add_route('/ips-service/status/{run_id}', StatusApi(workflow))
 app.add_route('/ips-service/cancel/{run_id}', CancelApi(workflow))
 
 app.add_route("/runs", RunApi(workflow))
+app.add_route("/runs/{run_id}", RunApi(workflow))
 
 app.add_route("/run_steps/{run_id}", RunStepsApi(workflow))
 app.add_route("/run_steps/{run_id}/{value}", RunStepsValueApi(workflow))
