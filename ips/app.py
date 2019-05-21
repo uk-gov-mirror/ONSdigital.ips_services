@@ -49,7 +49,6 @@ app.add_route("/login/{user_name}/{password}", LoginApi(workflow))
 app.add_route("/process_variables/{run_id}", PvApi(workflow))
 
 app.add_route("/builder/{run_id}", PvBuilderApi(workflow))
-app.add_route("/builder/{run_id}/{pv_id}", PvBuilderApi(workflow))
 app.add_route("/builder/variables", PvBuilderVariablesApi(workflow))
 
 app.add_route("/import/survey/{run_id}", ImportSurvey(workflow))
