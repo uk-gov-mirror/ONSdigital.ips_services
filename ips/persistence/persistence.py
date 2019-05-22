@@ -4,6 +4,7 @@ import ips_common_db.sql as db
 import pandas
 import pandas as pd
 from ips_common.ips_logging import log
+import json;
 
 
 def clear_memory_table(table: str) -> Callable[[str], None]:
@@ -25,6 +26,11 @@ def read_table_values(table: str) -> Callable[[], pd.DataFrame]:
 
     return read
 
+
+def get_responses(step_id, run_id):
+    res = db.execute_sql_statement(f'SELECT RESPONSE_CODE, MESSAGE, DATE_FORMAT(TIME_STAMP, "%%d/%%m/%%Y - %%H:%%i:%%s") AS TIME_STAMP'
+                                   f' FROM RESPONSE WHERE RUN_ID = "{run_id}" AND STEP_NUMBER = {step_id}')
+    return json.dumps([dict(r) for r in res])
 
 def truncate_table(table: str) -> Callable[[str], None]:
     def truncate():

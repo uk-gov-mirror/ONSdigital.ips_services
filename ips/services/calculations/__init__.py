@@ -31,13 +31,14 @@ def log_warnings(warning_str: str) -> Callable[[pd.DataFrame], None]:
                     warn += " : "
             log.warning(warn)
             if run_id is not None and step_id is not None:
-                runs.insert_issue(run_id, step_id, 1, warn)
+                runs.insert_issue(run_id, step_id, 2, warn)
     return log_message
 
 
 def log_errors(error_str: str) -> Callable[[pd.DataFrame], None]:
-    def log_message(df: pd.DataFrame):
+    def log_message(df: pd.DataFrame, run_id = None, step_id = None):
         for index, record in df.iterrows():
             log(f"{error_str} [{df.columns[0]} = {str(record[0])}]")
-
+        if run_id is not None and step_id is not None:
+            runs.insert_issue(run_id, step_id, 3, error_str)
     return log_message

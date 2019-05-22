@@ -1,9 +1,11 @@
 import falcon
 from ips_common.ips_logging import log
 import pandas as pd
-from ips.persistence.persistence import read_table_values, delete_from_table, insert_from_dataframe
+from ips.persistence.persistence import read_table_values, delete_from_table, insert_from_dataframe, get_responses
+import json
 
 RUN_STEPS_TABLE = 'RUN_STEPS'
+RESPONSE_TABLE = 'RESPONSE'
 
 get_steps = read_table_values(RUN_STEPS_TABLE)
 delete_steps = delete_from_table(RUN_STEPS_TABLE)
@@ -20,14 +22,19 @@ def get_run_steps(run_id: str = None) -> str:
 
     if run_id:
         data = data.loc[data['RUN_ID'] == run_id]
-
         if data.empty:
             error = f"Run id, {run_id}, is not in the RUN_STEPS table."
             log.error(error)
             raise falcon.HTTPError(falcon.HTTP_400, 'Data Error', error)
 
     try:
-        return data.to_json(orient='records')
+        data_json = json.loads(data.to_json(orient='records'))
+        for index,step in enumerate(data_json):
+            responses = json.loads(get_responses(data_json[index]['STEP_NUMBER'], run_id))
+            if len(responses) > 0:
+                data_json[index]['Responses'] = responses
+        return json.dumps(data_json)
+
     except ValueError:
         error = f"Could not decode the request body. The JSON was invalid."
         log.error(error)
