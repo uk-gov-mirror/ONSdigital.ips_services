@@ -1,5 +1,5 @@
 import math
-
+from ips_common.ips_logging import log
 import numpy as np
 from pandas import DataFrame, Series
 
@@ -35,15 +35,15 @@ OLD_PACKAGE_VARIABLE = 'PACKAGE'
 THRESH_BASE_LIST = [3, 3, 3, 3, 3, 3, 3, 0, 0]
 
 STRATA_BASE_LIST = [
-    ['INTMONTH', 'TYPE_PV', 'UKPORT1_PV', 'OSPORT1_PV', 'OPERA_PV'],
-    ['INTMONTH', 'TYPE_PV', 'UKPORT2_PV', 'OSPORT1_PV', 'OPERA_PV'],
-    ['INTMONTH', 'TYPE_PV', 'UKPORT1_PV', 'OSPORT2_PV', 'OPERA_PV'],
-    ['INTMONTH', 'TYPE_PV', 'UKPORT2_PV', 'OSPORT2_PV', 'OPERA_PV'],
-    ['INTMONTH', 'TYPE_PV', 'UKPORT3_PV', 'OSPORT2_PV', 'OPERA_PV'],
-    ['INTMONTH', 'TYPE_PV', 'UKPORT3_PV', 'OSPORT3_PV', 'OPERA_PV'],
-    ['INTMONTH', 'TYPE_PV', 'UKPORT4_PV', 'OSPORT3_PV', 'OPERA_PV'],
-    ['INTMONTH', 'TYPE_PV', 'UKPORT4_PV', 'OSPORT4_PV'],
-    ['INTMONTH', 'TYPE_PV', 'OSPORT4_PV']
+    ['INTDATE', 'TYPE_PV', 'UKPORT1_PV', 'OSPORT1_PV', 'OPERA_PV'],
+    ['INTDATE', 'TYPE_PV', 'UKPORT2_PV', 'OSPORT1_PV', 'OPERA_PV'],
+    ['INTDATE', 'TYPE_PV', 'UKPORT1_PV', 'OSPORT2_PV', 'OPERA_PV'],
+    ['INTDATE', 'TYPE_PV', 'UKPORT2_PV', 'OSPORT2_PV', 'OPERA_PV'],
+    ['INTDATE', 'TYPE_PV', 'UKPORT3_PV', 'OSPORT2_PV', 'OPERA_PV'],
+    ['INTDATE', 'TYPE_PV', 'UKPORT3_PV', 'OSPORT3_PV', 'OPERA_PV'],
+    ['INTDATE', 'TYPE_PV', 'UKPORT4_PV', 'OSPORT3_PV', 'OPERA_PV'],
+    ['INTDATE', 'TYPE_PV', 'UKPORT4_PV', 'OSPORT4_PV'],
+    ['INTDATE', 'TYPE_PV', 'OSPORT4_PV']
 ]
 
 
@@ -71,27 +71,35 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
                                       IMPUTATION_LEVEL_VARIABLE)
 
     # Merge df_output_final and df_input by var_serial_num
+
     df_output.sort_values(var_serial, inplace=True)
 
     df_input.sort_values(var_serial, inplace=True)
 
     # df_output = df_input.merge(df_output, on=var_serial, how='left')
+
     df_output = df_input.merge(df_output, how='left', left_on=var_serial, right_on=var_serial)
 
     # Above merge creates fares_x and fares_y column; this line removes the empty
     # fares_x column and keeps then renames the imputed fares_y column
+
     df_output = df_output.drop([OUTPUT_VARIABLE + '_x', IMPUTATION_LEVEL_VARIABLE + '_x'], axis=1)
+
 
     df_output.rename(index=str, columns={OUTPUT_VARIABLE + '_y': OUTPUT_VARIABLE,
                                          IMPUTATION_LEVEL_VARIABLE + '_y': IMPUTATION_LEVEL_VARIABLE},
                      inplace=True)
 
     # Re-sort columns by column name in alphabetical order (may not be required)
+
     df_output.sort_index(axis=1, inplace=True)
+
 
     df_output = df_output.apply(compute_additional_fares, axis=1)
 
+
     df_output = df_output.apply(compute_additional_spend, axis=1)
+
 
     final_output_column_list = [var_serial, SPEND_VARIABLE, SPEND_REASON_KEY_VARIABLE, OUTPUT_VARIABLE,
                                 IMPUTATION_LEVEL_VARIABLE]

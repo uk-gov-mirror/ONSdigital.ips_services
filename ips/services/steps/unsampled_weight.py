@@ -62,7 +62,8 @@ def unsampled_weight_step(run_id):
         traffic_weight='TRAFFIC_WT',
         out_of_hours_weight="UNSAMP_TRAFFIC_WT",
         df_ustotals=unsampled_data,
-        min_count_threshold=30)
+        min_count_threshold=30,
+        run_id=run_id)
 
     # Insert data to SQL
     insert_from_dataframe(config["temp_table"])(output_data)

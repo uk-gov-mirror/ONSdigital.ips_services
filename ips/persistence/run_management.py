@@ -110,3 +110,16 @@ def set_percentage_done(run_id: str, percent: int) -> None:
     db.execute_sql()(
         f"UPDATE {RUN_MANAGEMENT} SET PERCENT = {percent} WHERE RUN_ID='{run_id}' "
     )
+
+
+def insert_issue(run_id: str, step_num: int, response_code: int, msg: str):
+    db.execute_sql()(
+        f"INSERT INTO RESPONSE (RUN_ID, STEP_NUMBER, RESPONSE_CODE, MESSAGE) "
+        f"VALUES ('{run_id}', {step_num}, {response_code}, '{msg}')"
+    )
+
+
+def reset_issues(run_id: str):
+    db.execute_sql()(
+        f"DELETE FROM RESPONSE WHERE RUN_ID = '{run_id}'"
+    )

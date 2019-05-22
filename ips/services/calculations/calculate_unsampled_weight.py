@@ -255,7 +255,7 @@ def do_ips_ges_weighting(df_surveydata: pd.DataFrame, df_ustotals: pd.DataFrame)
 
 def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num: str, shift_weight: str,
                                         nr_weight: str, min_weight: str, traffic_weight: str, out_of_hours_weight: str,
-                                        df_ustotals: pd.DataFrame, min_count_threshold: int):
+                                        df_ustotals: pd.DataFrame, min_count_threshold: int, run_id=None):
     """
     Author       : Thomas Mahoney / Nassir Mohammad
     Date         : Apr 2018
@@ -413,7 +413,7 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
 
     # Collect data outside of specified threshold
     if len(df_unsampled_thresholds_check) > 0:
-        log_warnings("Shift weight outside thresholds for")(df_unsampled_thresholds_check, 4)
+        log_warnings("Shift weight outside thresholds for")(df_unsampled_thresholds_check, 4, run_id, 5)
 
     df_summary[PRIOR_WEIGHT_SUM_COLUMN] = df_summary[PRIOR_WEIGHT_SUM_COLUMN].round(3)
     df_summary[OOH_WEIGHT_SUM_COLUMN] = df_summary[OOH_WEIGHT_SUM_COLUMN].round(3)

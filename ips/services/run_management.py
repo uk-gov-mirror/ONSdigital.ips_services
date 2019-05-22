@@ -72,3 +72,11 @@ def set_percent_done(run_id: str, percent) -> None:
 
 def get_percent_done(run_id: str) -> int:
     return db.get_percentage_done(run_id)
+
+
+def insert_issue(run_id: str, step_num: int, response_code: int, msg: str):
+    db.insert_issue(run_id, step_num, response_code, msg)
+
+
+def reset_issues(run_id: str):
+    db.reset_issues(run_id)

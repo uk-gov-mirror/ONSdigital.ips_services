@@ -1591,8 +1591,7 @@ create table RESPONSE
     STEP_NUMBER   int           not null,
     RESPONSE_CODE int           not null,
     MESSAGE       varchar(250)  null,
-    OUTPUT        varchar(4000) null,
-    TIME_STAMP    datetime      null
+    TIME_STAMP    datetime      default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP
 );
 
 

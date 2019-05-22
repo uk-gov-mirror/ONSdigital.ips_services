@@ -35,7 +35,7 @@ GROSS_RESP_COLUMN = 'GROSS_RESP'
 GNR_COLUMN = 'GNR'
 
 
-def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_weight_column, var_serial):
+def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_weight_column, var_serial, run_id=None):
     """
     Author       : James Burr
     Date         : Jan 2018
@@ -236,7 +236,7 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
 
     # Collect data outside of specified threshold
     if len(df_merged_thresholds) > 0:
-        log_warnings("Respondent count below minimum threshold for")(df_merged_thresholds)
+        log_warnings("Respondent count below minimum threshold for")(df_merged_thresholds, 2, run_id, 2)
 
     # Reduce output to just key value pairs
     # Round up to avoid truncation messages when saving to DB

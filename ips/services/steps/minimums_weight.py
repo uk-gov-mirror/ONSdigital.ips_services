@@ -43,7 +43,8 @@ def minimums_weight_step(run_id):
                                                                serial_num='SERIAL',
                                                                shift_weight='SHIFT_WT',
                                                                nr_weight='NON_RESPONSE_WT',
-                                                               min_weight='MINS_WT')
+                                                               min_weight='MINS_WT',
+                                                               run_id=run_id)
 
     # Insert data to SQL
     insert_from_dataframe(config["temp_table"])(output_data)

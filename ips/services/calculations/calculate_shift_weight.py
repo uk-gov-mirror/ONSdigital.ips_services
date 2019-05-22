@@ -237,7 +237,7 @@ def calculate_ips_crossing_factor(df_shiftsdata, df_surveydata):
     return df_total_sampled_crossings, df_surveydata_merge
 
 
-def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number, shift_weight):
+def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number, shift_weight, run_id=None):
     """
     Author       :  Richmond Rice / Nassir Mohammad
     Date         :  May 2018
@@ -527,6 +527,7 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     # Collect data outside of specified threshold
 
     if len(df_sw_thresholds_check) > 0:
-        log_warnings("Shift weight outside thresholds for")(df_sw_thresholds_check, 4)
+        log_warnings("Shift weight outside thresholds for")(df_sw_thresholds_check, 4, run_id, 1)
+
 
     return final_output_data, final_summary_data

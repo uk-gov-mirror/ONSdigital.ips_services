@@ -17,7 +17,7 @@ RAIL_EXPENSE_VARIABLE = 'RAILEXP'
 RAIL_FACTOR_VARIABLE = 'RAIL_FACTOR'
 
 
-def do_ips_railex_imp(df_input, var_serial, var_final_weight, minimum_count_threshold):
+def do_ips_railex_imp(df_input, var_serial, var_final_weight, minimum_count_threshold, run_id=None):
     """
     Author       : Thomas Mahoney
     Date         : 28 / 02 / 2018
@@ -72,7 +72,7 @@ def do_ips_railex_imp(df_input, var_serial, var_final_weight, minimum_count_thre
 
     # Output the values below of the threshold to the logger
     if len(df_summin_thresholds_check) > 0:
-        log_warnings("Minimums weight outside thresholds for")(df_summin_thresholds_check)
+        log_warnings("Minimums weight outside thresholds for")(df_summin_thresholds_check, 2, run_id, 11)
 
     # Calculate each row's rail factor
     def calculate_rail_factor(row):

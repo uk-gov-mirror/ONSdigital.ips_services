@@ -58,7 +58,7 @@ def shift_weight_step(run_id):
         calculate_shift_weight.do_ips_shift_weight_calculation(survey_data,
                                                                shift_data,
                                                                serial_number='SERIAL',
-                                                               shift_weight='SHIFT_WT')
+                                                               shift_weight='SHIFT_WT', run_id=run_id)
 
     # Insert data to SQL
     # round columns to avoid truncation

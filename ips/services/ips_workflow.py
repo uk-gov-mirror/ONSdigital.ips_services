@@ -79,6 +79,9 @@ class IPSWorkflow:
     def reset_steps(self, run_id: str):
         runs.reset_all_step_status(run_id)
 
+    def reset_issues(self, run_id: str):
+        runs.reset_issues(run_id)
+
     def is_run_complete(self, run_id) -> bool:
         return runs.is_complete(run_id)
 
@@ -187,6 +190,7 @@ class IPSWorkflow:
 
         try:
             self.reset_steps(run_id)
+            self.reset_issues(run_id)
             self._initialize(run_id)
             self.num_done = 0
             self.in_progress = True
