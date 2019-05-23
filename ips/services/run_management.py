@@ -40,6 +40,7 @@ def is_complete(run_id: str) -> bool:
 
 def cancel_run(run_id: str) -> None:
     set_status(run_id, CANCELLED)
+    db.cancel_steps(run_id)
 
 
 def set_status(run_id: str, status: int, step: str = None) -> None:

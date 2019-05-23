@@ -7,6 +7,7 @@ from ips.api.api import Api
 from ips.api.validation.validate import validate
 from ips.api.validation.validate_run_id import validate_run_id
 from ips.persistence import data_management as db
+from ips.persistence.persistence import get_responses
 
 
 # noinspection PyUnusedLocal,PyMethodMayBeStatic
@@ -30,6 +31,10 @@ class StatusApi(Api):
             'steps': {}
         }
         for x in range(1, 15):
-            result['steps'][str(x)] = str(self.workflow.get_step_status(run_id, str(x)))
+            result['steps'][str(x)] = {}
+            result['steps'][str(x)]['Status'] = str(self.workflow.get_step_status(run_id, str(x)))
+            responses = json.loads(get_responses(str(x), run_id))
+            if len(responses) > 0:
+                result['steps'][str(x)]['Responses'] = responses
 
         resp.body = json.dumps(result)

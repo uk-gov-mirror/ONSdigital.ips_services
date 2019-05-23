@@ -74,7 +74,8 @@ class IPSWorkflow:
         return runs.get_step_status(run_id, step)
 
     def set_step_status(self, run_id: str, status: int, step: str) -> None:
-        runs.set_step_status(run_id, status, step)
+        if step.isdigit():
+            runs.set_step_status(run_id, status, step)
 
     def reset_steps(self, run_id: str):
         runs.reset_all_step_status(run_id)
