@@ -1,5 +1,4 @@
 from ips_common.ips_logging import log
-
 from ips.persistence.persistence import insert_from_dataframe, delete_from_table
 from ips.services.dataimport import CSVType
 
