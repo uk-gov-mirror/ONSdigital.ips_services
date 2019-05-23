@@ -9,11 +9,13 @@ from ips.persistence.persistence import read_table_values
 from pandas.testing import assert_frame_equal
 import ips_common_db.sql as db
 
+SURVEY_SUBSAMPLE_TABLE = 'SURVEY_SUBSAMPLE'
+
 input_survey_data = 'data/import_data/dec/ips1712bv4_amtspnd.csv'
 input_shift_data = 'data/import_data/dec/Poss shifts Dec 2017.csv'
 
 output_survey_data = 'data/calculations/december_2017/shift_weight/dec_output.csv'
-output_shift_data = 'data/calculations/december_2017/shift_weight/summarydata_final.csv'
+output_shift_data = 'data/calculations/december_2017/shift_weight/dec2017_summary.csv'
 
 run_id = 'h3re-1s-y0ur-run-1d'
 month = '12'
@@ -48,9 +50,12 @@ def teardown_module(module):
 def test_shift_weight():
     # Run step
     shift_weight.shift_weight_step(run_id)
+    # from ips.services import ips_workflow
+    # workflow = ips_workflow.IPSWorkflow()
+    # workflow.run_calculations(run_id)
 
     # Get survey results
-    data = read_table_values('SURVEY_SUBSAMPLE')
+    data = read_table_values(SURVEY_SUBSAMPLE_TABLE)
     survey_subsample = data()
 
     # Create comparison dataframes
@@ -68,20 +73,24 @@ def test_shift_weight():
 
     ####
 
-    # # Get summary results
-    # data = read_table_values('SHIFT_DATA')
-    # summary_data = data()
-    #
-    # # Create survey dataframes
-    # summary_results = summary_data.copy()
-    # summary_expected = pd.read_csv(output_shift_data)
+    # Get summary results
+    data = read_table_values('SHIFT_DATA')
+    summary_data = data()
+
+    # Create survey dataframes
+    summary_results = summary_data.copy()
+    summary_expected = pd.read_csv(output_shift_data)
 
     # pandas.testing.faff
-    # summary_results.sort_values(by=['PORTROUTE', 'WEEKDAY', 'ARRIVEDEPART', 'TOTAL', 'AM_PM_NIGHT'],
-    #                             axis=0, inplace=True)
-    # summary_expected.sort_values(by=['PORTROUTE', 'WEEKDAY', 'ARRIVEDEPART', 'TOTAL', 'AM_PM_NIGHT'],
-    #                                 axis=0, inplace=True)
-    # summary_results.index = range(0, len(summary_results))
-    # summary_expected.index = range(0, len(summary_expected))
+    summary_results.drop('RUN_ID', axis=1, inplace=True)
+    summary_results.sort_values(by=['PORTROUTE', 'WEEKDAY', 'ARRIVEDEPART', 'TOTAL', 'AM_PM_NIGHT'],
+                                axis=0, inplace=True)
+    summary_expected.sort_values(by=['PORTROUTE', 'WEEKDAY', 'ARRIVEDEPART', 'TOTAL', 'AM_PM_NIGHT'],
+                                    axis=0, inplace=True)
+    summary_results.index = range(0, len(summary_results))
+    summary_expected.index = range(0, len(summary_expected))
 
-    # assert_frame_equal(summary_results, summary_expected, check_dtype=False)
+    summary_results.to_csv('data/calculations/december_2017/shift_weight/summary_results.csv')
+    summary_expected.to_csv('data/calculations/december_2017/shift_weight/summary_expected.csv')
+
+    assert_frame_equal(summary_results, summary_expected, check_dtype=False)
