@@ -1,5 +1,5 @@
 from ips_common.ips_logging import log
-
+from ips.services.dataimport import CSVType
 from ips.persistence.persistence import insert_from_dataframe, delete_from_table
 
 NON_RESPONSE_TABLE = 'NON_RESPONSE_DATA'
@@ -13,7 +13,7 @@ def import_non_response(run_id, dataframe):
     dataframe["RUN_ID"] = run_id
     dataframe.rename(columns={"DATASOURCE": "DATA_SOURCE_ID"}, inplace=True)
 
-    dataframe['DATA_SOURCE_ID'].replace('Non Response', 4, inplace=True)
+    dataframe['DATA_SOURCE_ID'].replace('Non Response', CSVType.NonResponse.value, inplace=True)
 
     try:
         delete_non_response(run_id=run_id)
