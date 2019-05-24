@@ -49,10 +49,12 @@ def setup_pv():
 
 def teardown_module(module):
     clear_survey_subsample = delete_from_table('SURVEY_SUBSAMPLE')
+    clear_sas_survey_subsample = delete_from_table('SAS_SURVEY_SUBSAMPLE')
     clear_shift_data = delete_from_table('SHIFT_DATA')
     clear_nr_data = delete_from_table('NON_RESPONSE_DATA')
 
     clear_survey_subsample()
+    clear_sas_survey_subsample()
     clear_shift_data()
     clear_nr_data()
 
