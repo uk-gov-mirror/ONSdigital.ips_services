@@ -1,5 +1,4 @@
 import multiprocessing
-import random
 from functools import partial
 
 import ips.persistence.persistence as db
@@ -10,8 +9,6 @@ import pandas
 from ips_common.ips_logging import logging as log
 
 from ips.persistence.persistence import insert_from_dataframe
-
-random.seed(123456)
 
 
 def modify_values(row, dataset, pvs):

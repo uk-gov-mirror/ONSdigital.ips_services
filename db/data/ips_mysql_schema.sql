@@ -1412,22 +1412,8 @@ else:
     row[''TYPE_PV''] = 2');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 27, 'opera_pv', 'opera_pv', '
-if row[''FLOW''] < 5:
-    if not math.isnan(row[''DVLINECODE'']):
-        carrier = int(row[''DVLINECODE''])
-    else:
-        carrier = 0
-
-    if carrier >= 1000 and carrier <= 1999:
-        row[''OPERA_PV''] = 1
-    elif carrier >= 2000 and carrier <= 88880:
-        row[''OPERA_PV''] = 2
-
-elif row[''FLOW''] > 4:
-    row[''OPERA_PV''] = 3
-
-if math.isnan(row[''OPERA_PV'']):
-    row[''OPERA_PV''] = round(random.random(),0) + 1');
+from .sas_random import sas_random
+row[''OPERA_PV''] = round(sas_random(row[''SERIAL''])) + 1');
 create table PROCESS_VARIABLE_PY_BACKUP
 (
     RUN_ID              varchar(40)   not null,

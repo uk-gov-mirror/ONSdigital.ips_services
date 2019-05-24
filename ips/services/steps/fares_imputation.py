@@ -6,6 +6,7 @@ from ips.persistence.persistence import insert_from_dataframe
 from ips.services.calculations import calculate_fares_imputation
 from ips.util import process_variables
 from ips.util.config.services_configuration import ServicesConfiguration
+from ...util.sas_random import seed
 
 
 def fares_imputation_step(run_id):
@@ -29,6 +30,7 @@ def fares_imputation_step(run_id):
     idm.copy_step_pvs_for_survey_data(run_id, config)
     log.debug("after copy_step_pvs_for_survey_data")
 
+    seed(123456)
     # Apply Fares Imp PVs On Survey Data
     log.debug("before process")
     process_variables.process(dataset='survey',
