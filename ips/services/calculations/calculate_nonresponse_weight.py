@@ -57,6 +57,9 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
 
     # Formatting and fudgery
     # non_response_data['NR_PORT_GRP_PV'] = pd.to_numeric(non_response_data['NR_PORT_GRP_PV'], errors='coerce')
+    # non_response_data['NR_PORT_GRP_PV'] = non_response_data.NR_PORT_GRP_PV.astype(float)
+    # survey_data['NR_PORT_GRP_PV'] = pd.to_numeric(survey_data['NR_PORT_GRP_PV'], errors='coerce')
+    # survey_data['NR_PORT_GRP_PV'] = survey_data.NR_PORT_GRP_PV.astype(float)
     # non_response_data['WEEKDAY_END_PV'] = pd.to_numeric(non_response_data['WEEKDAY_END_PV'], errors='coerce')
     # non_response_data.replace('None', np.nan, inplace=True)
 
@@ -240,7 +243,7 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
 
     # Reduce output to just key value pairs
     # Round up to avoid truncation messages when saving to DB
-    df_out[non_response_weight_column] = df_out[non_response_weight_column].round(3)
+    # df_out[non_response_weight_column] = df_out[non_response_weight_column].round(3)
     df_out = df_out[[var_serial, non_response_weight_column]]
 
     return df_out, df_summary
