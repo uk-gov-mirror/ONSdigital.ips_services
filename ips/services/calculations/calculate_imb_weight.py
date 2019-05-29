@@ -157,7 +157,7 @@ def do_ips_imbweight_calculation(df_survey_data, serial, shift_weight, non_respo
     )
 
     df_sliced = df_survey_data[df_survey_data[POST_SUM_COLUMN] > 0]
-    df_sliced[imbalance_weight] = df_sliced[imbalance_weight].astype('float').round(decimals=3)
+    df_sliced[imbalance_weight] = df_sliced[imbalance_weight].astype('float').round(3)
     df_summary_data = df_sliced.groupby([FLOW_COLUMN]).agg({
         PRIOR_SUM_COLUMN: 'sum', POST_SUM_COLUMN: 'sum'})
     df_summary_data = df_summary_data.reset_index()
@@ -165,7 +165,7 @@ def do_ips_imbweight_calculation(df_survey_data, serial, shift_weight, non_respo
     # Cleanse dataframes before returning
     df_survey_data = df_output_data[['SERIAL', 'IMBAL_WT']].copy()
 
-    df_survey_data['IMBAL_WT'] = df_survey_data['IMBAL_WT'].apply(lambda x: round(x, 3))
+    df_survey_data['IMBAL_WT'] = df_survey_data['IMBAL_WT'].round(3)
 
     df_survey_data.sort_values([serial], inplace=True)
 

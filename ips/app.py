@@ -23,10 +23,11 @@ from ips.api.start_service import StartApi
 from ips.api.status_api import StatusApi
 from ips.services import ips_workflow
 
+
 workflow = ips_workflow.IPSWorkflow()
 
 app = falcon.API(middleware=MultipartMiddleware())
-app.req_options.auto_parse_form_urlencoded = True;
+app.req_options.auto_parse_form_urlencoded = True
 
 log.setLevel(logging.DEBUG)
 
@@ -35,6 +36,7 @@ app.add_route('/ips-service/status/{run_id}', StatusApi(workflow))
 app.add_route('/ips-service/cancel/{run_id}', CancelApi(workflow))
 
 app.add_route("/runs", RunApi(workflow))
+app.add_route("/runs/{run_id}", RunApi(workflow))
 
 app.add_route("/run_steps/{run_id}", RunStepsApi(workflow))
 app.add_route("/run_steps/{run_id}/{value}", RunStepsValueApi(workflow))
@@ -47,7 +49,6 @@ app.add_route("/login/{user_name}/{password}", LoginApi(workflow))
 app.add_route("/process_variables/{run_id}", PvApi(workflow))
 
 app.add_route("/builder/{run_id}", PvBuilderApi(workflow))
-app.add_route("/builder/{run_id}/{pv_id}", PvBuilderApi(workflow))
 app.add_route("/builder/variables", PvBuilderVariablesApi(workflow))
 
 app.add_route("/import/survey/{run_id}", ImportSurvey(workflow))
@@ -59,6 +60,7 @@ app.add_route("/import/tunnel/{run_id}", ImportTunnel(workflow))
 app.add_route("/import/unsampled/{run_id}", ImportUnsampled(workflow))
 
 app.add_route("/export/{run_id}/{table_name}", ExportApi(workflow))
+
 
 # from waitress import serve
 #

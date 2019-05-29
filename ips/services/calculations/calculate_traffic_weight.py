@@ -275,7 +275,7 @@ def run_r_ges_script():
 # generates the summary data
 def generate_ips_tw_summary(df_survey, df_output_merge_final,
                             serial_um, traffic_weight,
-                            pop_totals, min_count_thresh):
+                            pop_totals, min_count_thresh, run_id=None):
     """
     Author       : Nassir Mohammad
     Date         : 08 Mar 2018
@@ -372,13 +372,14 @@ def generate_ips_tw_summary(df_survey, df_output_merge_final,
 
     if len(df_sum_check) > 0:
         df_sum_check = df_sum_check.head(THRESHOLD_CAP)
-        log_warnings("Respondent count below minimum threshold for")(df_sum_check)
+        log_warnings("Respondent count below minimum threshold for")(df_sum_check, 2, run_id, 4)
+
 
     return df_summary_merge_sum_traftot
 
 
 # carry out the traffic weight calculation using R call
-def do_ips_trafweight_calculation_with_r(survey_data, trtotals):
+def do_ips_trafweight_calculation_with_r(survey_data, trtotals, run_id):
     # clear the auxillary tables
     db.truncate_survey_traffic_aux()
 
@@ -434,7 +435,8 @@ def do_ips_trafweight_calculation_with_r(survey_data, trtotals):
         var_serialNum,
         GWeightVar,
         df_pop_totals,
-        minCountThresh
+        minCountThresh,
+        run_id=run_id
     )
 
     # update the output SQL tables

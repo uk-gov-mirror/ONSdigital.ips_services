@@ -35,7 +35,7 @@ GROSS_RESP_COLUMN = 'GROSS_RESP'
 GNR_COLUMN = 'GNR'
 
 
-def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_weight_column, var_serial):
+def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_weight_column, var_serial, run_id=None):
     """
     Author       : James Burr
     Date         : Jan 2018
@@ -91,7 +91,7 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
 
     # TODO: Return error
     if len(df_migtotal_not_zero[df_migtotal_not_zero['grossmignonresp'].isnull()]) > 0:
-        log.error('Unable to gross up non-response total.')
+        log_errors("Unable to gross up non-response total.")(df_migtotal_not_zero, run_id, 2)
 
     # Summarise over non-response strata
     df_grossmignonresp = df_grossmignonresp.sort_values(NON_RESPONSE_STRATA)
@@ -172,7 +172,7 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
 
     # Collect data outside of specified threshold
     if len(df_gross_resp_is_zero) > 0:
-        log_errors("Gross response is 0")(df_gross_resp_is_zero)
+        log_errors("Gross response is 0")(df_gross_resp_is_zero, run_id, 2)
 
     # Sort df_gnr and df_surveydata ready for producing summary
     df_gnr = df_gnr.sort_values(NON_RESPONSE_STRATA)
@@ -250,7 +250,7 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
 
     # Collect data outside of specified threshold
     if len(df_merged_thresholds) > 0:
-        log_warnings("Respondent count below minimum threshold for")(df_merged_thresholds)
+        log_warnings("Respondent count below minimum threshold for")(df_merged_thresholds, 2, run_id, 2)
 
     # Reduce output to just key value pairs
     # Round up to avoid truncation messages when saving to DB

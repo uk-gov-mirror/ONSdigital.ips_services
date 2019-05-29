@@ -1,6 +1,6 @@
 import multiprocessing
 from typing import Callable
-
+import ips.services.run_management as runs
 import numpy as np
 import pandas as pd
 from ips_common.ips_logging import log
@@ -22,7 +22,7 @@ def parallelise_dataframe(df, func):
 
 
 def log_warnings(warning_str: str) -> Callable[[pd.DataFrame], None]:
-    def log_message(df: pd.DataFrame, items: int = 2):
+    def log_message(df: pd.DataFrame, items: int = 2, run_id = None, step_id = None):
         for index, record in df.iterrows():
             warn = f"{warning_str} "
             for i in range(items):
@@ -30,13 +30,15 @@ def log_warnings(warning_str: str) -> Callable[[pd.DataFrame], None]:
                 if i != (items - 1):
                     warn += " : "
             log.warning(warn)
-
+            if run_id is not None and step_id is not None:
+                runs.insert_issue(run_id, step_id, 2, warn)
     return log_message
 
 
 def log_errors(error_str: str) -> Callable[[pd.DataFrame], None]:
-    def log_message(df: pd.DataFrame):
+    def log_message(df: pd.DataFrame, run_id = None, step_id = None):
         for index, record in df.iterrows():
             log(f"{error_str} [{df.columns[0]} = {str(record[0])}]")
-
+        if run_id is not None and step_id is not None:
+            runs.insert_issue(run_id, step_id, 3, error_str)
     return log_message

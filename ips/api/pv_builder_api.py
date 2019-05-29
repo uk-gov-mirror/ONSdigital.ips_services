@@ -7,8 +7,8 @@ from ips.services.pv_builder_service import create_pv_build, get_pv_builds, get_
 # noinspection PyUnusedLocal,PyMethodMayBeStatic
 class PvBuilderApi(Api):
 
-    def on_post(self, req: Request, resp: Response, run_id, pv_id) -> None:
-        create_pv_build(req, run_id, pv_id)
+    def on_post(self, req: Request, resp: Response, run_id) -> None:
+        create_pv_build(req, run_id)
         resp.status = falcon.HTTP_201
 
     def on_get(self, req: Request, resp: Response, run_id) -> None:

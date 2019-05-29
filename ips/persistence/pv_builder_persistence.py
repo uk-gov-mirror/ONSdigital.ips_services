@@ -48,7 +48,6 @@ def _delete_pv_build(run_id, pv_id):
 
 
 def _delete_pv_bytes(run_id, pv_id):
-    print(pv_id)
     delete_bytes(RUN_ID=run_id, PROCESS_VARIABLE_ID=pv_id)
 
 
@@ -69,49 +68,46 @@ def _get_index(el):
     return el[-1:]
 
 
-def create_pv_build(request, run_id, pv_id=None):
-    a = request.get_param_as_json('json')
-    pv = request.get_param('pv')
-    pv_name = request.get_param('pv_name')
-    pv_desc = request.get_param('pv_desc')
-    _delete_pv_build(run_id, pv_id)
+def create_pv_build(request, run_id):
+    pvs = request.get_param_as_json('json')
+    for pv_id in pvs:
+        a = pvs[pv_id]['json']
+        pv = pvs[pv_id]['pv']
+        pv_name = pvs[pv_id]['pv_name']
+        pv_desc = pvs[pv_id]['pv_desc']
+        _delete_pv_build(run_id, pv_id)
 
-    setel = False
-    print(a)
-    for block in a:
-        if type(a[block]) is dict:
-            first = True
-            pv += "\n"
-            block_id = _create_block(run_id, _get_index(block), pv_id)
-            print(block_id)
-            for expression in a[block]:
-                expression_id = _create_expression(block_id, _get_index(expression))
-                print(expression_id)
-                for element in a[block][expression]:
-                    if a[block][expression][element] == "undefined":
-                        continue
-                    _create_element(expression_id, element, a[block][expression][element].replace("\"","\\\""))
-                    if element != "var":
-                        a[block][expression][element] = a[block][expression][element].lower()
-                    if a[block][expression][element] == "set":
-                        setel = True
-                        pv += ":"
-                    else:
-                        if setel:
-                            pv += "\n   "
-                            setel = False
-                        if not first:
-                            pv += " "
-                        pv += a[block][expression][element]
-                    first = False
-        else:
-            print(a[block])
-    _delete_pv_bytes(run_id, pv_id)
-    if pv != "":
-        pv = pv.replace("\\","\\\\")
-        pv = pv.replace("\"", "\\\"")
-        pv = pv.replace("%", "%%")
-        _store_pv_bytes(run_id, pv_id, pv, pv_name, pv_desc)
+        setel = False
+        for block in a:
+            if type(a[block]) is dict:
+                first = True
+                pv += "\n"
+                block_id = _create_block(run_id, _get_index(block), pv_id)
+                for expression in a[block]:
+                    expression_id = _create_expression(block_id, _get_index(expression))
+                    for element in a[block][expression]:
+                        if a[block][expression][element] == "undefined":
+                            continue
+                        _create_element(expression_id, element, a[block][expression][element].replace("\"","\\\""))
+                        if element != "var":
+                            a[block][expression][element] = a[block][expression][element].lower()
+                        if a[block][expression][element] == "set":
+                            setel = True
+                            pv += ":"
+                        else:
+                            if setel:
+                                pv += "\n   "
+                                setel = False
+                            if not first:
+                                pv += " "
+                            pv += a[block][expression][element]
+                        first = False
+        _delete_pv_bytes(run_id, pv_id)
+        if pv != "":
+            pv = pv.replace("\\","\\\\")
+            pv = pv.replace("\"", "\\\"")
+            pv = pv.replace("%", "%%")
+            _store_pv_bytes(run_id, pv_id, pv, pv_name, pv_desc)
 
 
 def get_pv_builds(run_id):

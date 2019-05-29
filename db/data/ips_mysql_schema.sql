@@ -1,3 +1,4 @@
+
 grant all on ips.* to 'ips'@'%' with grant option;
 
 use ips;
@@ -1584,15 +1585,14 @@ create table PS_UNSAMPLED_OOH
 -- );
 
 
--- create table RESPONSE
--- (
---     RUN_ID        varchar(40)   not null,
---     STEP_NUMBER   int           not null,
---     RESPONSE_CODE int           not null,
---     MESSAGE       varchar(250)  null,
---     OUTPUT        varchar(4000) null,
---     TIME_STAMP    datetime      null
--- );
+create table RESPONSE
+(
+    RUN_ID        varchar(40)   not null,
+    STEP_NUMBER   int           not null,
+    RESPONSE_CODE int           not null,
+    MESSAGE       varchar(250)  null,
+    TIME_STAMP    datetime      default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP
+);
 
 
 -- create table RESPONSE_ARCHIVE
@@ -1605,20 +1605,21 @@ create table PS_UNSAMPLED_OOH
 --     TIME_STAMP    datetime      null
 -- );
 
-
 create table RUN
 (
-    RUN_ID        varchar(40)  not null,
-    RUN_NAME      varchar(30)  not null,
-    RUN_DESC      varchar(250) not null,
-    USER_ID       varchar(20)  null,
-    YEAR          year(4)      not null,
-    PERIOD        varchar(255) not null,
-    RUN_STATUS    decimal(2)   not null,
-    RUN_TYPE_ID   decimal(3)   null,
-    LAST_MODIFIED timestamp    null,
-    constraint RUN_RUN_ID_uindex
-        unique (RUN_ID)
+	RUN_ID varchar(40) not null,
+	RUN_NAME varchar(30) null,
+	RUN_DESC varchar(250) null,
+	USER_ID varchar(20) null,
+	YEAR year null,
+	PERIOD varchar(255) null,
+	RUN_STATUS decimal(2) default 0 null,
+	RUN_TYPE_ID decimal(3) default 0 null,
+	LAST_MODIFIED timestamp default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+	STEP varchar(255) charset utf8 null,
+	PERCENT int default 0 null,
+	constraint RUN_RUN_ID_uindex
+		unique (RUN_ID)
 );
 
 alter table RUN
@@ -3821,21 +3822,5 @@ create table USER
 INSERT INTO USER (ID, USER_NAME, PASSWORD, FIRST_NAME, SURNAME, ROLE)
 VALUES (1, 'Admin', 'pbkdf2:sha256:50000$jYlAjFyT$a3990f67a04492fdffae29256cc168caf7becbe33ca6fefb2f89c04b00ef9d27',
         null, null, 'admin');
-
-create table RUN_MANAGEMENT
-(
-    RUN_ID  varchar(40) charset utf8  not null,
-    STATUS  int                       null,
-    STEP    varchar(255) charset utf8 null,
-    PERCENT int default 0             null,
-    constraint RUN_MANAGEMENT_RUN_ID_uindex
-        unique (RUN_ID)
-);
-
-alter table RUN_MANAGEMENT
-    add primary key (RUN_ID);
-
-
-
 
 SET FOREIGN_KEY_CHECKS = 1;

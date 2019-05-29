@@ -23,7 +23,7 @@ reference_data = {
 
 survey_data = "../tests/data/import_data/dec/surveydata.csv"
 
-run_id = str(uuid.uuid4())
+run_id = 'IPS-TEST'
 start_time = time.time()
 log.info("Module level start time: {}".format(start_time))
 
@@ -74,7 +74,7 @@ def teardown_module(module):
     """ teardown any state that was previously setup with a setup_module
         method.
     """
-    db.delete_from_table('SURVEY_SUBSAMPLE')
+    # db.delete_from_table('SURVEY_SUBSAMPLE')
 
     # List of tables to cleanse where [RUN_ID] = RUN_ID
     tables_to_cleanse = [

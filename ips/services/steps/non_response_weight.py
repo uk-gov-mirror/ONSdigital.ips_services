@@ -67,7 +67,8 @@ def non_response_weight_step(run_id):
         calculate_nonresponse_weight.do_ips_nrweight_calculation(survey_data,
                                                                  non_response_data,
                                                                  'NON_RESPONSE_WT',
-                                                                 'SERIAL')
+                                                                 'SERIAL',
+                                                                 run_id=run_id)
 
     insert_from_dataframe(config["temp_table"])(survey_data_out)
     insert_from_dataframe(config["sas_ps_table"])(summary_data_out)
