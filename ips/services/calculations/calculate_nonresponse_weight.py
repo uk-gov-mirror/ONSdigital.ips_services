@@ -254,7 +254,7 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
 
     # Reduce output to just key value pairs
     # Round up to avoid truncation messages when saving to DB
-    # df_out[non_response_weight_column] = df_out[non_response_weight_column].round(3)
+    df_out[non_response_weight_column] = df_out[non_response_weight_column].round(3)
     df_out = df_out[[var_serial, non_response_weight_column]]
 
     return df_out, df_summary

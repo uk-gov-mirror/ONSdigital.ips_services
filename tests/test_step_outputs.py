@@ -76,19 +76,34 @@ def teardown_module(module):
 
 
 @pytest.mark.parametrize('test_name, expected_survey_output, expected_summary_output, survey_output_columns, summary_output_table, summary_output_columns', [
-    ('SHIFT', 'data/calculations/december_2017/shift_weight/dec_output.csv', 'data/calculations/december_2017/shift_weight/dec2017_summary.csv', ['SERIAL', 'SHIFT_WT'], 'SHIFT_DATA', ['PORTROUTE', 'WEEKDAY', 'ARRIVEDEPART', 'TOTAL', 'AM_PM_NIGHT']),
-    ('NON_RESPONSE', 'data/calculations/december_2017/non_response_weight/dec_output.csv', 'data/calculations/december_2017/non_response_weight/dec2017_summary.csv', ['SERIAL', 'NON_RESPONSE_WT'], 'NON_RESPONSE_DATA', ['PORTROUTE', 'WEEKDAY', 'ARRIVEDEPART', 'AM_PM_NIGHT', 'SAMPINTERVAL', 'MIGTOTAL', 'ORDTOTAL']),
-    ('MINIMUMS', 'data/calculations/december_2017/min_weight/dec2017_survey.csv', 'data/calculations/december_2017/min_weight/dec2017_survey.csv', ['SERIAL', 'MINS_WT'], 'PS_MINIMUMS', ['MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV', 'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS', 'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD']),
+    ('SHIFT', 'data/calculations/december_2017/shift_weight/dec_output.csv', 'data/calculations/december_2017/shift_weight/summarydata_final.csv', ['SERIAL', 'SHIFT_WT'], 'PS_SHIFT_DATA', ['SHIFT_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'AM_PM_NIGHT_PV', 'MIGSI', 'POSS_SHIFT_CROSS', 'SAMP_SHIFT_CROSS', 'MIN_SH_WT', 'MEAN_SH_WT', 'MAX_SH_WT', 'COUNT_RESPS', 'SUM_SH_WT']),
+    ('NON_RESPONSE'
+     , 'data/calculations/december_2017/non_response_weight/dec_output.csv'
+     , 'data/calculations/december_2017/non_response_weight/summarydata_final.csv'
+     , ['SERIAL', 'NON_RESPONSE_WT']
+     , 'PS_NON_RESPONSE'
+     , ['NR_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'MEAN_RESPS_SH_WT', 'COUNT_RESPS', 'PRIOR_SUM', 'GROSS_RESP', 'GNR', 'MEAN_NR_WT']),
+    ('MINIMUMS' # test_name
+     , 'data/calculations/december_2017/min_weight/dec2017_survey.csv' # expected_survey_output
+     , 'data/calculations/december_2017/min_weight/summarydata_final.csv' # expected_summary_output
+     , ['SERIAL', 'MINS_WT'] # survey_output_columns
+     , 'PS_MINIMUMS' # summary_output_table
+     , ['MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV', 'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS', 'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD']), # summary_output_columns
     ])
-def test_step_outputs(test_name, expected_survey_output, expected_summary_output, survey_output_columns, summary_output_table, summary_output_columns):
+def test_step_outputs(test_name
+                      , expected_survey_output
+                      , expected_summary_output
+                      , survey_output_columns
+                      , summary_output_table
+                      , summary_output_columns):
     # Run step
     shift_weight.shift_weight_step(run_id)
     non_response_weight.non_response_weight_step(run_id)
     minimums_weight.minimums_weight_step(run_id)
 
     # TODO: Skippidy-skip
-    # if test_name == 'SHIFT':
-    #     pytest.skip("No need to keep testing Shift Weight")
+    if test_name == 'SHIFT':
+        pytest.skip("No need to keep testing Shift Weight")
 
     # Get survey results
     data = read_table_values(SURVEY_SUBSAMPLE_TABLE)
@@ -103,13 +118,6 @@ def test_step_outputs(test_name, expected_survey_output, expected_summary_output
     survey_expected.sort_values(by='SERIAL', axis=0, inplace=True)
     survey_results.index = range(0, len(survey_results))
     survey_expected.index = range(0, len(survey_expected))
-
-    # TODO: Fix dis
-    # if test_name == 'NON_RESPONSE':
-    #     survey_results['NON_RESPONSE_WT'] = survey_results['NON_RESPONSE_WT'].round(3)
-    #     survey_expected['NON_RESPONSE_WT'] = survey_expected['NON_RESPONSE_WT'].round(3)
-    #     survey_results.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/sas.csv')
-    #     survey_expected.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/python.csv')
 
     # Test survey outputs
     # TODO: Come back to fix these mismatching outputs
