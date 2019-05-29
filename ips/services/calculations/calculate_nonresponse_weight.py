@@ -139,6 +139,7 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
 
     df_summignonresp = df_summignonresp.sort_values(NON_RESPONSE_STRATA)
 
+
     # Use the calculated data frames to calculate the non-response weight
 
     # Merge previously sorted dataframes into one, ensuring all rows from summignonresp are kept
@@ -160,6 +161,12 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
     df_gnr[non_response_weight_column] = np.where(df_gnr[GROSS_RESP_COLUMN] != 0,
                                                   (df_gnr[GNR_COLUMN] + df_gnr[GROSS_RESP_COLUMN]) / df_gnr[
                                                       GROSS_RESP_COLUMN], np.NaN)
+
+    # # TODO
+    # df_gnr.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/df_gnr.csv')
+    # df_summignonresp.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/df_summignonresp.csv')
+    # df_sumresp.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/df_sumresp.csv')
+    # df_sumordnonresp.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/df_sumordnonresp.csv')
 
     df_gross_resp_is_zero = df_gnr[df_gnr[GROSS_RESP_COLUMN] == 0]
 
@@ -199,6 +206,10 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
     # simultaneously in a single dataframe
     df_summary_nr = df_out.groupby(SHIFTS_STRATA)[non_response_weight_column].agg(['mean'])
     df_summary_nr.rename(columns={'mean': MEAN_NRW_COLUMN}, inplace=True)
+
+    # # TODO:
+    # els_df = df_summary_nr.copy()
+    # els_df = els_df.loc[els_df['SERIAL'] == 434048224001.00000]
 
     # Flatten column structure
     df_summary_nr.reset_index(inplace=True)
