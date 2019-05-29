@@ -54,7 +54,7 @@ def traffic_weight_step(run_id):
     traffic_data = read_table_values(config["data_table"])()
 
     # Calculate Traffic Weight
-    output_data, summary_data = do_ips_trafweight_calculation_with_r(survey_data, traffic_data)
+    output_data, summary_data = do_ips_trafweight_calculation_with_r(survey_data, traffic_data, run_id)
 
     # Insert data to SQL
     insert_from_dataframe(config["temp_table"])(output_data)

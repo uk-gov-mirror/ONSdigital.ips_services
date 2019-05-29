@@ -41,7 +41,8 @@ def rail_imputation_step(run_id):
     survey_data_out = calculate_rail_imputation.do_ips_railex_imp(survey_data,
                                                                   var_serial='SERIAL',
                                                                   var_final_weight='FINAL_WT',
-                                                                  minimum_count_threshold=30)
+                                                                  minimum_count_threshold=30,
+                                                                  run_id=run_id)
 
     # Insert data to SQL
     insert_from_dataframe(config["temp_table"])(survey_data_out)

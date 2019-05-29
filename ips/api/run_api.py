@@ -16,8 +16,6 @@ class RunApi(Api):
         resp.body = res
         return get_run()
 
-    # TODO: Make sure this is called with the run_id set
-
     @validate(run_id=validate_run_id)
     def on_put(self, req: Request, resp: Response, run_id: str) -> None:
         data = self.load_json_from_request(req)

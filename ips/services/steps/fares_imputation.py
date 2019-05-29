@@ -25,34 +25,25 @@ def fares_imputation_step(run_id):
     idm.populate_survey_data_for_step(run_id, config)
 
     # Copy Fares Imp PVs For Survey Data
-    log.debug("before copy_step_pvs_for_survey_data")
     idm.copy_step_pvs_for_survey_data(run_id, config)
-    log.debug("after copy_step_pvs_for_survey_data")
 
     # Apply Fares Imp PVs On Survey Data
-    log.debug("before process")
     process_variables.process(dataset='survey',
                               in_table_name='SAS_SURVEY_SUBSAMPLE',
                               out_table_name='SAS_FARES_SPV',
                               in_id='serial')
-    log.debug("after process")
 
     # Update Survey Data with Fares Imp PV Output
-    log.debug("before update_survey_data_with_step_pv_output")
     idm.update_survey_data_with_step_pv_output(config)
-    log.debug("after update_survey_data_with_step_pv_output")
 
     # Retrieve data from SQL
     survey_data = get_survey_data()
 
     # Calculate Fares Imputation
-    log.debug("before calculate_fares_imputation")
     survey_data_out = calculate_fares_imputation.do_ips_fares_imputation(survey_data,
                                                                          var_serial='SERIAL',
                                                                          num_levels=9,
                                                                          measure='mean')
-    log.debug("after calculate_fares_imputation")
-
     # Insert data to SQL
     insert_from_dataframe(config["temp_table"])(survey_data_out)
 

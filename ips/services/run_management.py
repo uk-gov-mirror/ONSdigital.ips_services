@@ -1,3 +1,5 @@
+from ips_common.ips_logging import log
+
 import ips.persistence.run_management as db
 
 NOT_STARTED: int = 1
@@ -5,6 +7,19 @@ IN_PROGRESS: int = 2
 DONE: int = 3
 CANCELLED: int = 4
 INVALID_RUN: int = 5
+FAILED: int = 6
+
+
+# set all in_progress runs to failed.
+# called from the IPSWorkflow __init__ method at start up
+
+def clear_existing_status():
+    log.debug("Clearing IN_PROGRESS runs to FAILED")
+    db.clear_existing_status()
+
+
+def process_variables_exist(run_id: str) -> bool:
+    return db.process_variables_exist(run_id)
 
 
 def create_run(run_id: str):
@@ -25,14 +40,27 @@ def is_complete(run_id: str) -> bool:
 
 def cancel_run(run_id: str) -> None:
     set_status(run_id, CANCELLED)
+    db.cancel_steps(run_id)
 
 
 def set_status(run_id: str, status: int, step: str = None) -> None:
     db.set_status(run_id, status, step)
 
 
+def set_step_status(run_id: str, status: int, step: str) -> None:
+    db.set_step_status(run_id, status, step)
+
+
+def reset_all_step_status(run_id):
+    db.reset_steps(run_id)
+
+
 def get_status(run_id: str) -> int:
     return db.get_run_status(run_id)
+
+
+def get_step_status(run_id: str, step: str):
+    return db.get_step_status(run_id, step)
 
 
 def get_step(run_id) -> str:
@@ -45,3 +73,11 @@ def set_percent_done(run_id: str, percent) -> None:
 
 def get_percent_done(run_id: str) -> int:
     return db.get_percentage_done(run_id)
+
+
+def insert_issue(run_id: str, step_num: int, response_code: int, msg: str):
+    db.insert_issue(run_id, step_num, response_code, msg)
+
+
+def reset_issues(run_id: str):
+    db.reset_issues(run_id)

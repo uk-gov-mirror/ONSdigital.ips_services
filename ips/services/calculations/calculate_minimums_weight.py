@@ -18,7 +18,7 @@ POST_WEIGHT_COLUMN = 'POST_SUM'
 CASES_CARRIED_FORWARD_COLUMN = 'CASES_CARRIED_FWD'
 
 
-def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_weight, min_weight):
+def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_weight, min_weight, run_id=None):
     """
     Author       : James Burr
     Date         : Jan 2018
@@ -179,7 +179,7 @@ def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_wei
 
     # Collect data outside of specified threshold
     if len(df_merged_thresholds) > 0:
-        log_warnings("Minimums weight outside thresholds for")(df_merged_thresholds)
+        log_warnings("Minimums weight outside thresholds for")(df_merged_thresholds, 2, run_id, 3)
 
     df_out = df_out[[serial_num, min_weight]]
 

@@ -8,8 +8,8 @@ def get_pv_build_variables() -> str:
 
 
 @service
-def create_pv_build(request, run_id, pv_id=None):
-    builder.create_pv_build(request, run_id, pv_id)
+def create_pv_build(request, run_id):
+    builder.create_pv_build(request, run_id)
 
 
 @service
