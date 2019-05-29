@@ -1204,6 +1204,3 @@ TEMPLATE,26,type_pv,type_pv,"if row['PURPOSE'] in (20,21,22):
     row['TYPE_PV'] = 1
 else:
     row['TYPE_PV'] = 2"
-TEMPLATE,27,opera_pv,opera_pv,"
-from .sas_random import sas_random
-row['OPERA_PV'] = round(sas_random(row['SERIAL'])) + 1"

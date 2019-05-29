@@ -54,7 +54,7 @@ def fares_imputation_step(run_id):
                                                                          num_levels=9,
                                                                          measure='mean')
     log.debug("after calculate_fares_imputation")
-
+    print(survey_data_out)
     # Insert data to SQL
     insert_from_dataframe(config["temp_table"])(survey_data_out)
 

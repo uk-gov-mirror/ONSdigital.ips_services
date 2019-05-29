@@ -87,21 +87,21 @@ def compile_pvs(pv_list):
 
 
 def parallelise_pvs(dataframe, process_variables, dataset=None):
-    # num_partitions = multiprocessing.cpu_count()
-    # df_split = np.array_split(dataframe, num_partitions)
-    # pool = multiprocessing.Pool(num_partitions)
-    #
-    # res = pandas.concat(
-    #     pool.map(
-    #         partial(parallel_func, pv_list=process_variables, dataset=dataset),
-    #         df_split
-    #     ),
-    #     sort=True
-    # )
-    # pool.close()
-    # pool.join()
+    num_partitions = multiprocessing.cpu_count()
+    df_split = np.array_split(dataframe, num_partitions)
+    pool = multiprocessing.Pool(num_partitions)
 
-    res = parallel_func(dataframe, process_variables, dataset)
+    res = pandas.concat(
+        pool.map(
+            partial(parallel_func, pv_list=process_variables, dataset=dataset),
+            df_split
+        ),
+        sort=True
+    )
+
+    pool.close()
+    pool.join()
+
     return res
 
 
