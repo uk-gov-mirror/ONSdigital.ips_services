@@ -1411,24 +1411,7 @@ if row[''PURPOSE''] in (20,21,22):
     row[''TYPE_PV''] = 1
 else:
     row[''TYPE_PV''] = 2');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
-VALUES ('TEMPLATE', 27, 'opera_pv', 'opera_pv', '
-if row[''FLOW''] < 5:
-    if not math.isnan(row[''DVLINECODE'']):
-        carrier = int(row[''DVLINECODE''])
-    else:
-        carrier = 0
 
-    if carrier >= 1000 and carrier <= 1999:
-        row[''OPERA_PV''] = 1
-    elif carrier >= 2000 and carrier <= 88880:
-        row[''OPERA_PV''] = 2
-
-elif row[''FLOW''] > 4:
-    row[''OPERA_PV''] = 3
-
-if math.isnan(row[''OPERA_PV'']):
-    row[''OPERA_PV''] = round(random.random(),0) + 1');
 -- create table PROCESS_VARIABLE_PY_BACKUP
 -- (
 --     RUN_ID              varchar(40)   not null,
@@ -1679,6 +1662,7 @@ create table SAS_FARES_IMP
     FARE           decimal(6)  null,
     FAREK          decimal(2)  null,
     SPEND          decimal(7)  null,
+    OPERA_PV       decimal(1)  null,
     SPENDIMPREASON decimal(1)  null
 );
 
@@ -1693,7 +1677,6 @@ create table SAS_FARES_SPV
     DISCNT_F2_PV           decimal(4, 3) null,
     FAGE_PV                decimal(2)    null,
     TYPE_PV                decimal(2)    null,
-    OPERA_PV               decimal(2)    null,
     UKPORT1_PV             decimal(4)    null,
     UKPORT2_PV             decimal(4)    null,
     UKPORT3_PV             decimal(4)    null,
@@ -3368,8 +3351,6 @@ INSERT INTO G_PVs(PV_ID, Name)
 VALUES (25, 'fage_pv');
 INSERT INTO G_PVs(PV_ID, Name)
 VALUES (26, 'type_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (27, 'opera_pv');
 
 CREATE TABLE `G_PV_Variables`
 (
@@ -3767,14 +3748,6 @@ INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
 VALUES (192, 26, 'row["TYPE_PV"]');
 INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
 VALUES (193, 26, 'row["PURPOSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (194, 27, 'row["OPERA_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (195, 27, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (196, 27, 'row["DVLINECODE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (197, 27, 'carrier');
 
 CREATE TABLE PV_Block
 (
