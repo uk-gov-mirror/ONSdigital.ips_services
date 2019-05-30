@@ -1,7 +1,7 @@
 import math
 
 import numpy as np
-from pandas import DataFrame, Series
+from pandas import DataFrame, Series, options
 
 from ips.services.calculations import ips_impute
 
@@ -61,7 +61,7 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
     Requirements : NA
     Dependencies : NA
     """
-    # options.mode.chained_assignment = None
+    options.mode.chained_assignment = None
 
     seed(123456)
     for x in range(0, len(df_input)):

@@ -30,7 +30,6 @@ def fares_imputation_step(run_id):
     idm.copy_step_pvs_for_survey_data(run_id, config)
     log.debug("after copy_step_pvs_for_survey_data")
 
-    seed(123456)
     # Apply Fares Imp PVs On Survey Data
     log.debug("before process")
     process_variables.process(dataset='survey',
@@ -54,7 +53,7 @@ def fares_imputation_step(run_id):
                                                                          num_levels=9,
                                                                          measure='mean')
     log.debug("after calculate_fares_imputation")
-    print(survey_data_out)
+
     # Insert data to SQL
     insert_from_dataframe(config["temp_table"])(survey_data_out)
 
