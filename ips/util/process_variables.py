@@ -78,7 +78,7 @@ def get_pvs():
 def parallel_func(pv_df, pv_list, dataset=None):
 
     compile_pvs(pv_list)
-    return pv_df.apply(modify_values, axis=1,  args=(dataset, pv_list))
+    return pv_df.apply(modify_values, axis=1, args=(dataset, pv_list))
 
 
 def compile_pvs(pv_list):

@@ -6,7 +6,6 @@ from ips.persistence.persistence import insert_from_dataframe
 from ips.services.calculations import calculate_fares_imputation
 from ips.util import process_variables
 from ips.util.config.services_configuration import ServicesConfiguration
-from ...util.sas_random import seed
 
 
 def fares_imputation_step(run_id):
