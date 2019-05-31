@@ -48,6 +48,7 @@ def import_survey(run_id, data, month, year):
         data_frame[col] = data_frame[col].fillna(-1).astype(int).replace('-1', np.nan)
 
     df.columns = df.columns.str.upper()
+    df['TANDTSI'] = df['TANDTSI'].round(0)
     [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'DVEXPEND', 'TANDTSI']]
 
     errors = Errors()
