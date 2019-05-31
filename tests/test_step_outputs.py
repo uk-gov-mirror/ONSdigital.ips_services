@@ -15,7 +15,7 @@ from ips.services.dataimport.import_traffic import import_air
 from ips.services.dataimport.import_traffic import import_sea
 from ips.services.dataimport.import_traffic import import_tunnel
 
-from ips.services.steps import shift_weight, non_response_weight, minimums_weight
+from ips.services.steps import shift_weight, non_response_weight, minimums_weight, traffic_weight
 
 SURVEY_SUBSAMPLE_TABLE = 'SURVEY_SUBSAMPLE'
 
@@ -84,6 +84,7 @@ def setup_module(module):
     shift_weight.shift_weight_step(run_id)
     non_response_weight.non_response_weight_step(run_id)
     minimums_weight.minimums_weight_step(run_id)
+    traffic_weight.traffic_weight_step(run_id)
 
 
 def setup_pv():
@@ -115,13 +116,15 @@ def teardown_module(module):
 @pytest.mark.parametrize('test_name, expected_survey_output, expected_summary_output, survey_output_columns, summary_output_table, summary_output_columns', [
     ('SHIFT', 'data/calculations/december_2017/shift_weight/dec_output.csv', 'data/calculations/december_2017/shift_weight/dec2017_summary.csv', ['SERIAL', 'SHIFT_WT'], 'PS_SHIFT_DATA', ['SHIFT_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'AM_PM_NIGHT_PV', 'MIGSI', 'POSS_SHIFT_CROSS', 'SAMP_SHIFT_CROSS', 'MIN_SH_WT', 'MEAN_SH_WT', 'MAX_SH_WT', 'COUNT_RESPS', 'SUM_SH_WT']),
     ('NON_RESPONSE', 'data/calculations/december_2017/non_response_weight/dec_output.csv', 'data/calculations/december_2017/non_response_weight/dec2017_summary.csv', ['SERIAL', 'NON_RESPONSE_WT'], 'PS_NON_RESPONSE', ['NR_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'MEAN_RESPS_SH_WT', 'COUNT_RESPS', 'PRIOR_SUM', 'GROSS_RESP', 'GNR', 'MEAN_NR_WT']),
-    ('MINIMUMS' # test_name
-     , 'data/calculations/december_2017/min_weight/dec2017_survey.csv' # expected_survey_output
-     , 'data/calculations/december_2017/min_weight/summarydata_final.csv' # expected_summary_output
-     , ['SERIAL', 'MINS_WT'] # survey_output_columns
-     , 'PS_MINIMUMS' # summary_output_table
-     , ['MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV', 'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS', 'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD']), # summary_output_columns
+    ('MINIMUMS', 'data/calculations/december_2017/min_weight/dec2017_survey.csv', 'data/calculations/december_2017/min_weight/summarydata_final.csv', ['SERIAL', 'MINS_WT'], 'PS_MINIMUMS', ['MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV', 'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS', 'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD']), # summary_output_columns
+    ('TRAFFIC' # test_name
+     , 'data/calculations/december_2017/traffic_weight/surveydata_dec2017.csv' # expected_survey_output
+     , 'data/calculations/december_2017/traffic_weight/ps_traffic.csv' # expected_summary_output
+     , ['SERIAL', 'TRAFFIC_WT'] # survey_output_columns
+     , 'PS_TRAFFIC' # summary_output_table
+     , ['SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'FOOT_OR_VEHICLE_PV', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT']), # summary_output_columns
     ])
+
 def test_step_outputs(test_name
                       , expected_survey_output
                       , expected_summary_output
@@ -154,7 +157,7 @@ def test_step_outputs(test_name
     ####
 
     # Get summary results
-    if test_name in ('SHIFT', 'NON_RESPONSE', 'MINIMUMS'):
+    if test_name in ('SHIFT', 'NON_RESPONSE', 'MINIMUMS', 'TRAFFIC'):
         log.info(f"Testing summary results for {test_name}")
         data = read_table_values(summary_output_table)
         summary_data = data()
