@@ -1,19 +1,13 @@
 import multiprocessing
-import random
-from functools import partial
 
+from functools import partial
 import pandas
 from ips_common.ips_logging import logging as log
 import ips_common_db.sql as db
 import numpy as np
 # for exec
 import math
-
 from ips.persistence.persistence import insert_from_dataframe
-
-random.seed(123456)
-
-count = 1
 
 
 def modify_values(row, dataset, pvs):
@@ -82,6 +76,7 @@ def get_pvs():
 
 
 def parallel_func(pv_df, pv_list, dataset=None):
+
     compile_pvs(pv_list)
     return pv_df.apply(modify_values, axis=1, args=(dataset, pv_list))
 

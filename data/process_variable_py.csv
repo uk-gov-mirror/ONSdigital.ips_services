@@ -1204,19 +1204,3 @@ TEMPLATE,26,type_pv,type_pv,"if row['PURPOSE'] in (20,21,22):
     row['TYPE_PV'] = 1
 else:
     row['TYPE_PV'] = 2"
-TEMPLATE,27,opera_pv,opera_pv,"if row['FLOW'] < 5:
-    if not math.isnan(row['DVLINECODE']):
-        carrier = int(row['DVLINECODE'])
-    else:
-        carrier = 0
-        
-    if carrier >= 1000 and carrier <= 1999:
-        row['OPERA_PV'] = 1
-    elif carrier >= 2000 and carrier <= 88880:
-        row['OPERA_PV'] = 2
-        
-elif row['FLOW'] > 4:
-    row['OPERA_PV'] = 3
-
-if math.isnan(row['OPERA_PV']):
-    row['OPERA_PV'] = round(random.random(),0) + 1"
