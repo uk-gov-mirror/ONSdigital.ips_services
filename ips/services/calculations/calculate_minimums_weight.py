@@ -42,6 +42,8 @@ def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_wei
 
     df_surveydata_new['SWNRwght'] = df_surveydata_new[shift_weight] * df_surveydata_new[nr_weight]
 
+    df_surveydata_new.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/python_survey_in.csv')
+
     df_surveydata_sorted = df_surveydata_new.sort_values(STRATA)
 
     # Summarise the minimum responses by the strata
@@ -185,7 +187,7 @@ def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_wei
 
     # This block of rounding was largely used to test and to bring the results closer in line with the SAS results.
     # They can be removed if desired in order to produce a new standard test set.
-    df_out[min_weight] = df_out[min_weight].round(3)
+    # df_out[min_weight] = df_out[min_weight].round(3)
     columns_to_round = [PRIOR_WEIGHT_ALL_COLUMN, PRIOR_WEIGHT_FULL_COLUMN, PRIOR_WEIGHT_MINIMUM_COLUMN, min_weight,
                         POST_WEIGHT_COLUMN]
     df_summary[columns_to_round] = df_summary[columns_to_round].round(3)

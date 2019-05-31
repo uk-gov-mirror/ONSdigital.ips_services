@@ -80,6 +80,11 @@ def setup_module(module):
 
     setup_pv()
 
+    # Run steps
+    shift_weight.shift_weight_step(run_id)
+    non_response_weight.non_response_weight_step(run_id)
+    minimums_weight.minimums_weight_step(run_id)
+
 
 def setup_pv():
     df = db.select_data('*', "PROCESS_VARIABLE_PY", 'RUN_ID', 'TEMPLATE')
@@ -123,14 +128,10 @@ def test_step_outputs(test_name
                       , survey_output_columns
                       , summary_output_table
                       , summary_output_columns):
-    # Run step
-    shift_weight.shift_weight_step(run_id)
-    non_response_weight.non_response_weight_step(run_id)
-    minimums_weight.minimums_weight_step(run_id)
 
-    # TODO: Skippidy-skip
-    if test_name in ('SHIFT', 'NON_RESPONSE'):
-        pytest.skip("They pass")
+    # # TODO: Skippidy-skip
+    # if test_name in ('SHIFT', 'NON_RESPONSE', 'MINIMUMS'):
+    #     pytest.skip("They pass")
 
     # Get survey results
     data = read_table_values(SURVEY_SUBSAMPLE_TABLE)
