@@ -1,77 +1,8 @@
+CREATE DATABASE IF NOT EXISTS ips; 
 
 grant all on ips.* to 'ips'@'%' with grant option;
 
 use ips;
-
--- create table AUDIT_LOG
--- (
---     AUDIT_ID          decimal       not null,
---     ACTIONED_BY       varchar(20)   not null,
---     ACTION            varchar(30)   not null,
---     OBJECT            varchar(100)  not null,
---     LOG_DATE          date          not null,
---     AUDIT_LOG_DETAILS varchar(1000) not null
--- );
-
-
--- create table COLUMN_LOOKUP
--- (
---     LOOKUP_COLUMN varchar(50)  not null,
---     LOOKUP_KEY    decimal(2)   not null,
---     DISPLAY_VALUE varchar(100) not null
--- );
-
-
--- create table DATA_SOURCE
--- (
---     DATA_SOURCE_ID   decimal     not null
---         primary key,
---     DATA_SOURCE_NAME varchar(30) not null
--- );
---
--- INSERT INTO ips.DATA_SOURCE (DATA_SOURCE_ID, DATA_SOURCE_NAME)
--- VALUES (1, 'Sea');
--- INSERT INTO ips.DATA_SOURCE (DATA_SOURCE_ID, DATA_SOURCE_NAME)
--- VALUES (2, 'Air');
--- INSERT INTO ips.DATA_SOURCE (DATA_SOURCE_ID, DATA_SOURCE_NAME)
--- VALUES (3, 'Tunnel');
--- INSERT INTO ips.DATA_SOURCE (DATA_SOURCE_ID, DATA_SOURCE_NAME)
--- VALUES (4, 'Shift');
--- INSERT INTO ips.DATA_SOURCE (DATA_SOURCE_ID, DATA_SOURCE_NAME)
--- VALUES (5, 'Non Response');
--- INSERT INTO ips.DATA_SOURCE (DATA_SOURCE_ID, DATA_SOURCE_NAME)
--- VALUES (6, 'Unsampled');
--- create table DELTAS
--- (
---     DELTA_NUMBER decimal(38)  not null,
---     RUN_DATE     date         not null,
---     BACKOUT_DATE date         null,
---     DESCRIPTION  varchar(100) not null
--- );
-
-
--- create table EXPORT_COLUMN
--- (
---     EXPORT_TYPE_ID  decimal     not null,
---     COLUMN_SOURCE   varchar(3)  not null,
---     COLUMN_ORDER_NO decimal(4)  not null,
---     COLUMN_DESC     varchar(30) not null,
---     COLUMN_TYPE     varchar(20) null,
---     COLUMN_LENGTH   decimal(38) null
--- );
-
-
--- create table EXPORT_DATA_DETAILS
--- (
---     ED_ID          varchar(40) not null,
---     ED_NAME        varchar(30) not null,
---     EXPORT_TYPE_ID decimal     not null,
---     FORMAT_ID      decimal     not null,
---     DATE_CREATED   date        not null,
---     ED_STATUS      decimal(2)  not null,
---     USER_ID        varchar(20) not null
--- );
-
 
 create table EXPORT_DATA_DOWNLOAD
 (
@@ -81,23 +12,6 @@ create table EXPORT_DATA_DOWNLOAD
     SOURCE_TABLE      varchar(40) null,
     DATE_CREATED      text    null
 );
-
-
--- create table EXPORT_TYPE
--- (
---     EXPORT_TYPE_ID   decimal     not null,
---     EXPORT_TYPE_NAME varchar(30) not null,
---     EXPORT_TYPE_DEF  text        not null
--- );
-
-
--- create table FORMAT_TYPE
--- (
---     FORMAT_ID   decimal       not null,
---     FORMAT_NAME varchar(30)   not null,
---     FORMAT_DEF  varchar(2000) not null
--- );
-
 
 create table NON_RESPONSE_DATA
 (
@@ -113,42 +27,6 @@ create table NON_RESPONSE_DATA
     MIGTOTAL       decimal     null,
     ORDTOTAL       decimal     null
 );
-
-
--- create table PROCESS_NAME
--- (
---     PN_ID        decimal     not null,
---     PROCESS_NAME varchar(30) not null
--- );
-
-
--- create table PROCESS_VARIABLE
--- (
---     RUN_ID              varchar(40)   not null,
---     PROCESS_VARIABLE_ID decimal       not null,
---     PV_NAME             varchar(30)   not null,
---     PV_DESC             varchar(1000) not null,
---     PV_DEF              text          not null
--- );
-
-
--- create table PROCESS_VARIABLE_BACKUP
--- (
---     RUN_ID              varchar(40)   not null,
---     PROCESS_VARIABLE_ID decimal       not null,
---     PV_NAME             varchar(30)   not null,
---     PV_DESC             varchar(1000) not null,
---     PV_DEF              text          not null
--- );
-
-
--- create table PROCESS_VARIABLE_LOG
--- (
---     PROCESS_VARIABLE_ID decimal       not null,
---     PVL_DATE            date          not null,
---     PVL_REASON          varchar(1000) not null
--- );
-
 
 create table PROCESS_VARIABLE_PY
 (
@@ -1412,25 +1290,11 @@ if row[''PURPOSE''] in (20,21,22):
 else:
     row[''TYPE_PV''] = 2');
 
--- create table PROCESS_VARIABLE_PY_BACKUP
--- (
---     RUN_ID              varchar(40)   not null,
---     PROCESS_VARIABLE_ID decimal       not null,
---     PV_NAME             varchar(30)   not null,
---     PV_DESC             varchar(1000) not null,
---     PV_DEF              text          not null
--- );
---
---
--- create table PROCESS_VARIABLE_PY_BACKUP_2
--- (
---     RUN_ID              varchar(40)   not null,
---     PROCESS_VARIABLE_ID decimal       not null,
---     PV_NAME             varchar(30)   not null,
---     PV_DESC             varchar(1000) not null,
---     PV_DEF              text          not null
--- );
+elif row[''FLOW''] > 4:
+    row[''OPERA_PV''] = 3
 
+if math.isnan(row[''OPERA_PV'']):
+    row[''OPERA_PV''] = round(random.random(),0) + 1');
 
 create table PROCESS_VARIABLE_SET
 (
@@ -1559,15 +1423,6 @@ create table PS_UNSAMPLED_OOH
     UNSAMP_TRAFFIC_WT     decimal(9, 3)  null
 );
 
-
--- create table QUERY_RESPONSE
--- (
---     TASK_ID       varchar(40) not null,
---     RESPONSE_CODE varchar(10) null,
---     RESPONSE_MSG  text        null
--- );
-
-
 create table RESPONSE
 (
     RUN_ID        varchar(40)   not null,
@@ -1576,17 +1431,6 @@ create table RESPONSE
     MESSAGE       varchar(250)  null,
     TIME_STAMP    datetime      default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP
 );
-
-
--- create table RESPONSE_ARCHIVE
--- (
---     RUN_ID        varchar(40)   not null,
---     STEP_NUMBER   int           not null,
---     RESPONSE_CODE int           not null,
---     MESSAGE       varchar(250)  null,
---     OUTPUT        varchar(4000) null,
---     TIME_STAMP    datetime      null
--- );
 
 create table RUN
 (
@@ -1608,20 +1452,6 @@ create table RUN
 alter table RUN
     add primary key (RUN_ID);
 
-
--- create table RUN_DATA_MAP
--- (
---     RUN_ID      varchar(40) not null,
---     VERSION_ID  decimal     not null,
---     DATA_SOURCE varchar(60) not null,
---     constraint RUN_DATA_MAP_RUN_ID_UINDEX
---         unique (RUN_ID)
--- );
-
--- alter table RUN_DATA_MAP
---     add primary key (RUN_ID);
-
-
 create table RUN_STEPS
 (
     RUN_ID      varchar(40) not null,
@@ -1630,15 +1460,6 @@ create table RUN_STEPS
     STEP_STATUS decimal(2)  not null
 );
 
-
--- create table RUN_TYPE
--- (
---     RUN_TYPE_ID         decimal(3)  not null,
---     RUN_TYPE_NAME       varchar(30) not null,
---     RUN_TYPE_DEFINITION text        not null
--- );
-
-
 create table SAS_AIR_MILES
 (
     SERIAL    decimal(15) not null,
@@ -1646,15 +1467,6 @@ create table SAS_AIR_MILES
     OVLEG     decimal(6)  null,
     UKLEG     decimal(6)  null
 );
-
-
--- create table SAS_DATA_EXPORT
--- (
---     SAS_PROCESS_ID decimal     not null,
---     SDE_LABEL      varchar(80) not null,
---     SDE_DATA       binary(1)   not null
--- );
-
 
 create table SAS_FARES_IMP
 (
@@ -1665,7 +1477,6 @@ create table SAS_FARES_IMP
     OPERA_PV       decimal(1)  null,
     SPENDIMPREASON decimal(1)  null
 );
-
 
 create table SAS_FARES_SPV
 (
@@ -1777,14 +1588,6 @@ create table SAS_NON_RESPONSE_WT
     SERIAL          decimal(15)   not null,
     NON_RESPONSE_WT decimal(9, 3) null
 );
-
-
--- create table SAS_PARAMETERS
--- (
---     PARAMETER_SET_ID decimal       not null,
---     PARAMETER_NAME   varchar(32)   not null,
---     PARAMETER_VALUE  varchar(4000) null
--- );
 
 
 create table SAS_PROCESS_VARIABLE
@@ -1944,18 +1747,6 @@ create table SAS_REGIONAL_SPV
     REG_IMP_ELIGIBLE_PV  decimal(1)  null
 );
 
-
--- create table SAS_RESPONSE
--- (
---     SAS_PROCESS_ID decimal       not null,
---     RESPONSE_CODE  decimal(5)    not null,
---     ERROR_MSG      varchar(250)  null,
---     STACK_TRACE    varchar(4000) null,
---     WARNINGS       varchar(4000) null,
---     TIME_STAMP     datetime      null
--- );
-
-
 create table SAS_SHIFT_DATA
 (
     REC_ID            int auto_increment
@@ -1970,21 +1761,6 @@ create table SAS_SHIFT_DATA
     WEEKDAY_END_PV    decimal(1)  null
 );
 
-
--- create table SAS_SHIFT_DATA_RICER
--- (
---     REC_ID            decimal     not null,
---     PORTROUTE         decimal(4)  not null,
---     WEEKDAY           decimal(1)  not null,
---     ARRIVEDEPART      decimal(1)  not null,
---     TOTAL             decimal     not null,
---     AM_PM_NIGHT       decimal(1)  not null,
---     SHIFT_PORT_GRP_PV varchar(10) null,
---     AM_PM_NIGHT_PV    decimal(1)  null,
---     WEEKDAY_END_PV    decimal(1)  null
--- );
-
-
 create table SAS_SHIFT_PV
 (
     REC_ID            decimal     not null,
@@ -1992,7 +1768,6 @@ create table SAS_SHIFT_PV
     AM_PM_NIGHT_PV    decimal(1)  null,
     WEEKDAY_END_PV    decimal(1)  null
 );
-
 
 create table SAS_SHIFT_SPV
 (
@@ -2060,16 +1835,6 @@ create table SAS_STAY_SPV
 
 create index SAS_STAY_SPV_SERIAL_index
     on SAS_STAY_SPV (SERIAL);
-
-
--- create table SAS_SURVEY_COLUMN
--- (
---     VERSION_ID    decimal     not null,
---     COLUMN_NO     decimal(4)  not null,
---     COLUMN_DESC   varchar(30) not null,
---     COLUMN_TYPE   varchar(20) not null,
---     COLUMN_LENGTH decimal(5)  not null
--- );
 
 create table SAS_SURVEY_SUBSAMPLE
 (
@@ -2289,15 +2054,6 @@ create table SAS_SURVEY_SUBSAMPLE
         unique (SERIAL)
 );
 
--- create table SAS_SURVEY_VALUE
--- (
---     VERSION_ID   decimal      not null,
---     SERIAL_NO    decimal(15)  not null,
---     COLUMN_NO    decimal(4)   not null,
---     COLUMN_VALUE varchar(100) not null
--- );
-
-
 create table SAS_TOWN_STAY_IMP
 (
     SERIAL decimal(15) not null,
@@ -2311,7 +2067,6 @@ create table SAS_TOWN_STAY_IMP
     SPEND8 decimal(7)  null
 );
 
-
 create table SAS_TOWN_STAY_SPV
 (
     SERIAL               decimal(15) not null,
@@ -2322,7 +2077,6 @@ create table SAS_TOWN_STAY_SPV
     STAYIMPCTRYLEVEL4_PV decimal(8)  null,
     TOWN_IMP_ELIGIBLE_PV decimal(1)  null
 );
-
 
 create table SAS_TRAFFIC_DATA
 (
@@ -2404,21 +2158,6 @@ create table SAS_UNSAMPLED_OOH_WT
     UNSAMP_TRAFFIC_WT decimal(9, 3) null
 );
 
-
--- create table SERIALISED_RUN
--- (
---     RUN_ID  varchar(40) not null,
---     SER_OBJ binary(1)   not null
--- );
---
---
--- create table SERIALISED_WORKFLOW
--- (
---     WORKFLOW_ID varchar(40) not null,
---     SER_OBJ     binary(1)   not null
--- );
-
-
 create table SHIFT_DATA
 (
     RUN_ID         varchar(40) not null,
@@ -2434,53 +2173,6 @@ create table SHIFT_DATA
 
 create index SHIFT_DATA_RUN_ID_index
     on SHIFT_DATA (RUN_ID);
-
-
--- create table SPSS_METADATA
--- (
---     NAME   varchar(30) null,
---     TYPE   varchar(30) null,
---     LENGTH decimal(3)  null
--- );
-
-
--- create table SQL_QUERY
--- (
---     TASK_ID       varchar(40)   not null,
---     QUERY_STRING  text          not null,
---     QUERY_MESSAGE varchar(4000) null
--- );
-
-
--- create table STATE_MAINTENANCE
--- (
---     STATE_ID    decimal      not null,
---     USER_ID     varchar(20)  null,
---     WORKFLOW_ID decimal      not null,
---     ACTION      varchar(30)  null,
---     OBJECT      varchar(100) null,
---     STATUS      decimal(1)   null,
---     COMMENTS    varchar(500) null
--- );
-
-
--- create table STEP
--- (
---     STEP_ID         varchar(40)   not null,
---     STEP_DEFINITION text          not null,
---     STEP_MESSAGE    varchar(4000) null
--- );
-
-
--- create table SURVEY_COLUMN
--- (
---     VERSION_ID    decimal     not null,
---     COLUMN_NO     decimal(4)  not null,
---     COLUMN_DESC   varchar(30) not null,
---     COLUMN_TYPE   varchar(20) not null,
---     COLUMN_LENGTH decimal(5)  not null
--- );
-
 
 create table SURVEY_SUBSAMPLE
 (
@@ -2701,50 +2393,6 @@ create table SURVEY_SUBSAMPLE
 
 create index SURVEY_SUBSAMPLE_RUN_ID_index
     on SURVEY_SUBSAMPLE (RUN_ID);
-
-
--- create table SURVEY_VALUE
--- (
---     VERSION_ID   decimal      not null,
---     SERIAL_NO    decimal(15)  not null,
---     COLUMN_NO    decimal(4)   not null,
---     COLUMN_VALUE varchar(100) not null
--- );
-
-
--- create table TASK
--- (
---     TASK_ID      varchar(40) not null,
---     PARENT_ID    varchar(40) null,
---     SERVICE_NAME varchar(30) null,
---     TASK_NAME    varchar(30) not null,
---     DATE_CREATED date        not null,
---     TASK_STATUS  decimal(2)  not null
--- );
---
---
--- create table TASK_CHILD
--- (
---     TASK_ID  varchar(40) not null,
---     CHILD_ID varchar(40) not null
--- );
---
---
--- create table TASK_NODE
--- (
---     TASK_ID      varchar(40) not null,
---     PARENT_ID    varchar(40) null,
---     CHILD_ID     varchar(40) null,
---     TASK_STATUS  decimal(2)  not null,
---     DATE_CREATED date        not null
--- );
---
---
--- create table TASK_SAS_MAP
--- (
---     TASK_ID          varchar(40) not null,
---     PARAMETER_SET_ID decimal     not null
--- );
 
 
 create table TRAFFIC_DATA
@@ -3797,3 +3445,6 @@ VALUES (1, 'Admin', 'pbkdf2:sha256:50000$jYlAjFyT$a3990f67a04492fdffae29256cc168
         null, null, 'admin');
 
 SET FOREIGN_KEY_CHECKS = 1;
+SET max_heap_table_size=134217728;
+SET tmp_table_size=134217728;
+Set wait_timeout = 2147483;
