@@ -1,10 +1,11 @@
 import math
 from ips_common.ips_logging import log
 import numpy as np
-from pandas import DataFrame, Series
+from pandas import DataFrame, Series, options
 
 from ips.services.calculations import ips_impute
 
+from ...util.sas_random import sas_random, seed
 # dataimport survey_support
 
 DATE_VARIABLE = 'INTDATE'
@@ -60,6 +61,14 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
     Requirements : NA
     Dependencies : NA
     """
+    options.mode.chained_assignment = None
+
+    seed(123456)
+    for x in range(0, len(df_input)):
+        if df_input["FLOW"][x] > 4:
+            df_input["OPERA_PV"][x] = 3
+        else:
+            df_input["OPERA_PV"][x] = round(sas_random(), 0) + 1
 
     df_eligible = df_input.loc[df_input[ELIGIBLE_FLAG_VARIABLE] == 1.0]
 
@@ -105,6 +114,8 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
                                 IMPUTATION_LEVEL_VARIABLE]
 
     df_output = df_output[final_output_column_list]
+
+    df_output = df_output.merge(df_input[["SERIAL", "OPERA_PV"]], left_on='SERIAL', right_on="SERIAL").rename(columns={'OPERA_PV_y': 'OPERA_PV'})
 
     return df_output
 
