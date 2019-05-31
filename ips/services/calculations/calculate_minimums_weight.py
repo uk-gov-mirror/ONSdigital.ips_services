@@ -42,8 +42,6 @@ def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_wei
 
     df_surveydata_new['SWNRwght'] = df_surveydata_new[shift_weight] * df_surveydata_new[nr_weight]
 
-    df_surveydata_new.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/python_survey_in.csv')
-
     df_surveydata_sorted = df_surveydata_new.sort_values(STRATA)
 
     # Summarise the minimum responses by the strata
