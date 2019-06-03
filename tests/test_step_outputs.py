@@ -119,10 +119,11 @@ def teardown_module(module):
     ('MINIMUMS', 'data/calculations/december_2017/min_weight/dec2017_survey.csv', 'data/calculations/december_2017/min_weight/summarydata_final.csv', ['SERIAL', 'MINS_WT'], 'PS_MINIMUMS', ['MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV', 'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS', 'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD']), # summary_output_columns
     ('TRAFFIC' # test_name
      , 'data/calculations/december_2017/traffic_weight/surveydata_dec2017.csv' # expected_survey_output
-     , 'data/calculations/december_2017/traffic_weight/ps_traffic.csv' # expected_summary_output
+     , 'data/calculations/december_2017/traffic_weight/summary_final.csv' # expected_summary_output
      , ['SERIAL', 'TRAFFIC_WT'] # survey_output_columns
      , 'PS_TRAFFIC' # summary_output_table
-     , ['SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'FOOT_OR_VEHICLE_PV', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT']), # summary_output_columns
+     # , ['SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'FOOT_OR_VEHICLE_PV', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT']), # summary_output_columns
+     , ['SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT']), # summary_output_columns
     ])
 
 def test_step_outputs(test_name
@@ -133,8 +134,8 @@ def test_step_outputs(test_name
                       , summary_output_columns):
 
     # # TODO: Skippidy-skip
-    # if test_name in ('SHIFT', 'NON_RESPONSE', 'MINIMUMS'):
-    #     pytest.skip("They pass")
+    if test_name in ('SHIFT', 'NON_RESPONSE', 'MINIMUMS'):
+        pytest.skip("They pass")
 
     # Get survey results
     data = read_table_values(SURVEY_SUBSAMPLE_TABLE)
@@ -172,6 +173,9 @@ def test_step_outputs(test_name
         summary_expected.sort_values(by=summary_output_columns, axis=0, inplace=True)
         summary_results.index = range(0, len(summary_results))
         summary_expected.index = range(0, len(summary_expected))
+
+        summary_results.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/summary_results.csv')
+        summary_expected.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/summary_expected.csv')
 
         # Test summary outputs
         assert_frame_equal(summary_results, summary_expected, check_dtype=False)

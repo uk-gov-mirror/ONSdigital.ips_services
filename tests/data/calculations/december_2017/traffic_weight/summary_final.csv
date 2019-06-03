@@ -1,4 +1,4 @@
-samp_port_grp_pv,arrivedepart,cases,traffictotal,sum_traffic_wt,traffic_wt
+SAMP_PORT_GRP_PV,ARRIVEDEPART,CASES,TRAFFICTOTAL,SUM_TRAFFIC_WT,TRAFFIC_WT
 A111,1.0,,0.0,,
 A111,2.0,,0.0,,
 A121,1.0,498.0,471349.0,471349.0,0.977
