@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 
 # dataimport survey_support
 from ips.services.calculations import log_warnings, log_errors

@@ -1,5 +1,5 @@
 from typing import Tuple
-
+from ips.util.services_logging import log
 from pandas import DataFrame
 
 NUMBER_RECORDS_DISPLAYED = 20

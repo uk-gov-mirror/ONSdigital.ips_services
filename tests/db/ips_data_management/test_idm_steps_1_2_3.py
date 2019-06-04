@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 from pandas.util.testing import assert_frame_equal
 
-import ips_common_db.sql as db
+import ips.persistence.sql as db
 import ips.persistence.data_management as idm
 
 from ips.persistence.data_management import SURVEY_SUBSAMPLE_TABLE

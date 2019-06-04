@@ -2,6 +2,7 @@ import pandas
 
 from ips.persistence.persistence import insert_from_dataframe, delete_from_table
 import ips.services.dataimport.schemas.survey_data_schema as schema
+from ips.util.services_logging import log
 
 SURVEY_SUBSAMPLE = 'SURVEY_SUBSAMPLE'
 insert_ss = insert_from_dataframe(SURVEY_SUBSAMPLE, if_exists="append", dtype=schema.get_schema())

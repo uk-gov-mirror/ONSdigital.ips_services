@@ -2,7 +2,8 @@ from ips.persistence import data_management as idm
 from ips.persistence.data_management import get_survey_data
 from ips.persistence.persistence import insert_from_dataframe
 from ips.services.calculations import calculate_airmiles
-from ips.util.config.services_configuration import ServicesConfiguration
+from ips.util.services_configuration import ServicesConfiguration
+from ips.util.services_logging import log
 
 
 def airmiles_step(run_id):

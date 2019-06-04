@@ -1,7 +1,7 @@
 import time
 import uuid
 
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 import ips.services.run_management as runs
 import ips.persistence.run_management as runs_db
 import ips.persistence.persistence as db

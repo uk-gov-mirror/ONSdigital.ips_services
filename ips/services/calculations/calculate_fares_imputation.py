@@ -1,5 +1,5 @@
 import math
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 import numpy as np
 from pandas import DataFrame, Series, options
 
