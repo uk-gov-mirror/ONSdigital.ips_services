@@ -1,4 +1,8 @@
 from ips.util.services_logging import log
+import numpy as np
+import pandas as pd
+
+from ips.services.calculations import ips_impute as imp
 
 OUTPUT_TABLE_NAME = "SAS_SPEND_IMP"
 STEM_VARIABLE = [
@@ -36,6 +40,7 @@ def do_ips_spend_imputation(df_survey_data, var_serial, measure):
     """
 
     num_levels = len(STEM_THRESHOLD)
+    log.debug("in do_ips_spend_imputation")
 
     # Select only the eligible donors and recipients
     df_eligible = df_survey_data.copy()
