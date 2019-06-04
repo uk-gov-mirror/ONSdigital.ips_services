@@ -77,22 +77,6 @@ def setup_pv():
 
 
 def teardown_module(module):
-    clear_survey_subsample = delete_from_table('SURVEY_SUBSAMPLE')
-    clear_sas_survey_subsample = delete_from_table('SAS_SURVEY_SUBSAMPLE')
-    clear_shift_data = delete_from_table('SHIFT_DATA')
-    clear_nr_data = delete_from_table('NON_RESPONSE_DATA')
-    clear_unsamp_data = delete_from_table('UNSAMPLED_OOH_DATA')
-    clear_traffic_data = delete_from_table('TRAFFIC_DATA')
-    clear_pvs = delete_from_table('PROCESS_VARIABLE_PY')
-
-    clear_survey_subsample()
-    clear_sas_survey_subsample()
-    clear_shift_data()
-    clear_nr_data()
-    clear_unsamp_data()
-    clear_traffic_data()
-    clear_pvs(run_id=run_id)
-
     log.info(f"Test duration: {time.strftime('%H:%M:%S', time.gmtime(time.time() - start_time))}")
 
 
