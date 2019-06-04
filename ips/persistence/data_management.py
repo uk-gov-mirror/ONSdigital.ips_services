@@ -1,4 +1,4 @@
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 from ips.persistence.persistence import delete_from_table, insert_into_table, select_data, read_table_values
 from ips.persistence.persistence import execute_sql as exec_sql
 

@@ -1,8 +1,6 @@
-import logging
-
 import falcon
 from falcon_multipart.middleware import MultipartMiddleware
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 
 from ips.api.cancel_api import CancelApi
 from ips.api.dataimport.import_air import ImportAir
@@ -23,13 +21,11 @@ from ips.api.start_service import StartApi
 from ips.api.status_api import StatusApi
 from ips.services import ips_workflow
 
-
 workflow = ips_workflow.IPSWorkflow()
 
 app = falcon.API(middleware=MultipartMiddleware())
 app.req_options.auto_parse_form_urlencoded = True
 
-log.setLevel(logging.DEBUG)
 
 app.add_route('/ips-service/start/{run_id}', StartApi(workflow))
 app.add_route('/ips-service/status/{run_id}', StatusApi(workflow))
@@ -61,6 +57,7 @@ app.add_route("/import/unsampled/{run_id}", ImportUnsampled(workflow))
 
 app.add_route("/export/{run_id}/{table_name}", ExportApi(workflow))
 
+log.debug("IPS Services started")
 
 # from waitress import serve
 #

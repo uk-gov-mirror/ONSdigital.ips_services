@@ -1,6 +1,7 @@
 import pandas
 
 from ips.persistence.persistence import insert_from_dataframe, read_table_values
+from ips.util.services_logging import log
 
 _PV_SET = 'PROCESS_VARIABLE_SET'
 _insert_pv = insert_from_dataframe(_PV_SET, "append")

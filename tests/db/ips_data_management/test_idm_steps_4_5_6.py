@@ -6,8 +6,8 @@ import pytest
 from pandas.util.testing import assert_frame_equal
 
 import ips.persistence.data_management as idm
-import ips_common_db.sql as db
-from ips.services.dataimport import import_data, CSVType
+import ips.persistence.sql as db
+from ips.services.dataimport import CSVType
 
 TEST_DATA_DIR = 'data/ips_data_management/'
 STEP_PV_OUTPUT_PATH = TEST_DATA_DIR + 'update_survey_data_with_step_pv_output/'

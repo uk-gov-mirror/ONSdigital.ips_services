@@ -1,5 +1,5 @@
 
-
+from ips.util.services_logging import log
 from ips.persistence import persistence as db
 
 POP_ROWVEC_TABLE = 'POPROWVEC_TRAFFIC'

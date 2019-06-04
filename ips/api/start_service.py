@@ -3,7 +3,7 @@ import threading
 
 import falcon
 from falcon import Request, Response
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 
 from ips.api.api import Api
 from ips.api.validation.validate import validate

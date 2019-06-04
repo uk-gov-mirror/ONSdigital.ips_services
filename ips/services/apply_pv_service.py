@@ -1,5 +1,6 @@
 import ips.persistence.apply_survey_data_pvs as builder
 from ips.services import service
+from ips.util.services_logging import log
 
 
 @service

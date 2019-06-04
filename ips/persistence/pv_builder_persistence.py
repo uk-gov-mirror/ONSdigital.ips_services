@@ -1,4 +1,5 @@
 import json
+from ips.util.services_logging import log
 
 from ips.persistence.persistence import delete_from_table, execute_sql, get_identity, \
     insert_into_table, insert_into_table_id, read_table_values

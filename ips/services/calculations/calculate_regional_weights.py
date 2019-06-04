@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 import pandas as pd
-
+from ips.util.services_logging import log
 # dataimport survey_support
 
 OUTPUT_TABLE_NAME = 'SAS_REGIONAL_IMP'
