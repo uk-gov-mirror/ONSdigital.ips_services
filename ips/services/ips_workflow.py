@@ -1,6 +1,6 @@
 from typing import Callable, List, TypeVar
 
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 
 import ips.services.run_management as runs
 import ips.services.steps.air_miles as airmiles

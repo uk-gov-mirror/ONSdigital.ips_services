@@ -1,10 +1,10 @@
 import pytest
 import time
 import pandas as pd
-import ips_common_db.sql as db
+import ips.persistence.sql as db
 
 from pandas.testing import assert_frame_equal
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 from ips.services.dataimport.import_survey import import_survey
 from ips.services.dataimport.import_shift import import_shift
 from ips.services.dataimport.import_non_response import import_nonresponse

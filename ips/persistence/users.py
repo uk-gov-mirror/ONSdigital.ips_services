@@ -1,4 +1,5 @@
 from ips.persistence.persistence import read_table_values
+from ips.util.services_logging import log
 
 get_users = read_table_values('USER')
 

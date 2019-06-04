@@ -3,7 +3,7 @@ import uuid
 
 import falcon
 import ips.persistence.persistence as db
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 
 from ips.persistence.import_survey import SURVEY_SUBSAMPLE
 from ips.services.dataimport.import_survey import import_survey

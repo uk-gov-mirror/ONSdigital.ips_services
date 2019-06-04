@@ -8,6 +8,7 @@ from ips.api.validation.validate_run_id import validate_run_id
 from ips.api.validation.validate import validate
 
 from ips.persistence import data_management as db
+from ips.util.services_logging import log
 
 
 # noinspection PyUnusedLocal,PyMethodMayBeStatic
@@ -16,6 +17,7 @@ class CancelApi(Api):
     @validate(run_id=validate_run_id)
     def on_get(self, req: Request, resp: Response, run_id: str) -> None:
         # Cancel the specified run
+        log.debug(f"validating CancelApi, run_id={run_id}")
 
         if not db.is_valid_run_id(run_id):
             result = {'status': "invalid job id: " + run_id}
@@ -24,4 +26,3 @@ class CancelApi(Api):
             return
 
         self.workflow.cancel_run(run_id)
-

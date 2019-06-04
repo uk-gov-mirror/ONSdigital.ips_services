@@ -6,7 +6,7 @@ import ips.persistence.persistence as db
 import math
 import numpy as np
 import pandas
-from ips_common.ips_logging import logging as log
+from ips.util.services_logging import log
 
 from ips.persistence.persistence import insert_from_dataframe
 

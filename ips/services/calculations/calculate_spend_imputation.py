@@ -1,15 +1,4 @@
-"""
-Created on 7 Mar 2018
-
-@author: thorne1
-"""
-
-import numpy as np
-import pandas as pd
-
-from ips.services.calculations import ips_impute as imp
-
-# dataimport survey_support
+from ips.util.services_logging import log
 
 OUTPUT_TABLE_NAME = "SAS_SPEND_IMP"
 STEM_VARIABLE = [

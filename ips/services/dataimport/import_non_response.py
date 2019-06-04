@@ -2,7 +2,7 @@ import io
 import falcon
 import pandas as pd
 
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 import ips.persistence.import_non_response as nr
 from ips.services import service
 from ips.services.dataimport.schemas import non_response_schema

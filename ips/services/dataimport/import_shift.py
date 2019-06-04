@@ -4,7 +4,7 @@ import pandas as pd
 import ips.persistence.import_shift as db
 
 from ips.services.dataimport import validate
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 from ips.services import service
 from ips.services.dataimport.schemas import shift_schema
 from ips.services.dataimport import CSVType

@@ -1,5 +1,6 @@
 import ips.persistence.persistence as db
 import ips.services.run_management as status
+from ips.util.services_logging import log
 
 RUN_STEPS = 'RUN_STEPS'
 RUN_MANAGEMENT = 'RUN'

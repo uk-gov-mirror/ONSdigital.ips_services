@@ -1,5 +1,6 @@
 import ips.persistence.runs_persistence as runs
 from ips.services import service
+from ips.util.services_logging import log
 
 
 @service

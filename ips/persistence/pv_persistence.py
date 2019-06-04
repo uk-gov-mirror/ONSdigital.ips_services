@@ -1,6 +1,6 @@
 import falcon
 import pandas as pd
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 
 from ips.persistence.persistence import read_table_values, delete_from_table, insert_from_dataframe
 

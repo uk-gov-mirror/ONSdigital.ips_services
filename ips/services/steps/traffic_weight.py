@@ -3,7 +3,8 @@ from ips.persistence.data_management import get_survey_data
 from ips.persistence.persistence import read_table_values, insert_from_dataframe
 from ips.services.calculations.calculate_traffic_weight import do_ips_trafweight_calculation_with_r
 from ips.util import process_variables
-from ips.util.config.services_configuration import ServicesConfiguration
+from ips.util.services_configuration import ServicesConfiguration
+from ips.util.services_logging import log
 
 
 def traffic_weight_step(run_id):

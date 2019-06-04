@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pandas as pd
+from ips.util.services_logging import log
 
 from ips.persistence.persistence import select_data, insert_from_dataframe
 

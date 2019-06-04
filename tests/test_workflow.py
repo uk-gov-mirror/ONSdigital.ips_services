@@ -1,10 +1,10 @@
 import time
 import uuid
 
-import ips_common_db.sql as db
+import ips.persistence.sql as db
 # noinspection PyUnresolvedReferences
 import requests
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 
 from ips.services.dataimport.import_non_response import import_nonresponse
 from ips.services.dataimport.import_shift import import_shift

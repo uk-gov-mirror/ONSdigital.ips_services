@@ -1,4 +1,4 @@
-from ips_common.config.configuration import Configuration
+from ips.util.Configuration import Configuration
 
 
 class ServicesConfiguration(Configuration):
