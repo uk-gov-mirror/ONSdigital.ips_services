@@ -380,8 +380,6 @@ def generate_ips_tw_summary(df_survey, df_output_merge_final,
 
 # carry out the traffic weight calculation using R call
 def do_ips_trafweight_calculation_with_r(survey_data, trtotals, run_id):
-    trtotals.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/trtotals.csv')
-
     # clear the auxillary tables
     db.truncate_survey_traffic_aux()
 

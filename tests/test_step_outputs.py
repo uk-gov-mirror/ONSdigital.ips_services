@@ -5,7 +5,7 @@ import ips_common_db.sql as db
 
 from pandas.testing import assert_frame_equal
 from ips_common.ips_logging import log
-from ips.persistence.persistence import delete_from_table, read_table_values
+from ips.persistence.persistence import select_data
 
 from ips.services.dataimport.import_survey import import_survey
 from ips.services.dataimport.import_shift import import_shift
@@ -71,7 +71,7 @@ def setup_module(module):
 
 
 def setup_pv():
-    df = db.select_data('*', "PROCESS_VARIABLE_PY", 'RUN_ID', 'TEMPLATE')
+    df = db.select_data('*', 'PROCESS_VARIABLE_PY', 'RUN_ID', 'TEMPLATE')
     df['RUN_ID'] = run_id
     db.insert_dataframe_into_table('PROCESS_VARIABLE_PY', df)
 
@@ -94,8 +94,8 @@ def test_step_outputs(test_name
                       , summary_output_columns):
 
     # Get survey results
-    data = read_table_values(SURVEY_SUBSAMPLE_TABLE)
-    survey_subsample = data()
+    # data = read_table_values(SURVEY_SUBSAMPLE_TABLE)
+    survey_subsample = select_data("*", SURVEY_SUBSAMPLE_TABLE, "RUN_ID", run_id)
 
     # Create comparison survey dataframes
     survey_results = survey_subsample[survey_output_columns].copy()
@@ -116,8 +116,7 @@ def test_step_outputs(test_name
     # Get summary results
     if test_name in ('SHIFT', 'NON_RESPONSE', 'MINIMUMS'):
         log.info(f"Testing summary results for {test_name}")
-        data = read_table_values(summary_output_table)
-        summary_data = data()
+        summary_data = select_data("*", summary_output_table, "RUN_ID", run_id)
 
         # Create comparison summary dataframes
         summary_results = summary_data.copy()
