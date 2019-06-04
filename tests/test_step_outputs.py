@@ -5,7 +5,7 @@ import ips_common_db.sql as db
 
 from pandas.testing import assert_frame_equal
 from ips_common.ips_logging import log
-from ips.persistence.persistence import delete_from_table, read_table_values
+from ips.persistence.persistence import select_data
 
 from ips.services.dataimport.import_survey import import_survey
 from ips.services.dataimport.import_shift import import_shift
@@ -34,24 +34,6 @@ year = '2017'
 start_time = time.time()
 
 def setup_module(module):
-    # TODO: -->
-    clear_survey_subsample = delete_from_table('SURVEY_SUBSAMPLE')
-    clear_sas_survey_subsample = delete_from_table('SAS_SURVEY_SUBSAMPLE')
-    clear_shift_data = delete_from_table('SHIFT_DATA')
-    clear_nr_data = delete_from_table('NON_RESPONSE_DATA')
-    clear_unsamp_data = delete_from_table('UNSAMPLED_OOH_DATA')
-    clear_traffic_data = delete_from_table('TRAFFIC_DATA')
-    clear_pvs = delete_from_table('PROCESS_VARIABLE_PY')
-
-    clear_survey_subsample()
-    clear_sas_survey_subsample()
-    clear_shift_data()
-    clear_nr_data()
-    clear_unsamp_data()
-    clear_traffic_data()
-    clear_pvs(run_id=run_id)
-    # TODO: <--
-
     # Load Survey data
     with open(input_survey_data, 'rb') as file:
         import_survey(run_id, file.read(), month, year)
@@ -80,64 +62,31 @@ def setup_module(module):
     with open(input_tunnel_data, 'rb') as file:
         import_tunnel(run_id, file.read(), month, year)
 
-    log.info("Setting up PVs for testing")
     setup_pv()
 
     # Run steps
-    log.info("Running Shift Weight Step")
     shift_weight.shift_weight_step(run_id)
-    log.info("Running Non Response Weight Step")
     non_response_weight.non_response_weight_step(run_id)
-    log.info("Running Minimums Weight Step")
     minimums_weight.minimums_weight_step(run_id)
-    log.info("Running Traffic Weight Step")
     traffic_weight.traffic_weight_step(run_id)
-    log.info("Running Unsampled Weight Step")
     unsampled_weight.unsampled_weight_step(run_id)
 
 
 def setup_pv():
-    df = db.select_data('*', "PROCESS_VARIABLE_PY", 'RUN_ID', 'TEMPLATE')
+    df = db.select_data('*', 'PROCESS_VARIABLE_PY', 'RUN_ID', 'TEMPLATE')
     df['RUN_ID'] = run_id
     db.insert_dataframe_into_table('PROCESS_VARIABLE_PY', df)
 
 
 def teardown_module(module):
-    clear_survey_subsample = delete_from_table('SURVEY_SUBSAMPLE')
-    clear_sas_survey_subsample = delete_from_table('SAS_SURVEY_SUBSAMPLE')
-    clear_shift_data = delete_from_table('SHIFT_DATA')
-    clear_nr_data = delete_from_table('NON_RESPONSE_DATA')
-    clear_unsamp_data = delete_from_table('UNSAMPLED_OOH_DATA')
-    clear_traffic_data = delete_from_table('TRAFFIC_DATA')
-    clear_pvs = delete_from_table('PROCESS_VARIABLE_PY')
-
-    clear_survey_subsample()
-    clear_sas_survey_subsample()
-    clear_shift_data()
-    clear_nr_data()
-    clear_unsamp_data()
-    clear_traffic_data()
-    clear_pvs(run_id=run_id)
-
     log.info(f"Test duration: {time.strftime('%H:%M:%S', time.gmtime(time.time() - start_time))}")
 
 
 @pytest.mark.parametrize('test_name, expected_survey_output, expected_summary_output, survey_output_columns, summary_output_table, summary_output_columns', [
     ('SHIFT', 'data/calculations/december_2017/shift_weight/dec_output.csv', 'data/calculations/december_2017/shift_weight/dec2017_summary.csv', ['SERIAL', 'SHIFT_WT'], 'PS_SHIFT_DATA', ['SHIFT_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'AM_PM_NIGHT_PV', 'MIGSI', 'POSS_SHIFT_CROSS', 'SAMP_SHIFT_CROSS', 'MIN_SH_WT', 'MEAN_SH_WT', 'MAX_SH_WT', 'COUNT_RESPS', 'SUM_SH_WT']),
     ('NON_RESPONSE', 'data/calculations/december_2017/non_response_weight/dec_output.csv', 'data/calculations/december_2017/non_response_weight/dec2017_summary.csv', ['SERIAL', 'NON_RESPONSE_WT'], 'PS_NON_RESPONSE', ['NR_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'MEAN_RESPS_SH_WT', 'COUNT_RESPS', 'PRIOR_SUM', 'GROSS_RESP', 'GNR', 'MEAN_NR_WT']),
-    ('MINIMUMS', 'data/calculations/december_2017/min_weight/dec2017_survey.csv', 'data/calculations/december_2017/min_weight/summarydata_final.csv', ['SERIAL', 'MINS_WT'], 'PS_MINIMUMS', ['MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV', 'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS', 'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD']), # summary_output_columns
-    ('TRAFFIC' # test_name
-     , 'data/calculations/december_2017/traffic_weight/surveydata_dec2017.csv' # expected_survey_output
-     , 'data/calculations/december_2017/traffic_weight/ps_traffic.csv' # expected_summary_output
-     , ['SERIAL', 'TRAFFIC_WT'] # survey_output_columns
-     , 'PS_TRAFFIC' # summary_output_table
-     , ['SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'FOOT_OR_VEHICLE_PV', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT']), # summary_output_columns
-     ('UNSAMPLED' # test_name
-     , 'data/calculations/december_2017/unsampled_weight/surveydata_dec2017utf8.csv' # expected_survey_output
-     , 'data/calculations/december_2017/unsampled_weight/ps_unsampled_ooh.csv' # expected_summary_output
-     , ['SERIAL', 'UNSAMP_TRAFFIC_WT'] # survey_output_columns
-     , 'PS_UNSAMPLED_OOH' # summary_output_table
-     , ['UNSAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'UNSAMP_REGION_GRP_PV', 'CASES', 'SUM_PRIOR_WT', 'SUM_UNSAMP_TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT']), # summary_output_columns
+    ('MINIMUMS', 'data/calculations/december_2017/min_weight/dec2017_survey.csv', 'data/calculations/december_2017/min_weight/summarydata_final.csv', ['SERIAL', 'MINS_WT'], 'PS_MINIMUMS', ['MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV', 'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS', 'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD']),
+    ('TRAFFIC', 'data/calculations/december_2017/traffic_weight/surveydata_dec2017.csv', 'data/calculations/december_2017/traffic_weight/summary_final.csv', ['SERIAL', 'TRAFFIC_WT'], 'PS_TRAFFIC', ['SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT']),
     ])
 
 def test_step_outputs(test_name
@@ -147,13 +96,13 @@ def test_step_outputs(test_name
                       , summary_output_table
                       , summary_output_columns):
 
-    # TODO: Skippidy-skip
-    if test_name in ('SHIFT', 'NON_RESPONSE', 'MINIMUMS', 'TRAFFIC'):
-        pytest.skip("They pass-ish")
+    # # TODO: --->
+    # if test_name in ('SHIFT', 'NON_RESPONSE', 'MINIMUMS'):
+    #     pytest.skip("Because they pass")
+    # # TODO: <---
 
     # Get survey results
-    data = read_table_values(SURVEY_SUBSAMPLE_TABLE)
-    survey_subsample = data()
+    survey_subsample = select_data("*", SURVEY_SUBSAMPLE_TABLE, "RUN_ID", run_id)
 
     # Create comparison survey dataframes
     survey_results = survey_subsample[survey_output_columns].copy()
@@ -172,10 +121,9 @@ def test_step_outputs(test_name
     ####
 
     # Get summary results
-    if test_name in ('SHIFT', 'NON_RESPONSE', 'MINIMUMS', 'TRAFFIC', 'UNSAMPLED'):
+    if test_name in ('SHIFT', 'NON_RESPONSE', 'MINIMUMS', 'TRAFFIC'):
         log.info(f"Testing summary results for {test_name}")
-        data = read_table_values(summary_output_table)
-        summary_data = data()
+        summary_data = select_data("*", summary_output_table, "RUN_ID", run_id)
 
         # Create comparison summary dataframes
         summary_results = summary_data.copy()
