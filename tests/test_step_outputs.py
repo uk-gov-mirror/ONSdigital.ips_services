@@ -9,7 +9,7 @@ from ips.persistence.persistence import delete_from_table, read_table_values
 
 from ips.services.dataimport.import_survey import import_survey
 from ips.services.dataimport.import_shift import import_shift
-from ips.services.dataimport.import_non_sresponse import import_nonresponse
+from ips.services.dataimport.import_non_response import import_nonresponse
 from ips.services.dataimport.import_unsampled import import_unsampled
 from ips.services.dataimport.import_traffic import import_air
 from ips.services.dataimport.import_traffic import import_sea
@@ -123,7 +123,6 @@ def teardown_module(module):
      , ['SERIAL', 'TRAFFIC_WT'] # survey_output_columns
      , 'PS_TRAFFIC' # summary_output_table
      , ['SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'FOOT_OR_VEHICLE_PV', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT']), # summary_output_columns
-     # , ['SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT']), # summary_output_columns
     ])
 
 def test_step_outputs(test_name
