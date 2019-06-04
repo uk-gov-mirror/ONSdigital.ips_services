@@ -9,7 +9,7 @@ from ips.persistence.persistence import delete_from_table, read_table_values
 
 from ips.services.dataimport.import_survey import import_survey
 from ips.services.dataimport.import_shift import import_shift
-from ips.services.dataimport.import_non_response import import_nonresponse
+from ips.services.dataimport.import_non_sresponse import import_nonresponse
 from ips.services.dataimport.import_unsampled import import_unsampled
 from ips.services.dataimport.import_traffic import import_air
 from ips.services.dataimport.import_traffic import import_sea
@@ -78,11 +78,6 @@ def setup_module(module):
     with open(input_tunnel_data, 'rb') as file:
         import_tunnel(run_id, file.read(), month, year)
 
-    # TODO
-    data = read_table_values('TRAFFIC_DATA')
-    traffic_data = data()
-    traffic_data.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/traffic_data.csv')
-
     setup_pv()
 
     # Run steps
@@ -138,9 +133,9 @@ def test_step_outputs(test_name
                       , summary_output_table
                       , summary_output_columns):
 
-    # # TODO: Skippidy-skip
-    if test_name in ('SHIFT', 'NON_RESPONSE', 'MINIMUMS'):
-        pytest.skip("They pass")
+    # # # TODO: Skippidy-skip
+    # if test_name in ('SHIFT', 'NON_RESPONSE', 'MINIMUMS'):
+    #     pytest.skip("They pass")
 
     # Get survey results
     data = read_table_values(SURVEY_SUBSAMPLE_TABLE)
@@ -178,9 +173,6 @@ def test_step_outputs(test_name
         summary_expected.sort_values(by=summary_output_columns, axis=0, inplace=True)
         summary_results.index = range(0, len(summary_results))
         summary_expected.index = range(0, len(summary_expected))
-
-        summary_results.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/summary_results.csv')
-        summary_expected.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/summary_expected.csv')
 
         # Test summary outputs
         assert_frame_equal(summary_results, summary_expected, check_dtype=False)
