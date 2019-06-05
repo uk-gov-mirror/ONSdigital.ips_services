@@ -420,4 +420,6 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     df_summary['UNSAMP_TRAFFIC_WT'] = df_summary['UNSAMP_TRAFFIC_WT'].round(3)
     df_output['UNSAMP_TRAFFIC_WT'] = df_output['UNSAMP_TRAFFIC_WT'].round(3)
 
+    df_output.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/df_output.csv')
+
     return df_output, df_summary

@@ -65,12 +65,12 @@ def unsampled_weight_step(run_id):
         min_count_threshold=30,
         run_id=run_id)
 
+
     # Insert data to SQL
     insert_from_dataframe(config["temp_table"])(output_data)
     insert_from_dataframe(config["sas_ps_table"])(summary_data)
 
     # Update Survey Data With Unsampled Wt Results
-
     idm.update_survey_data_with_step_results(config)
 
     # Store Survey Data With Unsampled Wt Results
