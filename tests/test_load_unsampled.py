@@ -2,8 +2,8 @@ import time
 import uuid
 
 import falcon
-import ips_common_db.sql as db
-from ips_common.ips_logging import log
+import ips.persistence.sql as db
+from ips.util.services_logging import log
 
 from ips.persistence.import_unsampled import UNSAMPLED_OOH_DATA
 from ips.services.dataimport.import_unsampled import import_unsampled

@@ -2,6 +2,7 @@ from falcon import Request, Response, falcon
 
 from ips.api.api import Api
 from ips.services.pv_builder_service import create_pv_build, get_pv_builds, get_pv_build_variables
+from ips.util.services_logging import log
 
 
 # noinspection PyUnusedLocal,PyMethodMayBeStatic

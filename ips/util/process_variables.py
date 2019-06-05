@@ -2,8 +2,8 @@ import multiprocessing
 
 from functools import partial
 import pandas
-from ips_common.ips_logging import logging as log
-import ips_common_db.sql as db
+from ips.util.services_logging import log
+import ips.persistence.sql as db
 import numpy as np
 # for exec
 import math

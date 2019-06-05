@@ -1,9 +1,5 @@
-"""
-Created on 7 Feb 2018
-
-@author: thorne1
-"""
 import pandas as pd
+from ips.util.services_logging import log
 
 OUTPUT_TABLE_NAME = "SAS_IMBALANCE_WT"
 SUMMARY_TABLE_NAME = "SAS_PS_IMBALANCE"

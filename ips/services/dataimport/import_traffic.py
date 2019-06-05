@@ -3,7 +3,7 @@ import io
 from functools import partial
 
 import pandas as pd
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 
 from ips.services.dataimport import validate
 import ips.persistence.import_traffic as db

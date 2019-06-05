@@ -8,6 +8,7 @@ from ips.api.validation.validate_run_id import validate_run_id
 from ips.api.validation.validate_table import validate_table
 from ips.api.validation.validate import validate
 from ips.services.export_service import get_export_data
+from ips.util.services_logging import log
 
 
 # noinspection PyUnusedLocal,PyMethodMayBeStatic

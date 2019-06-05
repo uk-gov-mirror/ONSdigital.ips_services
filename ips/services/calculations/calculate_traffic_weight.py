@@ -2,10 +2,10 @@ import subprocess
 
 import numpy as np
 import pandas as pd
-from ips_common.config.configuration import Configuration
+from ips.util.services_configuration import Configuration
 from pkg_resources import resource_filename
 
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 import ips.persistence.traffic_weight as db
 from ips.services.calculations import log_warnings, THRESHOLD_CAP
 
@@ -380,8 +380,6 @@ def generate_ips_tw_summary(df_survey, df_output_merge_final,
 
 # carry out the traffic weight calculation using R call
 def do_ips_trafweight_calculation_with_r(survey_data, trtotals, run_id):
-    trtotals.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/trtotals.csv')
-
     # clear the auxillary tables
     db.truncate_survey_traffic_aux()
 

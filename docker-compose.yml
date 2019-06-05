@@ -20,38 +20,38 @@ version: '3.3'
 
 services:
 
-#  ips-ui:
-#    build: ../ips_user_interface
-#    container_name: ips-ui
-#    restart: always
-#
-#    environment:
-#      API_HOST: ${API_HOST}
-#      API_PORT: ${API_PORT}
-#      API_PROTOCOL: ${API_PROTOCOL}
-#      FLASK_APP: ${UI_FLASK_APP}
-#      FLASK_ENV: ${FLASK_ENV}
-#
-#    ports:
-#      - "5001:5000"
-#    networks:
-#      - ips-net
-#
-#  ips-services:
-#    build: .
-#    container_name: ips-services
-#    restart: unless-stopped
-#    ports:
-#      - "8000:8000" # for testing
-#
-#    networks:
-#      - ips-net
-#
-#    environment:
-#      DB_SERVER: ${DB_SERVER}
-#      DB_USER_NAME: ${DB_USER_NAME}
-#      DB_PASSWORD: ${DB_PASSWORD}
-#      DB_NAME: ${DB_NAME}
+  ips-ui:
+    build: ../ips_user_interface
+    container_name: ips-ui
+    restart: always
+
+    environment:
+      API_HOST: ${API_HOST}
+      API_PORT: ${API_PORT}
+      API_PROTOCOL: ${API_PROTOCOL}
+      FLASK_APP: ${UI_FLASK_APP}
+      FLASK_ENV: ${FLASK_ENV}
+
+    ports:
+      - "5001:5000"
+    networks:
+      - ips-net
+
+  ips-services:
+    build: .
+    container_name: ips-services
+    restart: unless-stopped
+    ports:
+      - "8000:8000" # for testing
+
+    networks:
+      - ips-net
+
+    environment:
+      DB_SERVER: ${DB_SERVER}
+      DB_USER_NAME: ${DB_USER_NAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
 
   ips-db:
      image: mysql:latest
