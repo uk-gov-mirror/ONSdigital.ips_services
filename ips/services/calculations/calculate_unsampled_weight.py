@@ -338,8 +338,6 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
 
     ges_dataframes = do_ips_ges_weighting(df_surveydata, df_ustotals)
 
-    # @TODO: WORK FROM HERE
-
     df_survey = ges_dataframes[0]
     df_output = ges_dataframes[1]
     # Sort df_surveydata dataframe before merge
