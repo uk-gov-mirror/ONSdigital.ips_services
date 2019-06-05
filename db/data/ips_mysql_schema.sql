@@ -1503,7 +1503,7 @@ create table PS_INSTRUCTION
 create table PS_MINIMUMS
 (
     RUN_ID                varchar(40)    not null,
-    MINS_PORT_GRP_PV      decimal        null,
+    MINS_PORT_GRP_PV      decimal(3)    null,
     ARRIVEDEPART          decimal(1)     null,
     MINS_CTRY_GRP_PV      decimal(6)     null,
     MINS_NAT_GRP_PV       decimal(6)     null,
@@ -1740,7 +1740,7 @@ create table SAS_IMBALANCE_WT
 create table SAS_MINIMUMS_SPV
 (
     SERIAL                decimal(15) not null,
-    MINS_PORT_GRP_PV      decimal     null,
+    MINS_PORT_GRP_PV      decimal(3) null,
     MINS_CTRY_GRP_PV      decimal(6)  null,
     MINS_NAT_GRP_PV       decimal(6)  null,
     MINS_CTRY_PORT_GRP_PV varchar(10) null,
@@ -1836,7 +1836,7 @@ create table SAS_PS_IMBALANCE
 
 create table SAS_PS_MINIMUMS
 (
-    MINS_PORT_GRP_PV      decimal        null,
+    MINS_PORT_GRP_PV      decimal(3)    null,
     ARRIVEDEPART          decimal(1)     null,
     MINS_CTRY_GRP_PV      decimal(6)     null,
     MINS_NAT_GRP_PV       decimal(6)     null,
@@ -2224,7 +2224,7 @@ create table SAS_SURVEY_SUBSAMPLE
     MINS_CTRY_PORT_GRP_PV  varchar(10)    null,
     MINS_FLAG_PV           decimal(1)     null,
     MINS_NAT_GRP_PV        decimal(6)     null,
-    MINS_PORT_GRP_PV       decimal        null,
+    MINS_PORT_GRP_PV       decimal(3)     null,
     MINS_QUALITY_PV        decimal(1)     null,
     NR_FLAG_PV             decimal(1)     null,
     NR_PORT_GRP_PV         decimal(3)    null,
@@ -2636,7 +2636,7 @@ create table SURVEY_SUBSAMPLE
     MINS_CTRY_PORT_GRP_PV  varchar(10)    null,
     MINS_FLAG_PV           decimal(1)     null,
     MINS_NAT_GRP_PV        decimal(6)     null,
-    MINS_PORT_GRP_PV       decimal     null,
+    MINS_PORT_GRP_PV       decimal(3)     null,
     MINS_QUALITY_PV        decimal(1)     null,
     NR_FLAG_PV             decimal(1)     null,
     NR_PORT_GRP_PV         decimal(3)    null,

@@ -3,7 +3,8 @@ from ips.persistence.data_management import get_survey_data
 from ips.persistence.persistence import insert_from_dataframe
 from ips.services.calculations import calculate_spend_imputation
 from ips.util import process_variables
-from ips.util.config.services_configuration import ServicesConfiguration
+from ips.util.services_configuration import ServicesConfiguration
+from ips.util.services_logging import log
 
 
 def spend_imputation_step(run_id):

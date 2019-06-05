@@ -1,6 +1,7 @@
 import ips.persistence.pv_persistence as pv
 from ips.persistence.pv_persistence import delete_pv
 from ips.services import service
+from ips.util.services_logging import log
 
 
 @service

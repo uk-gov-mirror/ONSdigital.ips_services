@@ -4,6 +4,13 @@ database:
   password: ${DB_PASSWORD}
   database: ${DB_NAME}
 
+logging:
+  file:
+    file_name: ${LOG_FILE}
+    file_level: ${LOG_FILE_LEVEL}
+
+  console:
+    console_level: ${LOG_CONSOLE_LEVEL}
 
 shift_weight:
   name: SHIFT_WEIGHT

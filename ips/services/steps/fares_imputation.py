@@ -1,11 +1,11 @@
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 
 from ips.persistence import data_management as idm
 from ips.persistence.data_management import get_survey_data
 from ips.persistence.persistence import insert_from_dataframe
 from ips.services.calculations import calculate_fares_imputation
 from ips.util import process_variables
-from ips.util.config.services_configuration import ServicesConfiguration
+from ips.util.services_configuration import ServicesConfiguration
 
 
 def fares_imputation_step(run_id):

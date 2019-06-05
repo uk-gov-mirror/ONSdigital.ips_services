@@ -1,5 +1,5 @@
 from falcon import Request, Response, falcon
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 
 from ips.api.api import Api
 from ips.services.pv_sets import create_new_pv_set, get_pv_sets

@@ -2,7 +2,7 @@ import io
 import pandas as pd
 import falcon
 import ips.persistence.import_unsampled as db
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 from ips.services import service
 from ips.services.dataimport.schemas import unsampled_schema
 from ips.services.dataimport import validate

@@ -2,7 +2,7 @@ import functools
 import inspect
 
 import falcon
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 
 
 class ValidationProgrammingError(ValueError):

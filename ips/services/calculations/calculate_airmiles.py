@@ -3,7 +3,7 @@ import math
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
-
+from ips.util.services_logging import log
 from ips.services.calculations import parallelise_dataframe
 
 FLOW_VARIABLE = 'FLOW'

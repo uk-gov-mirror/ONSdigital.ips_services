@@ -1,4 +1,5 @@
 import numpy as np
+from ips.util.services_logging import log
 
 
 def ips_impute(df_input, var_serial_num, strata_base_list, thresh_base_list, num_levels,

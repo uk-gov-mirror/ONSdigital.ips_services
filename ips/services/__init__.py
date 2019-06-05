@@ -1,7 +1,7 @@
 import functools
 
 import falcon
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 
 
 def service(func):
