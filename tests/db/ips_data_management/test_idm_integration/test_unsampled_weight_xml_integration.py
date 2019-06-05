@@ -208,9 +208,6 @@ def test_unsampled_weight_step():
 
     assert_frame_equal(df_unsampled_test, df_unsampled_target, check_dtype=False)
 
-    # TODO: Compare integration summary input with xml summary input
-    df_unsampled_actual.to_csv(r'S:\CASPA\IPS\Testing\scratch\summary_in_xml.csv', index=False)
-
     # Run step 9 / 12
     output_data, summary_data = do_ips_unsampled_weight_calculation(df_survey_actual,
                                                                     serial_num='SERIAL',

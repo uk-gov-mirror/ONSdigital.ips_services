@@ -42,7 +42,7 @@ services:
     container_name: ips-services
     restart: unless-stopped
     ports:
-      - "5000:5000" # for testing
+      - "8000:8000" # for testing
 
     networks:
       - ips-net
@@ -54,7 +54,7 @@ services:
       DB_NAME: ${DB_NAME}
 
   ips-db:
-     image: mysql:5.7
+     image: mysql:latest
      container_name: ips-db
      command: --default-authentication-plugin=mysql_native_password
      restart: always

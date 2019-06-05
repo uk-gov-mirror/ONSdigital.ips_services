@@ -1133,7 +1133,7 @@ else:
     row[''NR_FLAG_PV''] = 2');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 8, 'nr_port_grp_pv', 'nr_port_grp_pv', '
-row[''NR_PORT_GRP_PV''] = str(row[''PORTROUTE'']).rjust(3,'' '')');
+row[''NR_PORT_GRP_PV''] = row[''PORTROUTE'']');
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 9, 'mins_flag_pv', 'mins_flag_pv', '
 if row[''TYPEINTERVIEW''] == 1:
@@ -1503,7 +1503,7 @@ create table PS_INSTRUCTION
 create table PS_MINIMUMS
 (
     RUN_ID                varchar(40)    not null,
-    MINS_PORT_GRP_PV      varchar(10)    null,
+    MINS_PORT_GRP_PV      decimal(3)    null,
     ARRIVEDEPART          decimal(1)     null,
     MINS_CTRY_GRP_PV      decimal(6)     null,
     MINS_NAT_GRP_PV       decimal(6)     null,
@@ -1522,7 +1522,7 @@ create table PS_MINIMUMS
 create table PS_NON_RESPONSE
 (
     RUN_ID           varchar(40)    not null,
-    NR_PORT_GRP_PV   varchar(10)    not null,
+    NR_PORT_GRP_PV   decimal(3)    not null,
     ARRIVEDEPART     decimal(1)     not null,
     WEEKDAY_END_PV   decimal(1)     null,
     MEAN_RESPS_SH_WT decimal(9, 3)  null,
@@ -1740,7 +1740,7 @@ create table SAS_IMBALANCE_WT
 create table SAS_MINIMUMS_SPV
 (
     SERIAL                decimal(15) not null,
-    MINS_PORT_GRP_PV      varchar(10) null,
+    MINS_PORT_GRP_PV      decimal(3) null,
     MINS_CTRY_GRP_PV      decimal(6)  null,
     MINS_NAT_GRP_PV       decimal(6)  null,
     MINS_CTRY_PORT_GRP_PV varchar(10) null,
@@ -1767,7 +1767,7 @@ create table SAS_NON_RESPONSE_DATA
     SAMPINTERVAL   decimal(4)  null,
     MIGTOTAL       decimal     null,
     ORDTOTAL       decimal     null,
-    NR_PORT_GRP_PV varchar(10) null,
+    NR_PORT_GRP_PV decimal(3) null,
     WEEKDAY_END_PV decimal(1)  null,
     AM_PM_NIGHT_PV decimal(1)  null
 );
@@ -1777,14 +1777,14 @@ create table SAS_NON_RESPONSE_PV
 (
     REC_ID         decimal     not null,
     WEEKDAY_END_PV decimal(1)  null,
-    NR_PORT_GRP_PV varchar(10) null
+    NR_PORT_GRP_PV decimal(3) null
 );
 
 
 create table SAS_NON_RESPONSE_SPV
 (
     SERIAL         decimal(15) not null,
-    NR_PORT_GRP_PV varchar(10) null,
+    NR_PORT_GRP_PV decimal(3) null,
     MIG_FLAG_PV    decimal(1)  null,
     NR_FLAG_PV     decimal(1)  null
 );
@@ -1836,7 +1836,7 @@ create table SAS_PS_IMBALANCE
 
 create table SAS_PS_MINIMUMS
 (
-    MINS_PORT_GRP_PV      varchar(10)    null,
+    MINS_PORT_GRP_PV      decimal(3)    null,
     ARRIVEDEPART          decimal(1)     null,
     MINS_CTRY_GRP_PV      decimal(6)     null,
     MINS_NAT_GRP_PV       decimal(6)     null,
@@ -1854,7 +1854,7 @@ create table SAS_PS_MINIMUMS
 
 create table SAS_PS_NON_RESPONSE
 (
-    NR_PORT_GRP_PV   varchar(10)    not null,
+    NR_PORT_GRP_PV   decimal(3)    not null,
     ARRIVEDEPART     decimal(1)     not null,
     WEEKDAY_END_PV   decimal(1)     null,
     MEAN_RESPS_SH_WT decimal(9, 3)  null,
@@ -2224,10 +2224,10 @@ create table SAS_SURVEY_SUBSAMPLE
     MINS_CTRY_PORT_GRP_PV  varchar(10)    null,
     MINS_FLAG_PV           decimal(1)     null,
     MINS_NAT_GRP_PV        decimal(6)     null,
-    MINS_PORT_GRP_PV       varchar(6)     null,
+    MINS_PORT_GRP_PV       decimal(3)     null,
     MINS_QUALITY_PV        decimal(1)     null,
     NR_FLAG_PV             decimal(1)     null,
-    NR_PORT_GRP_PV         varchar(10)    null,
+    NR_PORT_GRP_PV         decimal(3)    null,
     OPERA_PV               decimal(2)     null,
     OSPORT1_PV             decimal(8)     null,
     OSPORT2_PV             decimal(8)     null,
@@ -2636,10 +2636,10 @@ create table SURVEY_SUBSAMPLE
     MINS_CTRY_PORT_GRP_PV  varchar(10)    null,
     MINS_FLAG_PV           decimal(1)     null,
     MINS_NAT_GRP_PV        decimal(6)     null,
-    MINS_PORT_GRP_PV       varchar(6)     null,
+    MINS_PORT_GRP_PV       decimal(3)     null,
     MINS_QUALITY_PV        decimal(1)     null,
     NR_FLAG_PV             decimal(1)     null,
-    NR_PORT_GRP_PV         varchar(10)    null,
+    NR_PORT_GRP_PV         decimal(3)    null,
     OPERA_PV               decimal(2)     null,
     OSPORT1_PV             decimal(8)     null,
     OSPORT2_PV             decimal(8)     null,

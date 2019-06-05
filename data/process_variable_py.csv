@@ -957,7 +957,7 @@ elif row['RESPNSE'] >= 4 and row['RESPNSE'] < 7:
     row['NR_FLAG_PV'] = 1
 else:
     row['NR_FLAG_PV'] = 2
-TEMPLATE,8,nr_port_grp_pv,nr_port_grp_pv,"row['NR_PORT_GRP_PV'] = str(row['PORTROUTE']).rjust(3,"" "")"
+TEMPLATE,8,nr_port_grp_pv,nr_port_grp_pv,"row['NR_PORT_GRP_PV'] = row['PORTROUTE']"
 TEMPLATE,9,mins_flag_pv,mins_flag_pv,if row['TYPEINTERVIEW'] == 1:
     row['MINS_FLAG_PV'] = 2
 elif row['RESPNSE'] == 1 or row['RESPNSE'] == 2:

@@ -55,11 +55,6 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
     if 'NON_RESPONSE_WT' in survey_data.columns:
         survey_data = survey_data.drop(columns=['NON_RESPONSE_WT'])
 
-    # Formatting and fudgery
-    # non_response_data['NR_PORT_GRP_PV'] = pd.to_numeric(non_response_data['NR_PORT_GRP_PV'], errors='coerce')
-    # non_response_data['WEEKDAY_END_PV'] = pd.to_numeric(non_response_data['WEEKDAY_END_PV'], errors='coerce')
-    # non_response_data.replace('None', np.nan, inplace=True)
-
     df_nonresponsedata_sorted = non_response_data.sort_values(SHIFTS_STRATA)
 
     survey_data['NR_PORT_GRP_PV'].fillna(0, inplace=True)
@@ -76,8 +71,7 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
     # Only keep rows that exist in df_nonresponsedata_sorted 
     df_grossmignonresp = pd.merge(df_nonresponsedata_sorted, df_psw, on=SHIFTS_STRATA, how='left')
 
-    # Add gross values using the primary sampling weight and add two new columns
-    # to df_grossmignonresp
+    # Add gross values using the primary sampling weight and add two new columns to df_grossmignonresp
     df_grossmignonresp['SHIFT_WT'].fillna(0, inplace=True)
     df_grossmignonresp['grossmignonresp'] = df_grossmignonresp[PSW_COLUMN] * df_grossmignonresp[NR_TOTALS_COLUMN]
 
@@ -92,20 +86,16 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
 
     # Summarise over non-response strata
     df_grossmignonresp = df_grossmignonresp.sort_values(NON_RESPONSE_STRATA)
-
     df_summignonresp = df_grossmignonresp.groupby(NON_RESPONSE_STRATA).agg({'grossmignonresp': 'sum',
                                                                             'grossordnonresp': 'sum'})
 
     # Flattens the column structure after adding the new grossmignonresp and grossordnonresp columns
     df_summignonresp = df_summignonresp.reset_index()
-
     df_summignonresp = df_summignonresp.rename(columns={'grossordnonresp': 'grossinelresp'})
 
     # Calculate the grossed number of respondents over the non-response strata
-
     # Use only records in which NR_FLAG_PV is 0
     df_surveydata_sliced = df_surveydata_sorted.loc[df_surveydata_sorted[NR_FLAG_COLUMN] == 0]
-
     df_surveydata_sliced = df_surveydata_sliced.sort_values(NON_RESPONSE_STRATA)
 
     # Create two new columns as aggregations of SHIFT_WT
@@ -116,10 +106,8 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
     df_sumresp = df_sumresp.reset_index()
 
     # Calculate the grossed number of T&T non-respondents of the non-response strata    
-
-    # Use only records from the survey dataset where the NR_FLAG_PV is 1, then sort    
+    # Use only records from the survey dataset where the NR_FLAG_PV is 1, then sort
     df_surveydata_sliced = df_surveydata_sorted.loc[df_surveydata_sorted[NR_FLAG_COLUMN] == 1]
-
     df_surveydata_sliced = df_surveydata_sliced.sort_values(NON_RESPONSE_STRATA)
 
     # Create new column using the sum of ShiftWt
@@ -131,18 +119,13 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
 
     # Sort values in the three dataframes required for the next calculation
     df_sumordnonresp = df_sumordnonresp.sort_values(NON_RESPONSE_STRATA)
-
     df_sumresp = df_sumresp.sort_values(NON_RESPONSE_STRATA)
-
     df_summignonresp = df_summignonresp.sort_values(NON_RESPONSE_STRATA)
 
     # Use the calculated data frames to calculate the non-response weight
-
     # Merge previously sorted dataframes into one, ensuring all rows from summignonresp are kept
     df_gnr = df_summignonresp.merge(df_sumresp, on=NON_RESPONSE_STRATA, how='outer')
-
     df_gnr = df_gnr.sort_values(NON_RESPONSE_STRATA)
-
     df_gnr = df_gnr.merge(df_sumordnonresp, on=NON_RESPONSE_STRATA, how='left')
 
     # Replace all NaN values in columns with zero's
@@ -191,9 +174,8 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
     # Flatten column structure
     df_summary.reset_index(inplace=True)
 
-    # Create and add one new column calculated using 'non_response_wt' in a 
-    # different dataframe due to difficulty in creating all four new columns
-    # simultaneously in a single dataframe
+    # Create and add one new column calculated using 'non_response_wt' in a different dataframe due to difficulty in
+    # creating all four new columns simultaneously in a single dataframe
     df_summary_nr = df_out.groupby(SHIFTS_STRATA)[non_response_weight_column].agg(['mean'])
     df_summary_nr.rename(columns={'mean': MEAN_NRW_COLUMN}, inplace=True)
 
@@ -227,11 +209,8 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
     # Perform data validation
     df_count_below_threshold = df_summary[df_summary[RESP_COUNT_COLUMN] > 0]
     df_gnr_below_threshold = df_summary[df_summary[GNR_COLUMN] > 0]
-
     df_merged_thresholds = df_count_below_threshold.merge(df_gnr_below_threshold, how='inner')
-
     df_merged_thresholds = df_merged_thresholds[df_merged_thresholds[RESP_COUNT_COLUMN] < 30]
-
     df_merged_thresholds = df_merged_thresholds[NON_RESPONSE_STRATA]
 
     # Collect data outside of specified threshold
@@ -239,8 +218,6 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
         log_warnings("Respondent count below minimum threshold for")(df_merged_thresholds, 2, run_id, 2)
 
     # Reduce output to just key value pairs
-    # Round up to avoid truncation messages when saving to DB
-    df_out[non_response_weight_column] = df_out[non_response_weight_column].round(3)
     df_out = df_out[[var_serial, non_response_weight_column]]
 
     return df_out, df_summary

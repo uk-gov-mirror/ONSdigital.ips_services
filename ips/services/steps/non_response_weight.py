@@ -51,7 +51,6 @@ def non_response_weight_step(run_id):
 
     # Retrieve data from SQL
     survey_data = get_survey_data()
-
     non_response_data = read_table_values(config["data_table"])()
 
     # Calculate Non Response Weight
