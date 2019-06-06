@@ -1204,37 +1204,37 @@ if dataset == ''survey'':
         else:
             row[''REGION''] = dvpc
         if row[''REGION''] in (8, 20, 31, 40, 51, 56, 70, 100, 112, 191, 203, 208, 233, 234, 246, 250, 268, 276, 348, 352, 380, 398, 417, 428, 440, 442, 492, 498, 499, 528, 578, 616, 642, 643, 674, 688, 703, 705, 752, 756, 762, 795, 804, 807, 860, 940, 942, 943, 944, 945, 946, 950, 951):
-            row[''UNSAMP_REGION_GRP_PV''] = ''1''
+            row[''UNSAMP_REGION_GRP_PV''] = 1.0
         elif row[''REGION''] in (124, 304, 630, 666, 840, 850):
-            row[''UNSAMP_REGION_GRP_PV''] = ''2''
+            row[''UNSAMP_REGION_GRP_PV''] = 2.0
         elif row[''REGION''] in (4, 36, 50, 64, 96, 104, 116, 126, 144, 156, 158, 242, 356, 360, 408, 410, 418, 446, 458, 462, 496, 524, 554, 586, 608, 626, 702, 704, 764):
-            row[''UNSAMP_REGION_GRP_PV''] = ''3''
+            row[''UNSAMP_REGION_GRP_PV''] = 3.0
         elif row[''REGION''] in (12, 24, 48, 72, 108, 120, 132, 140, 148, 174, 178, 180, 204, 226, 231, 232, 262, 266, 270, 288, 324, 348, 384, 404, 426, 430, 434, 450, 454, 466, 478, 480, 504, 508, 516, 562, 566, 624, 646, 654, 678, 686, 690, 694, 706, 710, 716, 732, 736, 748, 768, 788, 800, 818, 834, 854, 894):
-            row[''UNSAMP_REGION_GRP_PV''] = ''4''
+            row[''UNSAMP_REGION_GRP_PV''] = 4.0
         elif row[''REGION''] == 392:
-            row[''UNSAMP_REGION_GRP_PV''] = ''5''
+            row[''UNSAMP_REGION_GRP_PV''] = 5.0
         elif row[''REGION''] == 344:
-            row[''UNSAMP_REGION_GRP_PV''] = ''6''
+            row[''UNSAMP_REGION_GRP_PV''] = 6.0
         elif row[''REGION''] in (16, 28, 32, 44, 48, 52, 60, 68, 76, 84, 90, 92, 136, 152, 166, 170, 184, 188, 192, 212, 214, 218, 222, 238, 254, 258, 296, 308, 312, 316, 320, 328, 332, 340, 364, 368, 376, 388, 400, 414, 422, 474, 484, 500, 512, 520, 530, 533, 540, 548, 558, 580, 581, 584, 591, 598, 604, 634, 638, 659, 660, 662, 670, 682, 690, 740, 760, 776, 780, 784, 796, 798, 858, 862, 882, 887, 949):
-            row[''UNSAMP_REGION_GRP_PV''] = ''7''
+            row[''UNSAMP_REGION_GRP_PV''] = 7.0
         elif row[''REGION''] == 300:
-            row[''UNSAMP_REGION_GRP_PV''] = ''8''
+            row[''UNSAMP_REGION_GRP_PV''] = 8.0
         elif row[''REGION''] in (292, 620, 621, 911, 912):
-            row[''UNSAMP_REGION_GRP_PV''] = ''9''
+            row[''UNSAMP_REGION_GRP_PV''] = 9.0
         elif row[''REGION''] in (470, 792, 901, 902):
-            row[''UNSAMP_REGION_GRP_PV''] = ''10''
+            row[''UNSAMP_REGION_GRP_PV''] = 10.0
         elif row[''REGION''] == 372:
-            row[''UNSAMP_REGION_GRP_PV''] = ''11''
+            row[''UNSAMP_REGION_GRP_PV''] = 11.0
         elif row[''REGION''] in (831, 832, 833, 931):
-            row[''UNSAMP_REGION_GRP_PV''] = ''12''
+            row[''UNSAMP_REGION_GRP_PV''] = 12.0
         elif row[''REGION''] in (921, 923, 924, 926, 933):
-            row[''UNSAMP_REGION_GRP_PV''] = ''13''
+            row[''UNSAMP_REGION_GRP_PV''] = 13.0
 elif dataset == ''unsampled'':
     if not math.isnan(row[''REGION'']):
         row[''REGION''] = int(row[''REGION''])
-        row[''UNSAMP_REGION_GRP_PV''] = str(row[''REGION''])
+        row[''UNSAMP_REGION_GRP_PV''] = row[''REGION'']
 
-if row[''UNSAMP_PORT_GRP_PV''] == ''A201'' and row[''UNSAMP_REGION_GRP_PV''] == ''7'' and row[''ARRIVEDEPART''] == 2:
+if row[''UNSAMP_PORT_GRP_PV''] == ''A201'' and row[''UNSAMP_REGION_GRP_PV''] == 7.0 and row[''ARRIVEDEPART''] == 2:
     row[''UNSAMP_PORT_GRP_PV''] = ''A191''
 if row[''UNSAMP_PORT_GRP_PV''] == ''HGS'':
     row[''UNSAMP_PORT_GRP_PV''] = ''HBN''
@@ -1243,11 +1243,11 @@ if row[''UNSAMP_PORT_GRP_PV''] == ''E921'':
 if row[''UNSAMP_PORT_GRP_PV''] == ''E951'':
     row[''UNSAMP_PORT_GRP_PV''] = ''E911''
 
-if row[''UNSAMP_PORT_GRP_PV''] == ''A181'' and row[''UNSAMP_REGION_GRP_PV''] == ''6'' and row[''ARRIVEDEPART''] == 1:
+if row[''UNSAMP_PORT_GRP_PV''] == ''A181'' and row[''UNSAMP_REGION_GRP_PV''] == 6.0 and row[''ARRIVEDEPART''] == 1:
     row[''UNSAMP_PORT_GRP_PV''] = ''A151''
-if row[''UNSAMP_PORT_GRP_PV''] == ''A211'' and row[''UNSAMP_REGION_GRP_PV''] == ''4'' and row[''ARRIVEDEPART''] == 1:
+if row[''UNSAMP_PORT_GRP_PV''] == ''A211'' and row[''UNSAMP_REGION_GRP_PV''] == 4.0 and row[''ARRIVEDEPART''] == 1:
     row[''UNSAMP_PORT_GRP_PV''] = ''A221''
-if row[''UNSAMP_PORT_GRP_PV''] == ''A241'' and row[''UNSAMP_REGION_GRP_PV''] == ''8'' and row[''ARRIVEDEPART''] == 1:
+if row[''UNSAMP_PORT_GRP_PV''] == ''A241'' and row[''UNSAMP_REGION_GRP_PV''] == 8.0 and row[''ARRIVEDEPART''] == 1:
     row[''UNSAMP_PORT_GRP_PV''] = ''A201''
 
 if row[''UNSAMP_PORT_GRP_PV''] == ''RSS'' and row[''ARRIVEDEPART''] == 1:
@@ -1570,7 +1570,7 @@ create table PS_UNSAMPLED_OOH
     RUN_ID                varchar(40)    not null,
     UNSAMP_PORT_GRP_PV    varchar(10)    not null,
     ARRIVEDEPART          decimal(1)     not null,
-    UNSAMP_REGION_GRP_PV  varchar(10)    null,
+    UNSAMP_REGION_GRP_PV  decimal(9,3)    null,
     CASES                 decimal(6)     null,
     SUM_PRIOR_WT          decimal(12, 3) null,
     SUM_UNSAMP_TRAFFIC_WT decimal(12, 3) null,
@@ -1899,7 +1899,7 @@ create table SAS_PS_UNSAMPLED_OOH
 (
     UNSAMP_PORT_GRP_PV    varchar(10)    not null,
     ARRIVEDEPART          decimal(1)     not null,
-    UNSAMP_REGION_GRP_PV  varchar(10)    null,
+    UNSAMP_REGION_GRP_PV  decimal(9,3)    null,
     CASES                 decimal(6)     null,
     SUM_PRIOR_WT          decimal(12, 3) null,
     SUM_UNSAMP_TRAFFIC_WT decimal(12, 3) null,
@@ -2259,7 +2259,7 @@ create table SAS_SURVEY_SUBSAMPLE
     UKPORT3_PV             decimal(4)     null,
     UKPORT4_PV             decimal(4)     null,
     UNSAMP_PORT_GRP_PV     varchar(10)    null,
-    UNSAMP_REGION_GRP_PV   varchar(10)    null,
+    UNSAMP_REGION_GRP_PV   decimal(9,3)    null,
     WEEKDAY_END_PV         decimal(1)     null,
     DIRECT                 decimal(6)     null,
     EXPENDITURE_WT         decimal(6, 3)  null,
@@ -2394,7 +2394,7 @@ create table SAS_UNSAMPLED_OOH_DATA
     ARRIVEDEPART         decimal(1)  null,
     UNSAMP_TOTAL         decimal     null,
     UNSAMP_PORT_GRP_PV   varchar(10) null,
-    UNSAMP_REGION_GRP_PV varchar(10) null
+    UNSAMP_REGION_GRP_PV decimal(9,3) null
 );
 
 
@@ -2402,7 +2402,7 @@ create table SAS_UNSAMPLED_OOH_PV
 (
     REC_ID               decimal     not null,
     UNSAMP_PORT_GRP_PV   varchar(10) not null,
-    UNSAMP_REGION_GRP_PV varchar(10) null,
+    UNSAMP_REGION_GRP_PV decimal(9,3) null,
     HAUL_PV              varchar(2)  null
 );
 
@@ -2411,7 +2411,7 @@ create table SAS_UNSAMPLED_OOH_SPV
 (
     SERIAL               decimal(15) not null,
     UNSAMP_PORT_GRP_PV   varchar(10) null,
-    UNSAMP_REGION_GRP_PV varchar(10) null,
+    UNSAMP_REGION_GRP_PV decimal(9,3) null,
     HAUL_PV              varchar(2)  null
 );
 
@@ -2671,7 +2671,7 @@ create table SURVEY_SUBSAMPLE
     UKPORT3_PV             decimal(4)     null,
     UKPORT4_PV             decimal(4)     null,
     UNSAMP_PORT_GRP_PV     varchar(10)    null,
-    UNSAMP_REGION_GRP_PV   varchar(10)    null,
+    UNSAMP_REGION_GRP_PV   decimal(9,3)    null,
     WEEKDAY_END_PV         decimal(1)     null,
     DIRECT                 decimal(6)     null,
     EXPENDITURE_WT         decimal(6, 3)  null,
@@ -3152,7 +3152,7 @@ create index IX_POPROWVEC_UNSAMP_C_GROUP
 create table R_TRAFFIC
 (
     rownames           varchar(255) null,
-    SERIAL             double       null,
+    SERIAL             decimal(15)       null,
     ARRIVEDEPART       int          null,
     PORTROUTE          int          null,
     SAMP_PORT_GRP_PV   varchar(255) null,
@@ -3170,15 +3170,15 @@ create table R_TRAFFIC
 create table R_UNSAMPLED
 (
     rownames              varchar(255) null,
-    SERIAL                float        null,
+    SERIAL                decimal(15)        null,
     ARRIVEDEPART          int          null,
     PORTROUTE             int          null,
     UNSAMP_PORT_GRP_PV    varchar(255) null,
-    UNSAMP_REGION_GRP_PV  int          null,
+    UNSAMP_REGION_GRP_PV  decimal(9,3)          null,
     SHIFT_WT              float        null,
     NON_RESPONSE_WT       float        null,
     MINS_WT               float        null,
-    UNSAMP_TRAFFIC_WT     float        null,
+    UNSAMP_TRAFFIC_WT     decimal(9, 3)        null,
     OOH_DESIGN_WEIGHT     float        null,
     T1                    int          null,
     T_                    varchar(255) null,
@@ -3206,7 +3206,7 @@ create table R_UNSAMPLED
 
 create table SURVEY_TRAFFIC_AUX
 (
-    SERIAL             bigint       null,
+    SERIAL             decimal(15)       null,
     ARRIVEDEPART       int          null,
     PORTROUTE          int          null,
     SAMP_PORT_GRP_PV   varchar(255) null,
@@ -3221,15 +3221,15 @@ create table SURVEY_TRAFFIC_AUX
 
 create table SURVEY_UNSAMP_AUX
 (
-    SERIAL               bigint       null,
+    SERIAL               decimal(15)       null,
     ARRIVEDEPART         int          null,
     PORTROUTE            int          null,
     UNSAMP_PORT_GRP_PV   varchar(255) null,
-    UNSAMP_REGION_GRP_PV int          null,
+    UNSAMP_REGION_GRP_PV decimal(9,3)          null,
     SHIFT_WT             float        null,
     NON_RESPONSE_WT      float        null,
     MINS_WT              float        null,
-    UNSAMP_TRAFFIC_WT    varchar(5)   null,
+    UNSAMP_TRAFFIC_WT    decimal(9, 3)   null,
     OOH_DESIGN_WEIGHT    float        null,
     T1                   int          null
 );

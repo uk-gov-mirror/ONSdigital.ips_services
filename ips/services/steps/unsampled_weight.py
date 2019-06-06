@@ -66,7 +66,6 @@ def unsampled_weight_step(run_id):
         min_count_threshold=30,
         run_id=run_id)
 
-
     # Insert data to SQL
     insert_from_dataframe(config["temp_table"])(output_data)
     insert_from_dataframe(config["sas_ps_table"])(summary_data)

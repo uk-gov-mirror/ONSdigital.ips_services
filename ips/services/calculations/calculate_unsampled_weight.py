@@ -281,6 +281,7 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
                    function call and implement its return functionality 
                    be rewriting the 
     """
+
     ooh_design_weight_column = 'OOHDESIGNWEIGHT'
     # Create new column for design weights (Generate the design weights)
     df_surveydata[ooh_design_weight_column] = \
@@ -420,6 +421,6 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     df_summary['UNSAMP_TRAFFIC_WT'] = df_summary['UNSAMP_TRAFFIC_WT'].round(3)
     df_output['UNSAMP_TRAFFIC_WT'] = df_output['UNSAMP_TRAFFIC_WT'].round(3)
 
-    df_output.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/data/df_output.csv')
+    df_summary.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/df_summary.csv')
 
     return df_output, df_summary
