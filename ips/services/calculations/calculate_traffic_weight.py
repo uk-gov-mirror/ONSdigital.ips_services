@@ -440,7 +440,7 @@ def do_ips_trafweight_calculation_with_r(survey_data, trtotals, run_id):
     )
 
     # update the output SQL tables
-    db.save_sas_traffic_wt(ret_out_final)
-    db.save_summary(df_summary_merge_sum_traftot)
+    # db.save_sas_traffic_wt(ret_out_final)
+    # db.save_summary(df_summary_merge_sum_traftot)
 
     return ret_out_final, df_summary_merge_sum_traftot
