@@ -339,8 +339,6 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
 
     ges_dataframes = do_ips_ges_weighting(df_surveydata, df_ustotals)
 
-    # @TODO: WORK FROM HERE
-
     df_survey = ges_dataframes[0]
     df_output = ges_dataframes[1]
     # Sort df_surveydata dataframe before merge
@@ -389,7 +387,7 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     # Merge the cases dataframe into our summary dataframe
     df_summary = pd.merge(df_summary, df_cases, on=OOH_STRATA, how='right')
 
-    # Replace the previously added 'NOTHING' values with their original blank values  
+    # Replace the previously added 'NOTHING' values with their original blank values
     df_summary = df_summary.replace('NOTHING', np.NaN)
 
     output_column_order = [
@@ -420,7 +418,5 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     df_summary[OOH_WEIGHT_SUM_COLUMN] = df_summary[OOH_WEIGHT_SUM_COLUMN].round(3)
     df_summary['UNSAMP_TRAFFIC_WT'] = df_summary['UNSAMP_TRAFFIC_WT'].round(3)
     df_output['UNSAMP_TRAFFIC_WT'] = df_output['UNSAMP_TRAFFIC_WT'].round(3)
-
-    df_summary.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/df_summary.csv')
 
     return df_output, df_summary
