@@ -15,8 +15,7 @@ from ips.services.dataimport.import_traffic import import_air
 from ips.services.dataimport.import_traffic import import_sea
 from ips.services.dataimport.import_traffic import import_tunnel
 
-from ips.services.steps import shift_weight, non_response_weight, minimums_weight, traffic_weight, unsampled_weight, \
-    imbalance_weight
+from ips.services import ips_workflow
 
 SURVEY_SUBSAMPLE_TABLE = 'SURVEY_SUBSAMPLE'
 
@@ -67,12 +66,8 @@ def setup_module(module):
     setup_pv()
 
     # Run steps
-    shift_weight.shift_weight_step(run_id)
-    non_response_weight.non_response_weight_step(run_id)
-    minimums_weight.minimums_weight_step(run_id)
-    traffic_weight.traffic_weight_step(run_id)
-    unsampled_weight.unsampled_weight_step(run_id)
-    imbalance_weight.imbalance_weight_step(run_id)
+    workflow = ips_workflow.IPSWorkflow()
+    workflow.run_calculations(run_id)
 
 
 def setup_pv():
@@ -90,13 +85,9 @@ def teardown_module(module):
     ('NON_RESPONSE', 'data/calculations/december_2017/non_response_weight/dec_output.csv', 'data/calculations/december_2017/non_response_weight/dec2017_summary.csv', ['SERIAL', 'NON_RESPONSE_WT'], 'PS_NON_RESPONSE', ['NR_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'MEAN_RESPS_SH_WT', 'COUNT_RESPS', 'PRIOR_SUM', 'GROSS_RESP', 'GNR', 'MEAN_NR_WT']),
     ('MINIMUMS', 'data/calculations/december_2017/min_weight/dec2017_survey.csv', 'data/calculations/december_2017/min_weight/summarydata_final.csv', ['SERIAL', 'MINS_WT'], 'PS_MINIMUMS', ['MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV', 'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS', 'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD']),
     ('TRAFFIC', 'data/calculations/december_2017/traffic_weight/surveydata_dec2017.csv', 'data/calculations/december_2017/traffic_weight/ps_traffic.csv', ['SERIAL', 'TRAFFIC_WT'], 'PS_TRAFFIC', ['SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT']),
-    ('UNSAMPLED', 'data/calculations/december_2017/unsampled_weight/surveydata_dec2017utf8.csv', 'data/calculations/december_2017/unsampled_weight/ps_unsampled_ooh.csv', ['SERIAL', 'UNSAMP_TRAFFIC_WT'], 'PS_UNSAMPLED_OOH', ['UNSAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'UNSAMP_REGION_GRP_PV', 'CASES', 'SUM_PRIOR_WT', 'SUM_UNSAMP_TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT']), # summary_output_columns
-    ('IMBALANCE',
-     'data/calculations/december_2017/imbalance_weight/surveydata_dec2017_utf8.csv',
-     'data/calculations/december_2017/imbalance_weight/ps_imbalance.csv',
-     ['SERIAL', 'IMBAL_WT'],
-     'PS_IMBALANCE',
-     ['FLOW', 'SUM_PRIOR_WT', 'SUM_IMBAL_WT']),
+    ('UNSAMPLED', 'data/calculations/december_2017/unsampled_weight/surveydata_dec2017utf8.csv', 'data/calculations/december_2017/unsampled_weight/ps_unsampled_ooh.csv', ['SERIAL', 'UNSAMP_TRAFFIC_WT'], 'PS_UNSAMPLED_OOH', ['UNSAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'UNSAMP_REGION_GRP_PV', 'CASES', 'SUM_PRIOR_WT', 'SUM_UNSAMP_TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT']),
+    ('IMBALANCE', 'data/calculations/december_2017/imbalance_weight/surveydata_dec2017_utf8.csv', 'data/calculations/december_2017/imbalance_weight/ps_imbalance.csv', ['SERIAL', 'IMBAL_WT'], 'PS_IMBALANCE', ['FLOW', 'SUM_PRIOR_WT', 'SUM_IMBAL_WT']),
+    ('FINAL', 'data/calculations/december_2017/final_weight/surveydata_dec2017_utf8.csv', 'data/calculations/december_2017/final_weight/ps_final.csv', ['SERIAL', 'FINAL_WT'], 'PS_FINAL', ['SERIAL', 'SHIFT_WT', 'NON_RESPONSE_WT', 'MINS_WT', 'TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT', 'IMBAL_WT', 'FINAL_WT']),
     ])
 
 def test_step_outputs(test_name
@@ -121,25 +112,32 @@ def test_step_outputs(test_name
 
     # Test survey outputs
     log.info(f"Testing survey results for {test_name}")
-    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=False)
+    assert_frame_equal(survey_results, survey_expected, check_dtype=False)
 
     ####
 
     # Get summary results
-    if test_name in ('SHIFT', 'NON_RESPONSE', 'MINIMUMS', 'TRAFFIC', 'UNSAMPLED', 'IMBALANCE'):
+    if test_name in ('SHIFT', 'NON_RESPONSE', 'MINIMUMS', 'TRAFFIC', 'UNSAMPLED', 'IMBALANCE', 'FINAL'):
         log.info(f"Testing summary results for {test_name}")
-        summary_data = select_data("*", summary_output_table, "RUN_ID", run_id)
 
         # Create comparison summary dataframes
-        summary_results = summary_data.copy()
         summary_expected = pd.read_csv(expected_summary_output)
 
+        if test_name != 'FINAL':
+            # Summary data is exported from table
+            summary_data = select_data("*", summary_output_table, "RUN_ID", run_id)
+            summary_results = summary_data.copy()
+            summary_results.drop('RUN_ID', axis=1, inplace=True)
+        else:
+            # Final Weight Summary data is a subsample of records from the Survey output
+            summary_data = survey_subsample[survey_subsample['SERIAL'].isin(summary_expected['SERIAL'])]
+            summary_results = summary_data[summary_output_columns].copy()
+
         # pandas.testing.faff
-        summary_results.drop('RUN_ID', axis=1, inplace=True)
         summary_results.sort_values(by=summary_output_columns, axis=0, inplace=True)
         summary_expected.sort_values(by=summary_output_columns, axis=0, inplace=True)
         summary_results.index = range(0, len(summary_results))
         summary_expected.index = range(0, len(summary_expected))
 
         # Test summary outputs
-        assert_frame_equal(summary_results, summary_expected, check_dtype=False, check_less_precise=False)
+        assert_frame_equal(summary_results, summary_expected, check_dtype=False, check_less_precise=True)
