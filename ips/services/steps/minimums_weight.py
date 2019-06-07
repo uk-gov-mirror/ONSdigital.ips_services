@@ -35,16 +35,6 @@ def minimums_weight_step(run_id):
     # Update Survey Data with Minimums Wt PVs Output
     idm.update_survey_data_with_step_pv_output(config)
 
-
-# #     # TODO: Delete after debug -->
-#     import sys
-#     sys.exit()
-# #
-#
-# def els_hack(run_id):
-#     config = ServicesConfiguration().get_non_response()
-#     # TODO: <--
-
     # Retrieve data from SQL
     survey_data = get_survey_data()
 
@@ -69,8 +59,3 @@ def minimums_weight_step(run_id):
 
     # Store Minimums Wt Summary
     idm.store_step_summary(run_id, config)
-
-
-# if __name__ == '__main__':
-#     run_id = 'h3re-1s-y0ur-run-1d'
-#     els_hack(run_id)
