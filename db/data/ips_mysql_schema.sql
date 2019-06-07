@@ -1174,13 +1174,13 @@ elif row[''PORTROUTE''] in (641, 671, 672, 681, 682, 691, 692, 731):
     row[''IMBAL_PORT_GRP_PV''] = 10
 elif row[''PORTROUTE''] in (611, 612, 701, 711, 721, 722, 812):
     row[''IMBAL_PORT_GRP_PV''] = 11
-elif row[''IMBAL_PORT_GRP_PV''] in (621, 631, 632, 633, 634, 651, 661, 662):
+elif row[''PORTROUTE''] in (621, 631, 632, 633, 634, 651, 661, 662):
     row[''IMBAL_PORT_GRP_PV''] = 12
 elif row[''PORTROUTE''] == 911:
     row[''IMBAL_PORT_GRP_PV''] = 13
 elif row[''PORTROUTE''] == 921:
     row[''IMBAL_PORT_GRP_PV''] = 14
-elif row[''IMBAL_PORT_GRP_PV''] == 811:
+elif row[''PORTROUTE''] == 811:
     row[''IMBAL_PORT_GRP_PV''] = 15
 elif row[''IMBAL_PORT_GRP_PV''] == 9999:
     row[''IMBAL_PORT_GRP_PV''] = 16
