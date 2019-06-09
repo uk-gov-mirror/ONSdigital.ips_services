@@ -121,7 +121,7 @@ def test_step_outputs(test_name
 
     # Test survey outputs
     log.info(f"Testing survey results for {test_name}")
-    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=False)
+    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
 
     ####
 
@@ -142,4 +142,4 @@ def test_step_outputs(test_name
         summary_expected.index = range(0, len(summary_expected))
 
         # Test summary outputs
-        assert_frame_equal(summary_results, summary_expected, check_dtype=False, check_less_precise=False)
+        assert_frame_equal(summary_results, summary_expected, check_dtype=False, check_less_precise=True)
