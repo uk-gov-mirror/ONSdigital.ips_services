@@ -91,12 +91,7 @@ def teardown_module(module):
     ('MINIMUMS', 'data/calculations/december_2017/min_weight/dec2017_survey.csv', 'data/calculations/december_2017/min_weight/summarydata_final.csv', ['SERIAL', 'MINS_WT'], 'PS_MINIMUMS', ['MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV', 'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS', 'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD']),
     ('TRAFFIC', 'data/calculations/december_2017/traffic_weight/surveydata_dec2017.csv', 'data/calculations/december_2017/traffic_weight/ps_traffic.csv', ['SERIAL', 'TRAFFIC_WT'], 'PS_TRAFFIC', ['SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT']),
     ('UNSAMPLED', 'data/calculations/december_2017/unsampled_weight/surveydata_dec2017utf8.csv', 'data/calculations/december_2017/unsampled_weight/ps_unsampled_ooh.csv', ['SERIAL', 'UNSAMP_TRAFFIC_WT'], 'PS_UNSAMPLED_OOH', ['UNSAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'UNSAMP_REGION_GRP_PV', 'CASES', 'SUM_PRIOR_WT', 'SUM_UNSAMP_TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT']), # summary_output_columns
-    ('IMBALANCE',
-     'data/calculations/december_2017/imbalance_weight/surveydata_dec2017_utf8.csv',
-     'data/calculations/december_2017/imbalance_weight/ps_imbalance.csv',
-     ['SERIAL', 'IMBAL_WT'],
-     'PS_IMBALANCE',
-     ['FLOW', 'SUM_PRIOR_WT', 'SUM_IMBAL_WT']),
+    ('IMBALANCE', 'data/calculations/december_2017/imbalance_weight/surveydata_dec2017_utf8.csv', 'data/calculations/december_2017/imbalance_weight/ps_imbalance.csv', ['SERIAL', 'IMBAL_WT'], 'PS_IMBALANCE', ['FLOW', 'SUM_PRIOR_WT', 'SUM_IMBAL_WT']),
     ])
 
 def test_step_outputs(test_name
