@@ -17,8 +17,6 @@ from ips.services.dataimport.import_traffic import import_tunnel
 
 from ips.services import ips_workflow
 
-SURVEY_SUBSAMPLE_TABLE = 'SURVEY_SUBSAMPLE'
-
 input_survey_data = 'data/calculations/december_2017/New_Dec_Data/Survey Data.csv'
 input_shift_data = 'data/calculations/december_2017/New_Dec_Data/Poss shifts Dec 2017.csv'
 input_nr_data = 'data/calculations/december_2017/New_Dec_Data/Dec17_NR.csv'
@@ -27,6 +25,7 @@ input_air_data = 'data/calculations/december_2017/New_Dec_Data/Air Sheet Dec 201
 input_sea_data = 'data/calculations/december_2017/New_Dec_Data/Sea Traffic Dec 2017.csv'
 input_tunnel_data = 'data/calculations/december_2017/New_Dec_Data/Tunnel Traffic Dec 2017.csv'
 
+survey_subsample_table = 'SURVEY_SUBSAMPLE'
 run_id = 'h3re-1s-y0ur-run-1d'
 month = '12'
 year = '2017'
@@ -89,16 +88,10 @@ def teardown_module(module):
     ('IMBALANCE', 'data/calculations/december_2017/imbalance_weight/surveydata_dec2017_utf8.csv', 'data/calculations/december_2017/imbalance_weight/ps_imbalance.csv', ['SERIAL', 'IMBAL_WT'], 'PS_IMBALANCE', ['FLOW', 'SUM_PRIOR_WT', 'SUM_IMBAL_WT']),
     ('FINAL', 'data/calculations/december_2017/final_weight/surveydata_dec2017_utf8.csv', 'data/calculations/december_2017/final_weight/ps_final.csv', ['SERIAL', 'FINAL_WT'], 'PS_FINAL', ['SERIAL', 'SHIFT_WT', 'NON_RESPONSE_WT', 'MINS_WT', 'TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT', 'IMBAL_WT', 'FINAL_WT']),
     ])
-
-def test_step_outputs(test_name
-                      , expected_survey_output
-                      , expected_summary_output
-                      , survey_output_columns
-                      , summary_output_table
-                      , summary_output_columns):
+def test_step_outputs(test_name, expected_survey_output, expected_summary_output, survey_output_columns, summary_output_table, summary_output_columns):
 
     # Get survey results
-    survey_subsample = select_data("*", SURVEY_SUBSAMPLE_TABLE, "RUN_ID", run_id)
+    survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
 
     # Create comparison survey dataframes
     survey_results = survey_subsample[survey_output_columns].copy()
@@ -112,7 +105,7 @@ def test_step_outputs(test_name
 
     # Test survey outputs
     log.info(f"Testing survey results for {test_name}")
-    assert_frame_equal(survey_results, survey_expected, check_dtype=False)
+    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
 
     ####
 
@@ -133,7 +126,7 @@ def test_step_outputs(test_name
             summary_data = survey_subsample[survey_subsample['SERIAL'].isin(summary_expected['SERIAL'])]
             summary_results = summary_data[summary_output_columns].copy()
 
-        # pandas.testing.faff
+        # pandas testing faff
         summary_results.sort_values(by=summary_output_columns, axis=0, inplace=True)
         summary_expected.sort_values(by=summary_output_columns, axis=0, inplace=True)
         summary_results.index = range(0, len(summary_results))
