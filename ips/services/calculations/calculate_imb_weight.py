@@ -1,4 +1,6 @@
 import pandas as pd
+import numpy as np
+
 from ips.util.services_logging import log
 
 OUTPUT_TABLE_NAME = "SAS_IMBALANCE_WT"
@@ -153,16 +155,22 @@ def do_ips_imbweight_calculation(df_survey_data, serial, shift_weight, non_respo
     )
 
     df_sliced = df_survey_data[df_survey_data[POST_SUM_COLUMN] > 0]
-    df_sliced[imbalance_weight] = df_sliced[imbalance_weight].astype('float').round(3)
+    # df_sliced[imbalance_weight] = df_sliced[imbalance_weight].astype('float').round(3)
+    df_sliced[imbalance_weight] = df_sliced[imbalance_weight].astype('float')
+
+    # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.
+    df_sliced[FLOW_COLUMN].fillna('NOTHING', inplace=True)
+
     df_summary_data = df_sliced.groupby([FLOW_COLUMN]).agg({
         PRIOR_SUM_COLUMN: 'sum', POST_SUM_COLUMN: 'sum'})
     df_summary_data = df_summary_data.reset_index()
 
+    # Replace the previously added 'NOTHING' values with their original blank values
+    df_summary_data = df_summary_data.replace('NOTHING', np.NaN)
+
     # Cleanse dataframes before returning
     df_survey_data = df_output_data[['SERIAL', 'IMBAL_WT']].copy()
-
-    df_survey_data['IMBAL_WT'] = df_survey_data['IMBAL_WT'].round(3)
-
+    # df_survey_data['IMBAL_WT'] = df_survey_data['IMBAL_WT'].round(3)
     df_survey_data.sort_values([serial], inplace=True)
 
     return df_survey_data, df_summary_data
