@@ -1,4 +1,3 @@
-import pytest
 import time
 import pandas as pd
 import ips.persistence.sql as db
@@ -280,7 +279,14 @@ def test_town_stay_expenditure_imputation():
 
 
 def test_airmiles():
-    log.info("Testing Calculation 14 --> airmiles")
+    log.info("Testing Calculation 14 --> airiles")
+    survey_output(
+        "AIRMILES",
+        "data/calculations/december_2017/air_miles/surveydata_dec2017.csv",
+        [
+            'SERIAL', 'UKLEG', 'OVLEG', 'DIRECTLEG'
+        ]
+    )
 
 
 def survey_output(test_name, expected_survey_output, survey_output_columns):
@@ -305,7 +311,6 @@ def survey_output(test_name, expected_survey_output, survey_output_columns):
 
 def summary_output(test_name, expected_summary_output, summary_output_table, summary_output_columns):
     # Get summary results
-
     log.info(f"Testing summary results for {test_name}")
 
     # Create comparison summary dataframes
@@ -317,8 +322,8 @@ def summary_output(test_name, expected_summary_output, summary_output_table, sum
         summary_results = summary_data.copy()
         summary_results.drop('RUN_ID', axis=1, inplace=True)
     else:
-        survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
         # Final Weight Summary data is a subsample of records from the Survey output
+        survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
         summary_data = survey_subsample[survey_subsample['SERIAL'].isin(summary_expected['SERIAL'])]
         summary_results = summary_data[summary_output_columns].copy()
 
