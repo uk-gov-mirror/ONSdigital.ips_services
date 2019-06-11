@@ -29,6 +29,7 @@ def shift_weight_step(run_id):
     # Copy Shift Wt PVs For Survey Data
     idm.copy_step_pvs_for_survey_data(run_id, config)
 
+    log.debug("shift_weight: Apply Shift Wt PVs On Survey Data")
     # Apply Shift Wt PVs On Survey Data
     process_variables.process(dataset='survey',
                               in_table_name='SAS_SURVEY_SUBSAMPLE',
@@ -41,6 +42,7 @@ def shift_weight_step(run_id):
     # Copy Shift Wt PVs For Shift Data
     idm.copy_step_pvs_for_step_data(run_id, config)
 
+    log.debug("shift_weight: Apply Shift Wt PVs On Shift Data")
     # Apply Shift Wt PVs On Shift Data
     process_variables.process(dataset='shift',
                               in_table_name='SAS_SHIFT_DATA',
@@ -54,6 +56,7 @@ def shift_weight_step(run_id):
     survey_data = get_survey_data()
     shift_data = read_table_values(config["data_table"])()
 
+    log.debug("shift_weight: Calculate Shift Weight")
     # Calculate Shift Weight
     survey_data_out, summary_data_out = \
         calculate_shift_weight.do_ips_shift_weight_calculation(survey_data,

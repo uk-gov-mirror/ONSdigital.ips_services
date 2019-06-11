@@ -1,7 +1,5 @@
 from typing import Callable, List, TypeVar
 
-from ips.util.services_logging import log
-
 import ips.services.run_management as runs
 import ips.services.steps.air_miles as airmiles
 import ips.services.steps.fares_imputation as fares_imputation
@@ -17,7 +15,8 @@ import ips.services.steps.stay_imputation as stay_imputation
 import ips.services.steps.town_stay_expenditure as town_stay_expenditure
 import ips.services.steps.traffic_weight as traffic_weight
 import ips.services.steps.unsampled_weight as unsampled_weight
-from ips.persistence.persistence import truncate_table, delete_from_table
+from ips.persistence.persistence import truncate_table
+from ips.util.services_logging import log
 
 
 class IPSWorkflow:
@@ -36,6 +35,7 @@ def run_step(func: [[W, str], None]) -> Callable[[str], None]:
             self.set_status(run_id, runs.IN_PROGRESS, func.__name__[1:])
             func(self, run_id)
             self.set_step_status(run_id, runs.DONE, func.__name__[6:])
+
     return wrapper
 
 
@@ -93,7 +93,7 @@ class IPSWorkflow:
         runs.set_percent_done(run_id, percent)
 
     def get_step(self, run_id):
-        return runs.get_step(run_id);
+        return runs.get_step(run_id)
 
     @run_step
     def _step_1(self, run_id: str) -> None:
@@ -150,10 +150,9 @@ class IPSWorkflow:
         log.info("Calculation 11 --> rail_imputation")
         rail_imputation.rail_imputation_step(run_id)
 
-
     @run_step
     def _step_12(self, run_id: str) -> None:
-        self.set_step_status(run_id, runs.IN_PROGRESS, '12')
+        log.info("Calculation 12 --> regional_weights")
         regional_weights.regional_weights_step(run_id)
 
     @run_step

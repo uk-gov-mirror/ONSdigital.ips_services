@@ -7,7 +7,7 @@ cffi==1.12.3
 chardet==3.0.4
 colorama==0.4.1
 cryptography==2.6.1
-Cython==0.29.7
+Cython==0.29.10
 falcon==2.0.0
 falcon-multipart==0.2.0
 idna==2.8

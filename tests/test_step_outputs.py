@@ -1,10 +1,10 @@
 import pytest
 import time
 import pandas as pd
-import ips_common_db.sql as db
+import ips.persistence.sql as db
 
 from pandas.testing import assert_frame_equal
-from ips_common.ips_logging import log
+from ips.util.services_logging import log
 from ips.persistence.persistence import select_data
 
 from ips.services.dataimport.import_survey import import_survey
@@ -31,6 +31,7 @@ month = '12'
 year = '2017'
 
 start_time = time.time()
+
 
 def setup_module(module):
     # Load Survey data
@@ -79,23 +80,217 @@ def teardown_module(module):
     log.info(f"Test duration: {time.strftime('%H:%M:%S', time.gmtime(time.time() - start_time))}")
 
 
-@pytest.mark.parametrize('test_name, expected_survey_output, expected_summary_output, survey_output_columns, summary_output_table, summary_output_columns', [
-    ('SHIFT', 'data/calculations/december_2017/shift_weight/dec_output.csv', 'data/calculations/december_2017/shift_weight/dec2017_summary.csv', ['SERIAL', 'SHIFT_WT'], 'PS_SHIFT_DATA', ['SHIFT_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'AM_PM_NIGHT_PV', 'MIGSI', 'POSS_SHIFT_CROSS', 'SAMP_SHIFT_CROSS', 'MIN_SH_WT', 'MEAN_SH_WT', 'MAX_SH_WT', 'COUNT_RESPS', 'SUM_SH_WT']),
-    ('NON_RESPONSE', 'data/calculations/december_2017/non_response_weight/dec_output.csv', 'data/calculations/december_2017/non_response_weight/dec2017_summary.csv', ['SERIAL', 'NON_RESPONSE_WT'], 'PS_NON_RESPONSE', ['NR_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'MEAN_RESPS_SH_WT', 'COUNT_RESPS', 'PRIOR_SUM', 'GROSS_RESP', 'GNR', 'MEAN_NR_WT']),
-    ('MINIMUMS', 'data/calculations/december_2017/min_weight/dec2017_survey.csv', 'data/calculations/december_2017/min_weight/summarydata_final.csv', ['SERIAL', 'MINS_WT'], 'PS_MINIMUMS', ['MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV', 'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS', 'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD']),
-    ('TRAFFIC', 'data/calculations/december_2017/traffic_weight/surveydata_dec2017.csv', 'data/calculations/december_2017/traffic_weight/ps_traffic.csv', ['SERIAL', 'TRAFFIC_WT'], 'PS_TRAFFIC', ['SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT']),
-    ('UNSAMPLED', 'data/calculations/december_2017/unsampled_weight/surveydata_dec2017utf8.csv', 'data/calculations/december_2017/unsampled_weight/ps_unsampled_ooh.csv', ['SERIAL', 'UNSAMP_TRAFFIC_WT'], 'PS_UNSAMPLED_OOH', ['UNSAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'UNSAMP_REGION_GRP_PV', 'CASES', 'SUM_PRIOR_WT', 'SUM_UNSAMP_TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT']),
-    ('IMBALANCE', 'data/calculations/december_2017/imbalance_weight/surveydata_dec2017_utf8.csv', 'data/calculations/december_2017/imbalance_weight/ps_imbalance.csv', ['SERIAL', 'IMBAL_WT'], 'PS_IMBALANCE', ['FLOW', 'SUM_PRIOR_WT', 'SUM_IMBAL_WT']),
-    ('FINAL', 'data/calculations/december_2017/final_weight/surveydata_dec2017_utf8.csv', 'data/calculations/december_2017/final_weight/ps_final.csv', ['SERIAL', 'FINAL_WT'], 'PS_FINAL', ['SERIAL', 'SHIFT_WT', 'NON_RESPONSE_WT', 'MINS_WT', 'TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT', 'IMBAL_WT', 'FINAL_WT']),
-    ])
-def test_step_outputs(test_name, expected_survey_output, expected_summary_output, survey_output_columns, summary_output_table, summary_output_columns):
+def test_shift_weight():
+    log.info("Testing Calculation  1 --> shift_weight")
 
+    survey_output(
+        "SHIFT",
+        "data/calculations/december_2017/shift_weight/dec_output.csv",
+        [
+            'SERIAL', 'SHIFT_WT'
+        ]
+    )
+
+    summary_output(
+        "SHIFT",
+        "data/calculations/december_2017/shift_weight/dec2017_summary.csv",
+        "PS_SHIFT_DATA",
+        [
+            'SHIFT_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'AM_PM_NIGHT_PV', 'MIGSI', 'POSS_SHIFT_CROSS',
+            'SAMP_SHIFT_CROSS', 'MIN_SH_WT', 'MEAN_SH_WT', 'MAX_SH_WT', 'COUNT_RESPS', 'SUM_SH_WT'
+        ]
+    )
+
+
+def test_non_response_weight():
+    log.info("Testing Calculation  2 --> non_response_weight")
+    survey_output(
+        "NON_RESPONSE",
+        "data/calculations/december_2017/non_response_weight/dec_output.csv",
+        [
+            'SERIAL', 'NON_RESPONSE_WT'
+        ]
+    )
+
+    summary_output(
+        "NON_RESPONSE",
+        "data/calculations/december_2017/non_response_weight/dec2017_summary.csv",
+        "PS_NON_RESPONSE",
+        [
+            'NR_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'MEAN_RESPS_SH_WT', 'COUNT_RESPS', 'PRIOR_SUM',
+            'GROSS_RESP', 'GNR', 'MEAN_NR_WT'
+        ]
+    )
+
+
+def test_minimums_weight():
+    log.info("Testing Calculation  3 --> minimums_weight")
+
+    survey_output(
+        "MINIMUMS",
+        "data/calculations/december_2017/min_weight/dec2017_survey.csv",
+        [
+            'SERIAL', 'MINS_WT'
+        ]
+    )
+
+    summary_output(
+        "MINIMUMS",
+        "data/calculations/december_2017/min_weight/summarydata_final.csv",
+        "PS_MINIMUMS",
+        [
+            'MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV',
+            'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS',
+            'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD'
+        ]
+    )
+
+
+def test_traffic_weight():
+    log.info("Testing Calculation  4 --> traffic_weight")
+    survey_output(
+        "TRAFFIC",
+        "data/calculations/december_2017/traffic_weight/surveydata_dec2017.csv",
+        [
+            'SERIAL', 'TRAFFIC_WT'
+        ]
+    )
+
+    summary_output(
+        "TRAFFIC",
+        "data/calculations/december_2017/traffic_weight/ps_traffic.csv",
+        "PS_TRAFFIC",
+        [
+            'SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT'
+        ]
+    )
+
+
+def test_unsampled_weight():
+    log.info("Testing Calculation  5 --> unsampled_weight")
+    survey_output(
+        "UNSAMPLED",
+        "data/calculations/december_2017/unsampled_weight/surveydata_dec2017utf8.csv",
+        [
+            'SERIAL', 'UNSAMP_TRAFFIC_WT'
+        ]
+    )
+
+    summary_output(
+        "UNSAMPLED",
+        "data/calculations/december_2017/unsampled_weight/ps_unsampled_ooh.csv",
+        "PS_UNSAMPLED_OOH",
+        [
+            'UNSAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'UNSAMP_REGION_GRP_PV', 'CASES', 'SUM_PRIOR_WT',
+            'SUM_UNSAMP_TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT'
+        ]
+    )
+
+
+def test_imbalance_weight():
+    log.info("Testing Calculation  6 --> imbalance_weight")
+    survey_output(
+        "IMBALANCE",
+        "data/calculations/december_2017/imbalance_weight/surveydata_dec2017_utf8.csv",
+        [
+            'SERIAL', 'IMBAL_WT'
+        ]
+    )
+
+    summary_output(
+        "IMBALANCE",
+        "data/calculations/december_2017/imbalance_weight/ps_imbalance.csv",
+        "PS_IMBALANCE",
+        [
+            'FLOW', 'SUM_PRIOR_WT', 'SUM_IMBAL_WT'
+        ]
+    )
+
+
+def test_final_weight():
+    log.info("Testing Calculation  7 --> final_weight")
+    survey_output(
+        "FINAL",
+        "data/calculations/december_2017/final_weight/surveydata_dec2017_utf8.csv",
+        [
+            'SERIAL', 'FINAL_WT'
+        ]
+    )
+
+    summary_output(
+        "FINAL",
+        "data/calculations/december_2017/final_weight/ps_final.csv",
+        "PS_IMBALANCE",
+        [
+            'SERIAL', 'SHIFT_WT', 'NON_RESPONSE_WT', 'MINS_WT', 'TRAFFIC_WT',
+            'UNSAMP_TRAFFIC_WT', 'IMBAL_WT', 'FINAL_WT'
+        ]
+    )
+
+
+def test_stay_imputation():
+    log.info("Testing Calculation  8 --> stay_imputation")
+    survey_output(
+        "STAY",
+        "data/calculations/december_2017/stay/surveydata_dec2017.csv",
+        [
+            'SERIAL', 'STAY', 'STAYK'
+        ]
+    )
+
+
+def test_fares_imputation():
+    import ips.services.steps.stay_imputation as stay
+    import ips.services.steps.fares_imputation as fares
+
+    stay.stay_imputation_step(run_id)
+    fares.fares_imputation_step(run_id)
+
+    log.info("Testing Calculation  9 --> fares_imputation")
+    survey_output(
+        "FARES",
+        "data/calculations/december_2017/stay/surveydata_dec2017.csv",
+        [
+            'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
+        ]
+    )
+
+
+def test_spend_imputation():
+    log.info("Testing Calculation 10 --> spend_imputation")
+    survey_output(
+        "SPEND",
+        "data/calculations/december_2017/stay/surveydata_dec2017.csv",
+        [
+            'SERIAL', 'SPENDK', 'NEWSPEND'
+        ]
+    )
+
+
+def test_rail_imputation():
+    log.info("Testing Calculation 11 --> rail_imputation")
+
+
+def test_regional_weight():
+    log.info("Testing Calculation 14 --> regional_weight")
+
+
+def test_town_stay_expenditure_imputation():
+    log.info("Testing Calculation 13 --> town_stay_expenditure_imputation")
+
+
+def test_airmiles():
+    log.info("Testing Calculation 14 --> airmiles")
+
+
+def survey_output(test_name, expected_survey_output, survey_output_columns):
     # Get survey results
     survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
 
     # Create comparison survey dataframes
     survey_results = survey_subsample[survey_output_columns].copy()
     survey_expected = pd.read_csv(expected_survey_output)
+    survey_expected = survey_expected[survey_output_columns].copy()
 
     # pandas.testing.faff
     survey_results.sort_values(by='SERIAL', axis=0, inplace=True)
@@ -107,30 +302,31 @@ def test_step_outputs(test_name, expected_survey_output, expected_summary_output
     log.info(f"Testing survey results for {test_name}")
     assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
 
-    ####
 
+def summary_output(test_name, expected_summary_output, summary_output_table, summary_output_columns):
     # Get summary results
-    if test_name in ('SHIFT', 'NON_RESPONSE', 'MINIMUMS', 'TRAFFIC', 'UNSAMPLED', 'IMBALANCE', 'FINAL'):
-        log.info(f"Testing summary results for {test_name}")
 
-        # Create comparison summary dataframes
-        summary_expected = pd.read_csv(expected_summary_output)
+    log.info(f"Testing summary results for {test_name}")
 
-        if test_name != 'FINAL':
-            # Summary data is exported from table
-            summary_data = select_data("*", summary_output_table, "RUN_ID", run_id)
-            summary_results = summary_data.copy()
-            summary_results.drop('RUN_ID', axis=1, inplace=True)
-        else:
-            # Final Weight Summary data is a subsample of records from the Survey output
-            summary_data = survey_subsample[survey_subsample['SERIAL'].isin(summary_expected['SERIAL'])]
-            summary_results = summary_data[summary_output_columns].copy()
+    # Create comparison summary dataframes
+    summary_expected = pd.read_csv(expected_summary_output)
 
-        # pandas testing faff
-        summary_results.sort_values(by=summary_output_columns, axis=0, inplace=True)
-        summary_expected.sort_values(by=summary_output_columns, axis=0, inplace=True)
-        summary_results.index = range(0, len(summary_results))
-        summary_expected.index = range(0, len(summary_expected))
+    if test_name != 'FINAL':
+        # Summary data is exported from table
+        summary_data = select_data("*", summary_output_table, "RUN_ID", run_id)
+        summary_results = summary_data.copy()
+        summary_results.drop('RUN_ID', axis=1, inplace=True)
+    else:
+        survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
+        # Final Weight Summary data is a subsample of records from the Survey output
+        summary_data = survey_subsample[survey_subsample['SERIAL'].isin(summary_expected['SERIAL'])]
+        summary_results = summary_data[summary_output_columns].copy()
 
-        # Test summary outputs
-        assert_frame_equal(summary_results, summary_expected, check_dtype=False, check_less_precise=True)
+    # pandas testing faff
+    summary_results.sort_values(by=summary_output_columns, axis=0, inplace=True)
+    summary_expected.sort_values(by=summary_output_columns, axis=0, inplace=True)
+    summary_results.index = range(0, len(summary_results))
+    summary_expected.index = range(0, len(summary_expected))
+
+    # Test summary outputs
+    assert_frame_equal(summary_results, summary_expected, check_dtype=False, check_less_precise=True)
