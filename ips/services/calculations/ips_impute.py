@@ -166,7 +166,7 @@ def ips_impute_match(remainder, df_input, output, strata, var_value, level,
     # df_remainder = pd.merge(df_remainder, df_input, how="left")
 
     # TODO: This doesn't seem to do anything?
-    # df_remainder.merge(df_input, how="left")
+    df_remainder.merge(df_input, how="left")
 
     # df_remainder = df_remainder.drop('_merge', axis = 1)
     df_remainder = df_remainder.reset_index(drop=True)

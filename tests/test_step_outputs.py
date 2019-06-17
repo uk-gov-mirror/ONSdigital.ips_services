@@ -17,7 +17,7 @@ from ips.services.dataimport.import_traffic import import_tunnel
 
 from ips.services import ips_workflow
 
-input_survey_data = 'data/calculations/december_2017/New_Dec_Data/surveydata.csv'
+input_survey_data = 'data/import_data/dec/ips1712bv4_amtspnd.csv'
 input_shift_data = 'data/calculations/december_2017/New_Dec_Data/Poss shifts Dec 2017.csv'
 input_nr_data = 'data/calculations/december_2017/New_Dec_Data/Dec17_NR.csv'
 input_unsampled_data = 'data/calculations/december_2017/New_Dec_Data/Unsampled Traffic Dec 2017.csv'
