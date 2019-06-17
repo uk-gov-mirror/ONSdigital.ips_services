@@ -61,14 +61,16 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
     Requirements : NA
     Dependencies : NA
     """
-    options.mode.chained_assignment = None
 
     seed(123456)
-    for x in range(0, len(df_input)):
-        if df_input["FLOW"][x] > 4:
-            df_input["OPERA_PV"][x] = 3
+
+    df_input.OPERA_PV = 0
+
+    for index, row in df_input.iterrows():
+        if row["FLOW"] > 4:
+            df_input.at[index, 'OPERA_PV'] = 3
         else:
-            df_input["OPERA_PV"][x] = round(sas_random(), 0) + 1
+            df_input.at[index, 'OPERA_PV'] = round(sas_random(), 0) + 1
 
     df_eligible = df_input.loc[df_input[ELIGIBLE_FLAG_VARIABLE] == 1.0]
 
