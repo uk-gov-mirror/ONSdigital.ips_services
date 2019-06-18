@@ -16,7 +16,7 @@ from ips.services.dataimport.import_traffic import import_tunnel
 
 from ips.services import ips_workflow
 
-input_survey_data = 'data/calculations/december_2017/New_Dec_Data/Survey Data.csv'
+input_survey_data = 'data/import_data/dec/ips1712bv4_amtspnd.csv'
 input_shift_data = 'data/calculations/december_2017/New_Dec_Data/Poss shifts Dec 2017.csv'
 input_nr_data = 'data/calculations/december_2017/New_Dec_Data/Dec17_NR.csv'
 input_unsampled_data = 'data/calculations/december_2017/New_Dec_Data/Unsampled Traffic Dec 2017.csv'
@@ -239,18 +239,18 @@ def test_stay_imputation():
 
 
 def test_fares_imputation():
-    import ips.services.steps.stay_imputation as stay
-    import ips.services.steps.fares_imputation as fares
-
-    stay.stay_imputation_step(run_id)
-    fares.fares_imputation_step(run_id)
+    # import ips.services.steps.stay_imputation as stay
+    # import ips.services.steps.fares_imputation as fares
+    #
+    # stay.stay_imputation_step(run_id)
+    # fares.fares_imputation_step(run_id)
 
     log.info("Testing Calculation  9 --> fares_imputation")
     survey_output(
         "FARES",
         "data/calculations/december_2017/stay/surveydata_dec2017.csv",
         [
-            'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
+            'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON', 'OPERA_PV'
         ]
     )
 
@@ -300,9 +300,14 @@ def survey_output(test_name, expected_survey_output, survey_output_columns):
 
     # pandas.testing.faff
     survey_results.sort_values(by='SERIAL', axis=0, inplace=True)
-    survey_expected.sort_values(by='SERIAL', axis=0, inplace=True)
     survey_results.index = range(0, len(survey_results))
+
+    survey_expected.sort_values(by='SERIAL', axis=0, inplace=True)
     survey_expected.index = range(0, len(survey_expected))
+
+    if test_name == 'FARES':
+        survey_results.to_csv("/Users/paul/Desktop/results.csv")
+        survey_expected.to_csv("/Users/paul/Desktop/expected.csv")
 
     # Test survey outputs
     log.info(f"Testing survey results for {test_name}")
