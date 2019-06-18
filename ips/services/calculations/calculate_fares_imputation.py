@@ -113,16 +113,12 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
         ]
     ]
 
-    df_ps.to_csv("/Users/paul/Desktop/before_calc.csv")
-
     # Perform the imputation on eligible dataset
     df_output = ips_impute.ips_impute(df_eligible, var_serial,
                                       STRATA_BASE_LIST, THRESH_BASE_LIST,
                                       num_levels, DONOR_VARIABLE, OUTPUT_VARIABLE,
                                       measure, IMPUTATION_FLAG_VARIABLE,
                                       IMPUTATION_LEVEL_VARIABLE)
-
-    df_output.to_csv("/Users/paul/Desktop/after_calc.csv")
 
     # Merge df_output_final and df_input by var_serial_num
 
