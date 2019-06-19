@@ -1,13 +1,7 @@
-import io
-
-import falcon
-import numpy as np
+import pyreadstat
+from pandas.testing import assert_frame_equal
 import pandas as pd
-from ips.util.services_logging import log
-
-import ips.persistence.import_survey as db
-from ips.services import service
-from ips.services.dataimport import validate
+import numpy as np
 
 columns = [
     'SERIAL', 'AM_PM_NIGHT', 'AGE', 'ANYUNDER16', 'APORTLATDEG',
@@ -34,44 +28,23 @@ columns = [
 ]
 
 
-@service
-def import_survey(run_id, data, month, year):
-    log.info("Importing survey data")
-    df: pd.DataFrame = pd.read_csv(
-        io.BytesIO(data),
-        encoding="ISO-8859-1",
-        engine="python",
-        usecols=lambda x: x.upper() in columns
-    )
+def test_load_sav():
+    file_name = '/Users/paul/ONS/ips_services/quarter32017v2.sav'
+    df, meta = pyreadstat.read_sav(file_name)
+
+    df.columns = df.columns.str.upper()
+    df = df.filter(columns, axis=1)
+
+    if 'INTDATE' in df.columns:
+        df['INTDATE'] = df['INTDATE'].astype(str).str.rjust(8, '0')
 
     def convert_col_to_int(data_frame, col):
         data_frame[col] = data_frame[col].fillna(-1).astype(int).replace('-1', np.nan)
 
     df.columns = df.columns.str.upper()
     df['TANDTSI'] = df['TANDTSI'].round(0)
-
     [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'DVEXPEND', 'TANDTSI']]
 
-    errors = Errors()
-    validation = validate.validate_survey_data(df, month, year, errors)
-    if not validation:
-        log.error(f"Validation failed: {errors.get_messages()}")
-        raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
-
-    log.info("Survey validation completed successfully.")
-
     df = df.sort_values(by='SERIAL')
-    db.import_survey_data(run_id, df)
-    return df
 
-
-class Errors:
-
-    def __init__(self):
-        self.error_messages = []
-
-    def add(self, message):
-        self.error_messages.append(message)
-
-    def get_messages(self):
-        return self.error_messages
+    df.to_csv("/Users/paul/Desktop/sav.csv")

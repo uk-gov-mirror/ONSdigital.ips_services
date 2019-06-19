@@ -3,8 +3,7 @@ import random
 
 from ips.util.services_logging import log
 import numpy as np
-from pandas import DataFrame, Series, options
-
+from pandas import DataFrame, Series
 from ips.services.calculations import ips_impute
 
 from ...util.sas_random import sas_random, seed
@@ -39,56 +38,22 @@ OLD_PACKAGE_VARIABLE = 'PACKAGE'
 THRESH_BASE_LIST = [3, 3, 3, 3, 3, 3, 3, 0, 0]
 
 STRATA_BASE_LIST = [
-    ['INTDATE', 'TYPE_PV', 'UKPORT1_PV', 'OSPORT1_PV', 'OPERA_PV'],
-    ['INTDATE', 'TYPE_PV', 'UKPORT2_PV', 'OSPORT1_PV', 'OPERA_PV'],
-    ['INTDATE', 'TYPE_PV', 'UKPORT1_PV', 'OSPORT2_PV', 'OPERA_PV'],
-    ['INTDATE', 'TYPE_PV', 'UKPORT2_PV', 'OSPORT2_PV', 'OPERA_PV'],
-    ['INTDATE', 'TYPE_PV', 'UKPORT3_PV', 'OSPORT2_PV', 'OPERA_PV'],
-    ['INTDATE', 'TYPE_PV', 'UKPORT3_PV', 'OSPORT3_PV', 'OPERA_PV'],
-    ['INTDATE', 'TYPE_PV', 'UKPORT4_PV', 'OSPORT3_PV', 'OPERA_PV'],
-    ['INTDATE', 'TYPE_PV', 'UKPORT4_PV', 'OSPORT4_PV'],
-    ['INTDATE', 'TYPE_PV', 'OSPORT4_PV']
+    ['INTMONTH', 'TYPE_PV', 'UKPORT1_PV', 'OSPORT1_PV', 'OPERA_PV'],
+    ['INTMONTH', 'TYPE_PV', 'UKPORT2_PV', 'OSPORT1_PV', 'OPERA_PV'],
+    ['INTMONTH', 'TYPE_PV', 'UKPORT1_PV', 'OSPORT2_PV', 'OPERA_PV'],
+    ['INTMONTH', 'TYPE_PV', 'UKPORT2_PV', 'OSPORT2_PV', 'OPERA_PV'],
+    ['INTMONTH', 'TYPE_PV', 'UKPORT3_PV', 'OSPORT2_PV', 'OPERA_PV'],
+    ['INTMONTH', 'TYPE_PV', 'UKPORT3_PV', 'OSPORT3_PV', 'OPERA_PV'],
+    ['INTMONTH', 'TYPE_PV', 'UKPORT4_PV', 'OSPORT3_PV', 'OPERA_PV'],
+    ['INTMONTH', 'TYPE_PV', 'UKPORT4_PV', 'OSPORT4_PV'],
+    ['INTMONTH', 'TYPE_PV', 'OSPORT4_PV']
 ]
 
 
 def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: int, measure: str) -> DataFrame:
-    """
-    Author       : James Burr
-    Date         : 19 Feb 2018
-    Purpose      : Imputes fares for the IPS system.
-    Parameters   : df_input - the IPS survey dataset.
-                   var_serial - the serial number field name
-                   num_levels - number of imputation levels
-                   measure - measure function, such as mean
-    Returns      : Dataframe - df_output_final
-    Requirements : NA
-    Dependencies : NA
-    """
-
-    df_input.OPERA_PV = df_input.OPERA_PV.astype(float)
-
-    # for index, row in df_input.iterrows():
-    #
-    #     if row['FLOW'] < 5:
-    #         if not math.isnan(row['DVLINECODE']):
-    #             carrier = int(row['DVLINECODE'])
-    #         else:
-    #             carrier = 0
-    #
-    #         if carrier >= 1000 and carrier <= 1999:
-    #             df_input.at[index, 'OPERA_PV'] = 1
-    #         elif carrier >= 2000 and carrier <= 88880:
-    #             df_input.at[index, 'OPERA_PV'] = 2
-    #
-    #     elif row['FLOW'] > 4:
-    #         df_input.at[index, 'OPERA_PV'] = 3
-    #
-    #     if math.isnan(row['OPERA_PV']):
-    #         df_input.at[index, 'OPERA_PV'] = round(random.random(),0) + 1
+    log.debug("Starting fares imputation")
 
     seed(123456)
-
-    df_input.OPERA_PV = 0
 
     for index, row in df_input.iterrows():
 
@@ -99,21 +64,8 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
 
     df_eligible = df_input.loc[df_input[ELIGIBLE_FLAG_VARIABLE] == 1.0]
 
-    df_ps = df_eligible[
-        [
-            var_serial,
-            'INTDATE', 'TYPE_PV',
-            'UKPORT1_PV', 'OSPORT1_PV',
-            'UKPORT2_PV', 'OSPORT2_PV',
-            'UKPORT3_PV', 'OSPORT3_PV',
-            'UKPORT4_PV', 'OSPORT4_PV',
-            DONOR_VARIABLE, OUTPUT_VARIABLE,
-            IMPUTATION_FLAG_VARIABLE,
-            IMPUTATION_LEVEL_VARIABLE
-        ]
-    ]
-
-    df_ps.to_csv("/Users/paul/Desktop/before_calc.csv")
+    # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.
+    df_eligible['INTMONTH'].fillna(99, inplace=True)
 
     # Perform the imputation on eligible dataset
     df_output = ips_impute.ips_impute(df_eligible, var_serial,
@@ -121,8 +73,6 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
                                       num_levels, DONOR_VARIABLE, OUTPUT_VARIABLE,
                                       measure, IMPUTATION_FLAG_VARIABLE,
                                       IMPUTATION_LEVEL_VARIABLE)
-
-    df_output.to_csv("/Users/paul/Desktop/after_calc.csv")
 
     # Merge df_output_final and df_input by var_serial_num
 
@@ -145,11 +95,27 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
 
     # Re-sort columns by column name in alphabetical order (may not be required)
 
-    df_output.sort_index(axis=1, inplace=True)
+    # df_output.sort_index(axis=1, inplace=True)
+
+    a = math.modf(df_output['FARE'].astype(float))
+    if a[0] > .5:
+        b = a[1] + 1
+    else:
+        b = a[1]
+
+    df_output['FARE'] = b
+
+    # TODO: Print df_output to csv and compare with El's 'before_apply_something.csv'
+    df_output.to_csv("/Users/paul/Desktop/ONSData/before-compute-no-fudgery.csv")
 
     df_output = df_output.apply(compute_additional_fares, axis=1)
 
     df_output = df_output.apply(compute_additional_spend, axis=1)
+
+    df_output['FARE'] = df_output['FARE'].astype(float).round()
+
+    # TODO: Print df_output to csv and compare with El's 'after_apply_something.csv'
+    df_output.to_csv("/Users/paul/Desktop/ONSData/after-compute.csv")
 
     final_output_column_list = [var_serial, SPEND_VARIABLE, SPEND_REASON_KEY_VARIABLE, OUTPUT_VARIABLE,
                                 IMPUTATION_LEVEL_VARIABLE]
@@ -163,17 +129,7 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
 
 
 def compute_additional_fares(row: Series):
-    """
-    Author       : James Burr
-    Date         : 13 March 2018
-    Purpose      : Computes spend based on fares data and updates output dataframe.
-    Parameters   : Each individal row of the df_output data frame.
-    Returns      : The same row with extra calculations/edits applied.
-    Requirements : NA
-    Dependencies : NA
-    """
-
-    # Force the variable formatting to 8digit date
+    # Force the variable formatting to 8 digit date
 
     row[DATE_VARIABLE] = str(row[DATE_VARIABLE])
     row[DATE_VARIABLE] = row[DATE_VARIABLE].zfill(8)
@@ -281,10 +237,14 @@ def compute_additional_spend(row):
         else:
             row[SPEND_VARIABLE] = (row[EXPENDITURE_VARIABLE] + row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]
 
-    if row[SPEND_VARIABLE] != np.nan and row[DUTY_FREE_VARIABLE] != np.nan:
+    # if row[SPEND_VARIABLE] != np.nan and row[DUTY_FREE_VARIABLE] != np.nan:
+    #     row[SPEND_VARIABLE] = row[SPEND_VARIABLE] + row[DUTY_FREE_VARIABLE]
+    #
+    if row[SPEND_VARIABLE] != np.nan:
         row[SPEND_VARIABLE] = row[SPEND_VARIABLE] + row[DUTY_FREE_VARIABLE]
 
     # Ensure the spend values are integers
     row[SPEND_VARIABLE] = round(row[SPEND_VARIABLE], 0)
 
     return row
+

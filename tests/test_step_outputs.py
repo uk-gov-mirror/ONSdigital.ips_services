@@ -66,8 +66,22 @@ def setup_module(module):
     setup_pv()
 
     # Run steps
-    workflow = ips_workflow.IPSWorkflow()
-    workflow.run_calculations(run_id)
+    # TODO: Replace this with ips_workflow before committing -->
+    from ips.services.steps import shift_weight, non_response_weight, minimums_weight, traffic_weight, unsampled_weight, \
+        imbalance_weight, final_weight, stay_imputation, fares_imputation
+    shift_weight.shift_weight_step(run_id)
+    non_response_weight.non_response_weight_step(run_id)
+    minimums_weight.minimums_weight_step(run_id)
+    traffic_weight.traffic_weight_step(run_id)
+    unsampled_weight.unsampled_weight_step(run_id)
+    imbalance_weight.imbalance_weight_step(run_id)
+    final_weight.final_weight_step(run_id)
+    stay_imputation.stay_imputation_step(run_id)
+    fares_imputation.fares_imputation_step(run_id)
+
+    # workflow = ips_workflow.IPSWorkflow()
+    # workflow.run_calculations(run_id)
+    # TODO: <--
 
 
 def setup_pv():
@@ -251,7 +265,7 @@ def test_fares_imputation():
         "FARES",
         "data/calculations/december_2017/stay/surveydata_dec2017.csv",
         [
-            'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON', 'OPERA_PV'
+            'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
         ]
     )
 

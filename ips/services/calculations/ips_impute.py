@@ -4,28 +4,7 @@ from ips.util.services_logging import log
 
 def ips_impute(df_input, var_serial_num, strata_base_list, thresh_base_list, num_levels,
                impute_var, var_value, impute_function, var_impute_flag, var_impute_level):
-    """
-    Author       : James Burr
-    Date         : 09 Feb 2018
-    Purpose      : Performs imputations based on input parameters
-    Parameters   : input - dataframe holding both donors and recipients
-                   output - dataframe holding imputed records
-                   var_serial_num - variable holding the serial number
-                   strata_base_list - list containing lists of strata variable names
-                   thresh_base_list - list containing threshold values
-                   num_levels - number of imputation levels. Imputation will occur
-                                from 0 to this number-1.
-                   impute_var - variable to be imputed
-                   var_value - variable holding the name of the output value field
-                   impute_function - imputation cluster measure function (e.g. mean)
-                   var_impute_flag - name of the imputation flag variable
-                   var_impute_level - name of the imputation level output field
-    Returns      : Dataframe containing the imputed records
-    Requirements : NA
-    Dependencies : NA
-    """
-
-    # Create the donor set, in which the impute flag is false    
+    # Create the donor set, in which the impute flag is false
     df_output = df_input
 
     df_to_impute = df_input.loc[df_input[var_impute_flag] == 1.0]
@@ -39,7 +18,7 @@ def ips_impute(df_input, var_serial_num, strata_base_list, thresh_base_list, num
 
     df_output[count] = 0
 
-    # Loop until no more records can be imputed or max number of iterations is reached
+    # Loop until no more records can be imputed or max  number of iterations is reached
     while (level < num_levels) & (not df_to_impute.empty):
         # key_name = 'df_output_match_' + str(level)
 
@@ -80,6 +59,7 @@ def ips_impute(df_input, var_serial_num, strata_base_list, thresh_base_list, num
     # Tidy up the output by keeping only non-missing data and a subset of columns
     columns_to_keep = [var_serial_num, var_value, var_impute_level]
     df_output = df_output[columns_to_keep]
+
     df_output = df_output.dropna()
 
     return df_output
@@ -87,22 +67,6 @@ def ips_impute(df_input, var_serial_num, strata_base_list, thresh_base_list, num
 
 def ips_impute_segment(df_input, level, strata, impute_var, function, var_value,
                        var_count, thresh):
-    """
-    Author       : James Burr
-    Date         : 09 Feb 2018
-    Purpose      : Generates segments for use within IPS imputation.
-    Parameters   : input - dataframe holding the records to be segmented
-                   level - current iteration value
-                   strata - the list of classification variables
-                   impute_var - variable to impute
-                   function - measurement function to use e.g. mean
-                   var_value - variable holding the name of the output value field
-                   var_count - variable holding the name of the segment count field
-                   thresh - the segment count threshold
-    Returns      : Dataframe containing the produced segments
-    Requirements : NA
-    Dependencies : NA
-    """
     df_input = df_input.sort_values(strata)
 
     # Ensure rows with missing data aren't excluded indiscriminately
@@ -132,26 +96,6 @@ def ips_impute_segment(df_input, level, strata, impute_var, function, var_value,
 
 def ips_impute_match(remainder, df_input, output, strata, var_value, level,
                      var_level, var_impute_flag, var_count):
-    """
-    Author       : James Burr
-    Date         : 09 Feb 2018
-    Purpose      : Produces and returns imputed records.
-    Parameters   : remainder - dataframe of records left to impute
-                   input - donor dataframe
-                   output - current latest output set
-                   strata - list of classification variables
-                   var_value - variable holding the name of the output value field
-                   imputeVar - variable to be imputed
-                   level - current imputation level
-                   var_level - variable holding the name of the imputation level
-                               output field
-                   var_imputeFlag - name of imputation flag variable
-                   var_count - name of count variable
-    Returns      : File(CHECKTHIS: is it a file?) containing imputed records.
-    Requirements : 
-    Dependencies : 
-    """
-
     # Create sorted dataframes from passed-in data
 
     df_remainder = remainder.sort_values(strata)
