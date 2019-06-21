@@ -80,7 +80,7 @@ create table EXPORT_DATA_DOWNLOAD
     DOWNLOADABLE_DATA longtext    null,
     FILENAME          varchar(40) null,
     SOURCE_TABLE      varchar(40) null,
-    DATE_CREATED      text    null
+    DATE_CREATED      text        null
 );
 
 
@@ -232,18 +232,23 @@ elif row[''IMBAL_PORT_GRP_PV''] == 17 and row[''ARRIVEDEPART''] == 2:
     row[''IMBAL_PORT_FACT_PV''] = 1.03
 else:
     row[''IMBAL_PORT_FACT_PV''] = 1.0');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 13, 'stay_imp_flag_pv', 'stay_imp_flag_pv', '
 if math.isnan(row[''NUMNIGHTS'']) or row[''NUMNIGHTS''] == 999:
     row[''STAY_IMP_FLAG_PV''] = 1
 else:
     row[''STAY_IMP_FLAG_PV''] = 0');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 14, 'stay_imp_eligible_pv', 'stay_imp_eligible_pv', '
 if row[''FLOW''] in (1,4,5,8) and row[''MINS_FLAG_PV''] == 0 and row[''PURPOSE''] != 80:
     row[''STAY_IMP_ELIGIBLE_PV''] = 1
 else:
     row[''STAY_IMP_ELIGIBLE_PV''] = 0');
+
+# TODO: Check Me
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 33, 'osport2_pv', 'osport2_pv', '
 if row[''UKPORT1_PV''] == 641:
@@ -270,6 +275,7 @@ elif row[''OSPORT2_PV''] == 150:
 elif row[''OSPORT2_PV''] == 160:
     row[''OSPORT2_PV''] = 210
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 47, 'rail_cntry_grp_pv', 'rail_cntry_grp_pv', '
 railcountry = 0
@@ -303,6 +309,7 @@ elif railcountry == 124:
     row[''RAIL_CNTRY_GRP_PV''] = 11
 elif railcountry in (112,100,191,203,246,300,348,973,428,440,807,504,616,642,643,703,705,792,804,233):
     row[''RAIL_CNTRY_GRP_PV''] = 12');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 34, 'osport3_pv', 'osport3_pv', '
 
@@ -332,12 +339,14 @@ elif row[''OSPORT2_PV''] in (940,941,942,943,944,945,946,947,949):
     row[''OSPORT3_PV''] = 12
 else:
     row[''OSPORT3_PV''] = 13');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 35, 'osport4_pv', 'osport4_pv', '
 if row[''OSPORT3_PV''] in (1,2):
     row[''OSPORT4_PV''] = 1
 else:
     row[''OSPORT4_PV''] = 2');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 36, 'apd_pv', 'apd_pv', '
 if row[''OSPORT2_PV''] in (210,500,600,700,800):
@@ -364,12 +373,14 @@ elif APDBAND == 1:
 else:
     row[''APD_PV''] = 40/2
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 37, 'qmfare_pv', 'qmfare_pv', '
 if row[''OSPORT3_PV''] == 12 and (row[''MINS_FLAG_PV''] == 0 or math.isnan(row[''MINS_FLAG_PV''])):
     row[''QMFARE_PV''] = 1500
 else:
     row[''QMFARE_PV''] = None');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 38, 'duty_free_pv', 'duty_free_pv', '
 if row[''FLOW''] == 1 and ((row[''PURPOSE''] < 80 and row[''PURPOSE''] != 71) or math.isnan(row[''PURPOSE''])):
@@ -377,6 +388,7 @@ if row[''FLOW''] == 1 and ((row[''PURPOSE''] < 80 and row[''PURPOSE''] != 71) or
 else:
     row[''DUTY_FREE_PV''] = 0
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 39, 'spend_imp_eligible_pv', 'spend_imp_eligible_pv', '
 if (row[''FLOW''] in (1,4,5,8) and row[''PURPOSE''] < 80 and row[''PURPOSE''] != 23 and row[''PURPOSE''] != 24 and row[''MINS_FLAG_PV''] == 0) or (row[''FLOW''] in (1,4,5,8) and str(row[''PURPOSE'']) == ''nan'' and row[''MINS_FLAG_PV''] == 0):
@@ -384,6 +396,7 @@ if (row[''FLOW''] in (1,4,5,8) and row[''PURPOSE''] < 80 and row[''PURPOSE''] !=
 else:
     row[''SPEND_IMP_ELIGIBLE_PV''] = 0
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 40, 'uk_os_pv', 'uk_os_pv', '
 if row[''FLOW''] in (1,5):
@@ -391,6 +404,7 @@ if row[''FLOW''] in (1,5):
 
 if row[''FLOW''] in (4,8):
     row[''UK_OS_PV''] = 1');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 41, 'pur1_pv', 'pur1_pv', '
 if row[''DVPACKAGE''] in (1,2):
@@ -415,6 +429,7 @@ else:
 if row[''IND''] == 1 and row[''PUR1_PV''] == 2:
     row[''PUR1_PV''] = 1
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 42, 'pur2_pv', 'pur2_pv', '
 if row[''PURPOSE''] in (10,14,17,18,11,12):
@@ -430,6 +445,7 @@ else:
 
 if row[''IND''] == 1 and row[''PUR2_PV''] == 2:
     row[''PUR2_PV''] = 1');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 43, 'pur3_pv', 'pur3_pv', '
 if row[''PURPOSE''] in (20,21,22):
@@ -438,6 +454,7 @@ elif math.isnan(row[''PURPOSE'']):
     row[''PUR3_PV''] = None
 else:
     row[''PUR3_PV''] = 2');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 44, 'dur1_pv', 'dur1_pv', '
 if row[''STAY''] == 0:
@@ -453,6 +470,7 @@ elif row[''STAY''] >= 36 and row[''STAY''] <= 91:
 elif row[''STAY''] >= 92:
     row[''DUR1_PV''] = 5
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 45, 'dur2_pv', 'dur2_pv', '
 if row[''STAY''] >= 0 and row[''STAY''] <= 30:
@@ -460,6 +478,7 @@ if row[''STAY''] >= 0 and row[''STAY''] <= 30:
 elif row[''STAY''] >= 31:
     row[''DUR2_PV''] = 2
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 46, 'imbal_ctry_fact_pv', 'imbal_ctry_fact_pv', '
 if row[''RESIDENCE''] == 352 or row[''RESIDENCE''] == 40 or row[''RESIDENCE''] in (292, 470, 902, 901) or row[''RESIDENCE''] == 792 or row[''RESIDENCE''] == 620 or row[''RESIDENCE''] == 621 or row[''RESIDENCE''] in (973, 70, 191, 807, 499, 688, 951, 705)  or row[''RESIDENCE''] == 234:
@@ -510,6 +529,7 @@ elif row[''RESIDENCE''] in (840, 630, 850):
     row[''IMBAL_CTRY_FACT_PV''] = 1.04
 else:
     row[''IMBAL_CTRY_FACT_PV''] = 1.0');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 15, 'StayImpCtryLevel1_pv', 'StayImpCtryLevel1_pv', '
 if row[''UKFOREIGN''] == 1:
@@ -519,6 +539,7 @@ if row[''UKFOREIGN''] == 2:
     if not math.isnan(row[''RESIDENCE'']):
         row[''STAYIMPCTRYLEVEL1_PV''] = int(row[''RESIDENCE''])
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 16, 'StayImpCtryLevel2_pv', 'StayImpCtryLevel2_pv', '
 if row[''STAYIMPCTRYLEVEL1_PV''] in (830, 831, 832, 833, 931, 372):
@@ -581,6 +602,7 @@ elif row[''STAYIMPCTRYLEVEL1_PV''] in (0, 969, 99):
     row[''STAYIMPCTRYLEVEL2_PV''] = 91
 else:
     row[''STAYIMPCTRYLEVEL2_PV''] = 99');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 28, 'ukport1_pv', 'ukport1_pv', '
 if (row[''PORTROUTE''] >= 111 and row[''PORTROUTE''] <= 119) or row[''PORTROUTE''] in (161,171):
@@ -609,6 +631,7 @@ elif row[''PORTROUTE''] >= 311 and row[''PORTROUTE''] <= 319:
     row[''UKPORT1_PV''] = 310
 else:
     row[''UKPORT1_PV''] = row[''PORTROUTE'']');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 29, 'ukport2_pv', 'ukport2_pv', '
 if row[''UKPORT1_PV''] >= 110 and row[''UKPORT1_PV''] <= 150:
@@ -653,6 +676,7 @@ elif row[''UKPORT1_PV''] >= 911 and row[''UKPORT1_PV''] <= 951:
     row[''UKPORT2_PV''] = 32
 else:
     row[''UKPORT2_PV''] = 99');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 30, 'ukport3_pv', 'ukport3_pv', '
 if row[''UKPORT2_PV''] in (1,2,4,13):
@@ -675,6 +699,7 @@ elif row[''UKPORT2_PV''] == 32:
     row[''UKPORT3_PV''] = 9
 else:
     row[''UKPORT3_PV''] = 0');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 31, 'ukport4_pv', 'ukport4_pv', '
 if row[''UKPORT3_PV''] in (1,2,3,9):
@@ -683,6 +708,7 @@ elif row[''UKPORT3_PV''] in (4,5,6,7,8):
     row[''UKPORT4_PV''] = 2
 else:
     row[''UKPORT4_PV''] = 0');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 32, 'osport1_pv', 'osport1_pv', '
 row[''OSPORT1_PV''] = row[''DVPORTCODE'']
@@ -693,6 +719,7 @@ if not math.isnan(row[''CHANGECODE'']):
 if row[''OSPORT1_PV''] in (999998,999999):
     row[''OSPORT1_PV''] = float(''NaN'')
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 48, 'rail_exercise_pv', 'rail_exercise_pv', '
 if row[''FLOW''] == 8:
@@ -747,18 +774,21 @@ elif row[''FLOW''] == 5:
         row[''RAIL_EXERCISE_PV''] = 23
 
 row[''RAIL_EXERCISE_PV''] = row[''RAIL_EXERCISE_PV''] * 1000');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 49, 'rail_imp_eligible_pv', 'rail_imp_eligible_pv', '
 if row[''FLOW''] in (5,8):
     row[''RAIL_IMP_ELIGIBLE_PV''] = 1
 else:
     row[''RAIL_IMP_ELIGIBLE_PV''] = 0');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 50, 'spend_imp_flag_pv', 'spend_imp_flag_pv', '
 if math.isnan(row[''SPEND'']):
     row[''SPEND_IMP_FLAG_PV''] = 1
 else:
     row[''SPEND_IMP_FLAG_PV''] = 0');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 51, 'purpose_pv', 'purpose_pv', '
 if row[''PURPOSE''] == 3 or row[''PURPOSE''] == 4 or row[''PURPOSE''] == 31 or row[''PURPOSE''] == 32:
@@ -771,6 +801,7 @@ elif row[''PURPOSE''] == 61 or row[''PURPOSE''] == 62 or row[''PURPOSE''] == 6:
     row[''PURPOSE_PV''] = 4
 else:
     row[''PURPOSE_PV''] = 5');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 52, 'town_imp_eligible_pv', 'town_imp_eligible_pv', '
 if row[''FLOW''] in (1,5) and row[''RESPNSE''] != 5 and (row[''PURPOSE''] <= 89 or row[''PURPOSE''] == 92 or math.isnan(row[''PURPOSE''])):
@@ -778,6 +809,7 @@ if row[''FLOW''] in (1,5) and row[''RESPNSE''] != 5 and (row[''PURPOSE''] <= 89 
 else:
     row[''TOWN_IMP_ELIGIBLE_PV''] = 0
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 53, 'reg_imp_eligible_pv', 'reg_imp_eligible_pv', '
 if row[''FLOW''] in (1,5) and row[''RESPNSE''] != 5 and (row[''PURPOSE''] <= 89 or row[''PURPOSE''] == 92 or math.isnan(row[''PURPOSE''])):
@@ -785,12 +817,15 @@ if row[''FLOW''] in (1,5) and row[''RESPNSE''] != 5 and (row[''PURPOSE''] <= 89 
 else:
     row[''REG_IMP_ELIGIBLE_PV''] = 0
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 54, 'mins_ctry_grp_pv', 'mins_ctry_grp_pv', '
 row[''MINS_CTRY_GRP_PV''] = row[''FLOW'']');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 55, 'mins_port_grp_pv', 'mins_port_grp_pv', '
 row[''MINS_PORT_GRP_PV''] = int(row[''PORTROUTE''])');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 56, 'samp_port_grp_pv', 'samp_port_grp_pv', '
 if row[''PORTROUTE''] in (111, 113, 119, 161, 171):
@@ -971,6 +1006,7 @@ if row[''SAMP_PORT_GRP_PV''] == ''SLR'' and (row[''ARRIVEDEPART''] == 2):
 if row[''SAMP_PORT_GRP_PV''] == ''SSE'' and (row[''ARRIVEDEPART''] == 1):
     row[''SAMP_PORT_GRP_PV''] = ''SNE''
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 57, 'unsamp_port_grp_pv', 'unsamp_port_grp_pv', '
 if row[''PORTROUTE''] in (111, 113, 119, 161):
@@ -1101,18 +1137,21 @@ if dataset == ''survey'':
     elif (IoM) and (row[''PORTROUTE''] >= 300) and (row[''PORTROUTE''] < 600):
         row[''UNSAMP_PORT_GRP_PV''] = ''RAM''
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 4, 'shift_flag_pv', 'shift_flag_pv', '
 if row[''PORTROUTE''] < 600 or row[''PORTROUTE''] > 900:
     row[''SHIFT_FLAG_PV''] = 1
 else:
     row[''SHIFT_FLAG_PV''] = 0');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 5, 'crossings_flag_pv', 'crossings_flag_pv', '
 if row[''PORTROUTE''] < 600 or row[''PORTROUTE''] > 900:
     row[''CROSSINGS_FLAG_PV''] = 0
 else:
     row[''CROSSINGS_FLAG_PV''] = 1');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 6, 'shift_port_grp_pv', 'shift_port_grp_pv', '
 if row[''PORTROUTE''] >= 161 and row[''PORTROUTE''] <= 165:
@@ -1123,6 +1162,7 @@ else:
     #  row[''SHIFT_PORT_GRP_PV''] = str(row[''PORTROUTE'']).rjust(3,'' '')
     row[''SHIFT_PORT_GRP_PV''] = str(int(row[''PORTROUTE'']))
   ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 7, 'nr_flag_pv', 'nr_flag_pv', '
 if row[''RESPNSE''] > 0 and row[''RESPNSE''] < 4:
@@ -1131,9 +1171,11 @@ elif row[''RESPNSE''] >= 4 and row[''RESPNSE''] < 7:
     row[''NR_FLAG_PV''] = 1
 else:
     row[''NR_FLAG_PV''] = 2');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 8, 'nr_port_grp_pv', 'nr_port_grp_pv', '
 row[''NR_PORT_GRP_PV''] = row[''PORTROUTE'']');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 9, 'mins_flag_pv', 'mins_flag_pv', '
 if row[''TYPEINTERVIEW''] == 1:
@@ -1144,12 +1186,14 @@ elif row[''RESPNSE''] == 3:
     row[''MINS_FLAG_PV''] = 1
 else:
     row[''MINS_FLAG_PV''] = 3');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 10, 'imbal_eligible_pv', 'imbal_eligible_pv', '
 if not math.isnan(row[''FLOW'']) and (row[''RESPNSE''] > 0) and (row[''RESPNSE''] < 3) and ((row[''PURPOSE''] != 23) and (row[''PURPOSE''] != 24) and (row[''PURPOSE''] < 71 or math.isnan(row[''PURPOSE'']))) and (math.isnan(row[''INTENDLOS'']) or (row[''INTENDLOS''] < 2) or (row[''INTENDLOS''] > 7)):
     row[''IMBAL_ELIGIBLE_PV''] = 1
 else:
     row[''IMBAL_ELIGIBLE_PV''] = 0');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 11, 'imbal_port_grp_pv', 'imbal_port_grp_pv', '
 if row[''PORTROUTE''] in (111, 113, 119, 161, 171):
@@ -1186,6 +1230,7 @@ elif row[''IMBAL_PORT_GRP_PV''] == 9999:
     row[''IMBAL_PORT_GRP_PV''] = 16
 elif row[''PORTROUTE''] == 951:
     row[''IMBAL_PORT_GRP_PV''] = 17');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 58, 'unsamp_region_grp_pv', 'unsamp_region_grp_pv', '
 dvpc = 0
@@ -1255,6 +1300,7 @@ if row[''UNSAMP_PORT_GRP_PV''] == ''RSS'' and row[''ARRIVEDEPART''] == 1:
 if row[''UNSAMP_PORT_GRP_PV''] == ''RSS'' and row[''ARRIVEDEPART''] == 2:
     row[''UNSAMP_PORT_GRP_PV''] = ''HBN''
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 1, 'weekday_end_pv', 'weekday_end_pv', '
 if dataset == ''survey'':
@@ -1294,6 +1340,7 @@ else:
     else:
         row[''WEEKDAY_END_PV''] = row[''WEEKDAY'']
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 2, 'am_pm_night_pv', 'am_pm_night_pv', '
 if row[''PORTROUTE''] == 811 and row[''AM_PM_NIGHT''] == 2:
@@ -1302,12 +1349,14 @@ elif row[''PORTROUTE''] == 811 or row[''PORTROUTE''] == 812:
     row[''AM_PM_NIGHT_PV''] = row[''AM_PM_NIGHT'']
 else:
     row[''AM_PM_NIGHT_PV''] = 1');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 3, 'mig_flag_pv', 'mig_flag_pv', '
 if row[''LOSKEY''] > 0:
     row[''MIG_FLAG_PV''] = 1
 else:
     row[''MIG_FLAG_PV''] = 0');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 17, 'StayImpCtryLevel3_pv', 'StayImpCtryLevel3_pv', '
 if row[''STAYIMPCTRYLEVEL2_PV''] in (1,2,4,6,8):
@@ -1332,6 +1381,7 @@ elif row[''STAYIMPCTRYLEVEL2_PV''] == 91:
     row[''STAYIMPCTRYLEVEL3_PV''] = 10
 else:
     row[''STAYIMPCTRYLEVEL3_PV''] = 99');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 18, 'StayImpCtryLevel4_pv', 'StayImpCtryLevel4_pv', '
 if row[''STAYIMPCTRYLEVEL2_PV''] >= 1 and row[''STAYIMPCTRYLEVEL2_PV''] <= 8:
@@ -1344,6 +1394,7 @@ elif row[''STAYIMPCTRYLEVEL2_PV''] >= 41 and row[''STAYIMPCTRYLEVEL2_PV''] <= 46
     row[''STAYIMPCTRYLEVEL4_PV''] = 4
 else:
     row[''STAYIMPCTRYLEVEL4_PV''] = 5');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 19, 'stay_purpose_grp_pv', 'stay_purpose_grp_pv', '
 if row[''PURPOSE''] in (20, 21, 22, 24, 25):
@@ -1358,12 +1409,14 @@ elif row[''PURPOSE''] in (17, 18, 70, 71):
     row[''STAY_PURPOSE_GRP_PV''] = 5
 else:
     row[''STAY_PURPOSE_GRP_PV''] = 6');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 20, 'fares_imp_flag_pv', 'fares_imp_flag_pv', '
 if (row[''DVFARE''] == 999999) or math.isnan(row[''DVFARE'']) or (row[''DVFARE''] == 0):
     row[''FARES_IMP_FLAG_PV''] = 1
 else:
     row[''FARES_IMP_FLAG_PV''] = 0');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 21, 'fares_imp_eligible_pv', 'fares_imp_eligible_pv', '
 if (((row[''FAREKEY''] == ''1'') or (row[''FAREKEY''] == ''1.0'')) or ((row[''FARES_IMP_FLAG_PV'']) == 1)) and ((row[''MINS_FLAG_PV'']) == 0):
@@ -1371,30 +1424,24 @@ if (((row[''FAREKEY''] == ''1'') or (row[''FAREKEY''] == ''1.0'')) or ((row[''FA
 else:
     row[''FARES_IMP_ELIGIBLE_PV''] = 0
 ');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 22, 'discnt_f1_pv', 'discnt_f1_pv', '
-if row[''FLOW''] in (1,3,5,7):
-    row[''DISCNT_F1_PV''] = 0.85
-elif row[''FLOW''] in (2,4,6,8):
+if row[''FLOW''] in (1, 2, 3, 4, 5, 6, 7, 8):
     row[''DISCNT_F1_PV''] = 0.85');
-
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 23, 'discnt_package_cost_pv', 'discnt_package_cost_pv', '
-packagecost = row[''PACKAGECOST'']
-if row[''PACKAGE''] in (1 ,2):
-    if packagecost != 999999:
-        if not packagecost==None:
-            row[''DISCNT_PACKAGE_COST_PV''] = row[''DISCNT_F1_PV''] * packagecost
-    else:
-        row[''DISCNT_PACKAGE_COST_PV''] = packagecost
+if row[''PACKAGE''] in (1, 2):
+   if row[''PACKAGECOST''] != 999999:
+      row[''DISCNT_PACKAGE_COST_PV''] = row[''DISCNT_F1_PV''] * row[''PACKAGECOST'']
+else:
+    row[''DISCNT_PACKAGE_COST_PV''] = row[''PACKAGECOST'']
 row[''DISCNT_PACKAGE_COST_PV''] = round(row[''DISCNT_PACKAGE_COST_PV''], 1)');
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 24, 'discnt_f2_pv', 'discnt_f2_pv', '
-if row[''PACKAGE''] in (1,2) and row[''FLOW''] in (1,3,5,7):
-    row[''DISCNT_F2_PV''] = 0.85
-elif row[''PACKAGE''] in (1,2) and row[''FLOW''] in (2,4,6,8):
+if row[''PACKAGE''] in (1,2) and row[''FLOW''] in (1,2,3,4,5,6,7,8):
     row[''DISCNT_F2_PV''] = 0.85');
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
@@ -1418,24 +1465,6 @@ if row[''PURPOSE''] in (20,21,22):
 else:
     row[''TYPE_PV''] = 2');
 
-# INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
-# VALUES ('TEMPLATE', 27, 'opera_pv', 'opera_pv', '
-# if row[''FLOW''] < 5:
-#     if not math.isnan(row[''DVLINECODE'']):
-#         carrier = int(row[''DVLINECODE''])
-#     else:
-#         carrier = 0
-#
-#     if carrier >= 1000 and carrier <= 1999:
-#         row[''OPERA_PV''] = 1
-#     elif carrier >= 2000 and carrier <= 88880:
-#         row[''OPERA_PV''] = 2
-#
-# elif row[''FLOW''] > 4:
-#     row[''OPERA_PV''] = 3
-#
-# if math.isnan(row[''OPERA_PV'']):
-#     row[''OPERA_PV''] = round(random.random(),0) + 1');
 -- create table PROCESS_VARIABLE_PY_BACKUP
 -- (
 --     RUN_ID              varchar(40)   not null,
@@ -1509,7 +1538,7 @@ create table PS_INSTRUCTION
 create table PS_MINIMUMS
 (
     RUN_ID                varchar(40)    not null,
-    MINS_PORT_GRP_PV      decimal(3)    null,
+    MINS_PORT_GRP_PV      decimal(3)     null,
     ARRIVEDEPART          decimal(1)     null,
     MINS_CTRY_GRP_PV      decimal(6)     null,
     MINS_NAT_GRP_PV       decimal(6)     null,
@@ -1528,7 +1557,7 @@ create table PS_MINIMUMS
 create table PS_NON_RESPONSE
 (
     RUN_ID           varchar(40)    not null,
-    NR_PORT_GRP_PV   decimal(3)    not null,
+    NR_PORT_GRP_PV   decimal(3)     not null,
     ARRIVEDEPART     decimal(1)     not null,
     WEEKDAY_END_PV   decimal(1)     null,
     MEAN_RESPS_SH_WT decimal(9, 3)  null,
@@ -1576,7 +1605,7 @@ create table PS_UNSAMPLED_OOH
     RUN_ID                varchar(40)    not null,
     UNSAMP_PORT_GRP_PV    varchar(10)    not null,
     ARRIVEDEPART          decimal(1)     not null,
-    UNSAMP_REGION_GRP_PV  decimal(9,3)    null,
+    UNSAMP_REGION_GRP_PV  decimal(9, 3)  null,
     CASES                 decimal(6)     null,
     SUM_PRIOR_WT          decimal(12, 3) null,
     SUM_UNSAMP_TRAFFIC_WT decimal(12, 3) null,
@@ -1594,11 +1623,11 @@ create table PS_UNSAMPLED_OOH
 
 create table RESPONSE
 (
-    RUN_ID        varchar(40)   not null,
-    STEP_NUMBER   int           not null,
-    RESPONSE_CODE int           not null,
-    MESSAGE       varchar(250)  null,
-    TIME_STAMP    datetime      default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP
+    RUN_ID        varchar(40)                        not null,
+    STEP_NUMBER   int                                not null,
+    RESPONSE_CODE int                                not null,
+    MESSAGE       varchar(250)                       null,
+    TIME_STAMP    datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP
 );
 
 
@@ -1614,19 +1643,19 @@ create table RESPONSE
 
 create table RUN
 (
-	RUN_ID varchar(40) not null,
-	RUN_NAME varchar(30) null,
-	RUN_DESC varchar(250) null,
-	USER_ID varchar(20) null,
-	YEAR year null,
-	PERIOD varchar(255) null,
-	RUN_STATUS decimal(2) default 0 null,
-	RUN_TYPE_ID decimal(3) default 0 null,
-	LAST_MODIFIED timestamp default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
-	STEP varchar(255) charset utf8 null,
-	PERCENT int default 0 null,
-	constraint RUN_RUN_ID_uindex
-		unique (RUN_ID)
+    RUN_ID        varchar(40)                          not null,
+    RUN_NAME      varchar(30)                          null,
+    RUN_DESC      varchar(250)                         null,
+    USER_ID       varchar(20)                          null,
+    YEAR          year                                 null,
+    PERIOD        varchar(255)                         null,
+    RUN_STATUS    decimal(2) default 0                 null,
+    RUN_TYPE_ID   decimal(3) default 0                 null,
+    LAST_MODIFIED timestamp  default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+    STEP          varchar(255) charset utf8            null,
+    PERCENT       int        default 0                 null,
+    constraint RUN_RUN_ID_uindex
+        unique (RUN_ID)
 );
 
 alter table RUN
@@ -1700,15 +1729,15 @@ create table SAS_FARES_SPV
     DISCNT_F1_PV           decimal(4, 3) null,
     DISCNT_F2_PV           decimal(4, 3) null,
     FAGE_PV                decimal(2)    null,
-    TYPE_PV                float(9, 3)    null,
-    UKPORT1_PV             float(9, 3)    null,
-    UKPORT2_PV             float(9, 3)    null,
-    UKPORT3_PV             float(9, 3)    null,
-    UKPORT4_PV             float(9, 3)    null,
+    TYPE_PV                float(9, 3)   null,
+    UKPORT1_PV             float(9, 3)   null,
+    UKPORT2_PV             float(9, 3)   null,
+    UKPORT3_PV             float(9, 3)   null,
+    UKPORT4_PV             float(9, 3)   null,
     OSPORT1_PV             decimal(8)    null,
     OSPORT2_PV             decimal(8)    null,
-    OSPORT3_PV             float(9, 3)    null,
-    OSPORT4_PV             float(9, 3)    null,
+    OSPORT3_PV             float(9, 3)   null,
+    OSPORT4_PV             float(9, 3)   null,
     APD_PV                 decimal(4)    null,
     QMFARE_PV              decimal(8)    null,
     DUTY_FREE_PV           decimal(4)    null
@@ -1746,7 +1775,7 @@ create table SAS_IMBALANCE_WT
 create table SAS_MINIMUMS_SPV
 (
     SERIAL                decimal(15) not null,
-    MINS_PORT_GRP_PV      decimal(3) null,
+    MINS_PORT_GRP_PV      decimal(3)  null,
     MINS_CTRY_GRP_PV      decimal(6)  null,
     MINS_NAT_GRP_PV       decimal(6)  null,
     MINS_CTRY_PORT_GRP_PV varchar(10) null,
@@ -1766,23 +1795,23 @@ create table SAS_NON_RESPONSE_DATA
 (
     REC_ID         int auto_increment
         primary key,
-    PORTROUTE      decimal(4)  not null,
-    WEEKDAY        decimal(1)  null,
-    ARRIVEDEPART   decimal(1)  null,
-    AM_PM_NIGHT    decimal(1)  null,
-    SAMPINTERVAL   decimal(4)  null,
-    MIGTOTAL       decimal     null,
-    ORDTOTAL       decimal     null,
+    PORTROUTE      decimal(4) not null,
+    WEEKDAY        decimal(1) null,
+    ARRIVEDEPART   decimal(1) null,
+    AM_PM_NIGHT    decimal(1) null,
+    SAMPINTERVAL   decimal(4) null,
+    MIGTOTAL       decimal    null,
+    ORDTOTAL       decimal    null,
     NR_PORT_GRP_PV decimal(3) null,
-    WEEKDAY_END_PV decimal(1)  null,
-    AM_PM_NIGHT_PV decimal(1)  null
+    WEEKDAY_END_PV decimal(1) null,
+    AM_PM_NIGHT_PV decimal(1) null
 );
 
 
 create table SAS_NON_RESPONSE_PV
 (
-    REC_ID         decimal     not null,
-    WEEKDAY_END_PV decimal(1)  null,
+    REC_ID         decimal    not null,
+    WEEKDAY_END_PV decimal(1) null,
     NR_PORT_GRP_PV decimal(3) null
 );
 
@@ -1790,7 +1819,7 @@ create table SAS_NON_RESPONSE_PV
 create table SAS_NON_RESPONSE_SPV
 (
     SERIAL         decimal(15) not null,
-    NR_PORT_GRP_PV decimal(3) null,
+    NR_PORT_GRP_PV decimal(3)  null,
     MIG_FLAG_PV    decimal(1)  null,
     NR_FLAG_PV     decimal(1)  null
 );
@@ -1842,7 +1871,7 @@ create table SAS_PS_IMBALANCE
 
 create table SAS_PS_MINIMUMS
 (
-    MINS_PORT_GRP_PV      decimal(3)    null,
+    MINS_PORT_GRP_PV      decimal(3)     null,
     ARRIVEDEPART          decimal(1)     null,
     MINS_CTRY_GRP_PV      decimal(6)     null,
     MINS_NAT_GRP_PV       decimal(6)     null,
@@ -1860,7 +1889,7 @@ create table SAS_PS_MINIMUMS
 
 create table SAS_PS_NON_RESPONSE
 (
-    NR_PORT_GRP_PV   decimal(3)    not null,
+    NR_PORT_GRP_PV   decimal(3)     not null,
     ARRIVEDEPART     decimal(1)     not null,
     WEEKDAY_END_PV   decimal(1)     null,
     MEAN_RESPS_SH_WT decimal(9, 3)  null,
@@ -1905,7 +1934,7 @@ create table SAS_PS_UNSAMPLED_OOH
 (
     UNSAMP_PORT_GRP_PV    varchar(10)    not null,
     ARRIVEDEPART          decimal(1)     not null,
-    UNSAMP_REGION_GRP_PV  decimal(9,3)    null,
+    UNSAMP_REGION_GRP_PV  decimal(9, 3)  null,
     CASES                 decimal(6)     null,
     SUM_PRIOR_WT          decimal(12, 3) null,
     SUM_UNSAMP_TRAFFIC_WT decimal(12, 3) null,
@@ -2234,7 +2263,7 @@ create table SAS_SURVEY_SUBSAMPLE
     MINS_PORT_GRP_PV       decimal(3)     null,
     MINS_QUALITY_PV        decimal(1)     null,
     NR_FLAG_PV             decimal(1)     null,
-    NR_PORT_GRP_PV         decimal(3)    null,
+    NR_PORT_GRP_PV         decimal(3)     null,
     OPERA_PV               decimal(2)     null,
     OSPORT1_PV             decimal(8)     null,
     OSPORT2_PV             decimal(8)     null,
@@ -2259,14 +2288,14 @@ create table SAS_SURVEY_SUBSAMPLE
     STAY_PURPOSE_GRP_PV    decimal(2)     null,
     TOWNCODE_PV            varchar(10)    null,
     TOWN_IMP_ELIGIBLE_PV   decimal(1)     null,
-    TYPE_PV                float(9, 3)     null,
+    TYPE_PV                float(9, 3)    null,
     UK_OS_PV               decimal(1)     null,
     UKPORT1_PV             decimal(8)     null,
     UKPORT2_PV             decimal(8)     null,
     UKPORT3_PV             decimal(8)     null,
     UKPORT4_PV             decimal(8)     null,
     UNSAMP_PORT_GRP_PV     varchar(10)    null,
-    UNSAMP_REGION_GRP_PV   decimal(9,3)    null,
+    UNSAMP_REGION_GRP_PV   decimal(9, 3)  null,
     WEEKDAY_END_PV         decimal(1)     null,
     DIRECT                 decimal(6)     null,
     EXPENDITURE_WT         decimal(6, 3)  null,
@@ -2396,30 +2425,30 @@ create table SAS_UNSAMPLED_OOH_DATA
 (
     REC_ID               int auto_increment
         primary key,
-    PORTROUTE            decimal(4)  null,
-    REGION               decimal(3)  null,
-    ARRIVEDEPART         decimal(1)  null,
-    UNSAMP_TOTAL         decimal     null,
-    UNSAMP_PORT_GRP_PV   varchar(10) null,
-    UNSAMP_REGION_GRP_PV decimal(9,3) null
+    PORTROUTE            decimal(4)    null,
+    REGION               decimal(3)    null,
+    ARRIVEDEPART         decimal(1)    null,
+    UNSAMP_TOTAL         decimal       null,
+    UNSAMP_PORT_GRP_PV   varchar(10)   null,
+    UNSAMP_REGION_GRP_PV decimal(9, 3) null
 );
 
 
 create table SAS_UNSAMPLED_OOH_PV
 (
-    REC_ID               decimal     not null,
-    UNSAMP_PORT_GRP_PV   varchar(10) not null,
-    UNSAMP_REGION_GRP_PV decimal(9,3) null,
-    HAUL_PV              varchar(2)  null
+    REC_ID               decimal       not null,
+    UNSAMP_PORT_GRP_PV   varchar(10)   not null,
+    UNSAMP_REGION_GRP_PV decimal(9, 3) null,
+    HAUL_PV              varchar(2)    null
 );
 
 
 create table SAS_UNSAMPLED_OOH_SPV
 (
-    SERIAL               decimal(15) not null,
-    UNSAMP_PORT_GRP_PV   varchar(10) null,
-    UNSAMP_REGION_GRP_PV decimal(9,3) null,
-    HAUL_PV              varchar(2)  null
+    SERIAL               decimal(15)   not null,
+    UNSAMP_PORT_GRP_PV   varchar(10)   null,
+    UNSAMP_REGION_GRP_PV decimal(9, 3) null,
+    HAUL_PV              varchar(2)    null
 );
 
 
@@ -2647,7 +2676,7 @@ create table SURVEY_SUBSAMPLE
     MINS_PORT_GRP_PV       decimal(3)     null,
     MINS_QUALITY_PV        decimal(1)     null,
     NR_FLAG_PV             decimal(1)     null,
-    NR_PORT_GRP_PV         decimal(3)    null,
+    NR_PORT_GRP_PV         decimal(3)     null,
     OPERA_PV               decimal(2)     null,
     OSPORT1_PV             decimal(8)     null,
     OSPORT2_PV             decimal(8)     null,
@@ -2679,7 +2708,7 @@ create table SURVEY_SUBSAMPLE
     UKPORT3_PV             decimal(8)     null,
     UKPORT4_PV             decimal(8)     null,
     UNSAMP_PORT_GRP_PV     varchar(10)    null,
-    UNSAMP_REGION_GRP_PV   decimal(9,3)    null,
+    UNSAMP_REGION_GRP_PV   decimal(9, 3)  null,
     WEEKDAY_END_PV         decimal(1)     null,
     DIRECT                 decimal(6)     null,
     EXPENDITURE_WT         decimal(6, 3)  null,
@@ -3160,7 +3189,7 @@ create index IX_POPROWVEC_UNSAMP_C_GROUP
 create table R_TRAFFIC
 (
     rownames           varchar(255) null,
-    SERIAL             decimal(15)       null,
+    SERIAL             decimal(15)  null,
     ARRIVEDEPART       int          null,
     PORTROUTE          int          null,
     SAMP_PORT_GRP_PV   varchar(255) null,
@@ -3177,20 +3206,20 @@ create table R_TRAFFIC
 
 create table R_UNSAMPLED
 (
-    rownames              varchar(255) null,
-    SERIAL                decimal(15)        null,
-    ARRIVEDEPART          int          null,
-    PORTROUTE             int          null,
-    UNSAMP_PORT_GRP_PV    varchar(255) null,
-    UNSAMP_REGION_GRP_PV  decimal(9,3)          null,
-    SHIFT_WT              float        null,
-    NON_RESPONSE_WT       float        null,
-    MINS_WT               float        null,
-    UNSAMP_TRAFFIC_WT     decimal(9, 3)        null,
-    OOH_DESIGN_WEIGHT     float        null,
-    T1                    int          null,
-    T_                    varchar(255) null,
-    UNSAMP_TRAFFIC_WEIGHT float        null
+    rownames              varchar(255)  null,
+    SERIAL                decimal(15)   null,
+    ARRIVEDEPART          int           null,
+    PORTROUTE             int           null,
+    UNSAMP_PORT_GRP_PV    varchar(255)  null,
+    UNSAMP_REGION_GRP_PV  decimal(9, 3) null,
+    SHIFT_WT              float         null,
+    NON_RESPONSE_WT       float         null,
+    MINS_WT               float         null,
+    UNSAMP_TRAFFIC_WT     decimal(9, 3) null,
+    OOH_DESIGN_WEIGHT     float         null,
+    T1                    int           null,
+    T_                    varchar(255)  null,
+    UNSAMP_TRAFFIC_WEIGHT float         null
 );
 
 
@@ -3214,7 +3243,7 @@ create table R_UNSAMPLED
 
 create table SURVEY_TRAFFIC_AUX
 (
-    SERIAL             decimal(15)       null,
+    SERIAL             decimal(15)  null,
     ARRIVEDEPART       int          null,
     PORTROUTE          int          null,
     SAMP_PORT_GRP_PV   varchar(255) null,
@@ -3229,17 +3258,17 @@ create table SURVEY_TRAFFIC_AUX
 
 create table SURVEY_UNSAMP_AUX
 (
-    SERIAL               decimal(15)       null,
-    ARRIVEDEPART         int          null,
-    PORTROUTE            int          null,
-    UNSAMP_PORT_GRP_PV   varchar(255) null,
-    UNSAMP_REGION_GRP_PV decimal(9,3)          null,
-    SHIFT_WT             float        null,
-    NON_RESPONSE_WT      float        null,
-    MINS_WT              float        null,
-    UNSAMP_TRAFFIC_WT    decimal(9, 3)   null,
-    OOH_DESIGN_WEIGHT    float        null,
-    T1                   int          null
+    SERIAL               decimal(15)   null,
+    ARRIVEDEPART         int           null,
+    PORTROUTE            int           null,
+    UNSAMP_PORT_GRP_PV   varchar(255)  null,
+    UNSAMP_REGION_GRP_PV decimal(9, 3) null,
+    SHIFT_WT             float         null,
+    NON_RESPONSE_WT      float         null,
+    MINS_WT              float         null,
+    UNSAMP_TRAFFIC_WT    decimal(9, 3) null,
+    OOH_DESIGN_WEIGHT    float         null,
+    T1                   int           null
 );
 
 INSERT INTO ips.RUN

@@ -9,7 +9,7 @@ from ips.services.calculations import ips_impute
 
 from ips.util.sas_random import sas_random, seed
 from ips.persistence import data_management as idm
-from ips.persistence.persistence import insert_from_dataframe
+from ips.persistence.persistence import insert_from_dataframe, truncate_table
 from ips.util.services_configuration import ServicesConfiguration
 from ips.persistence.persistence import select_data
 
@@ -21,6 +21,9 @@ def test_fares():
 
     # Load survey data
     survey_data = pd.read_csv("/Users/paul/Desktop/ONSData/fares_calculation_input.csv")
+    survey_data.drop(survey_data.columns[0], inplace=True, axis=1)
+    truncate_table("SAS_SURVEY_SUBSAMPLE")()
+    insert_from_dataframe('SAS_SURVEY_SUBSAMPLE')(survey_data)
 
     # Run fares calculation and subsequent db steps
     survey_data_out = do_ips_fares_imputation(survey_data,
@@ -67,10 +70,13 @@ APD_PV = 'APD_PV'
 DVPACKAGE = 'DVPACKAGE'
 DISCNT_F2_PV = 'DISCNT_F2_PV'
 QMFARE_PV = 'QMFARE_PV'
+PACKAGECOST = 'PACKAGECOST'
 DVPACKCOST = 'DVPACKCOST'
 DISCNT_PACKAGE_COST_PV = 'DISCNT_PACKAGE_COST_PV'
 DVPERSONS = 'DVPERSONS'
+PERSONS = 'PERSONS'
 DVEXPEND = 'DVEXPEND'
+EXPENDITURE = 'EXPENDITURE'
 BEFAF = 'BEFAF'
 SPEND = 'SPEND'
 SPENDIMPREASON = 'SPENDIMPREASON'
@@ -138,16 +144,11 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
     # Re-sort columns by column name in alphabetical order (may not be required)
     # df_output.sort_index(axis=1, inplace=True)
 
-    final_output_column_list = [var_serial, SPEND, SPENDIMPREASON, FARE,
-                                FAREK]
-
     df_output = df_output.apply(compute_additional_fares, axis=1)
 
     df_output = df_output.apply(compute_additional_spend, axis=1)
 
-    df_output = df_output[final_output_column_list]
-
-    return df_output
+    return df_output[[var_serial, SPEND, SPENDIMPREASON, FARE, FAREK]]
 
 
 def compute_additional_fares(row: Series):
@@ -216,58 +217,52 @@ def compute_additional_spend(row):
     # than the cost of the fares. If all relevant fields are 0, participant
     # is assumed to have spent no money.
 
-    if row[DVPACKAGE] == 1:
-        if not row['DISCNT_PACKAGE_COST_PV']:
-            row['DISCNT_PACKAGE_COST_PV'] = np.NaN
+    package = row[DVPACKAGE]
+    expenditure = row[DVEXPEND]
+    befaf = row[BEFAF]
+    persons = row[DVPERSONS]
+    package_cost = row[DVPACKCOST]
+    discounted_package_cost = row[DISCNT_PACKAGE_COST_PV]
+    fare = row[FARE]
+    duty_free = row[DUTY_FREE_PV]
 
-        if row[DVPACKCOST] == 0 and row[DVEXPEND] == 0 and row[BEFAF] == 0:
-            row[SPEND] = 0
+    def compute_package():
+        if package_cost == 0 and expenditure == 0 and befaf == 0:
+            return 0, np.nan
 
-        elif (row[DVPACKCOST] == 999999
-              or row[DVPACKCOST] == np.nan
-              or row[DISCNT_PACKAGE_COST_PV] == np.nan
-              or row[DVPERSONS] == np.nan
-              or row[FARE] == np.nan
-              or row[DVEXPEND] == 999999
-              or row[DVEXPEND] == np.nan
-              or row[BEFAF] == np.nan
-              or row[BEFAF] == 999999):
-            row[SPEND] = np.nan
+        if (package_cost == 999999 or package_cost == np.nan or discounted_package_cost == np.nan
+                or persons == np.nan or expenditure == 999999 or expenditure == np.nan or fare == np.nan
+                or befaf == 999999 or befaf == np.nan):
+            return np.nan, np.nan
 
-        elif ((row[DISCNT_PACKAGE_COST_PV] + row[DVEXPEND] +
-               row[BEFAF]) / row[DVPERSONS]) < (row[FARE] * 2):
-            row[SPEND] = np.nan
-            row[SPENDIMPREASON] = 1
+        if ((discounted_package_cost + expenditure + befaf) / persons) < (fare * 2):
+            return np.nan, 1
 
-        else:
-            row[SPEND] = ((row[DISCNT_PACKAGE_COST_PV] + row[DVEXPEND]
-                           + row[BEFAF]) / row[DVPERSONS]) - (row[FARE] - 2)
+        return ((discounted_package_cost + expenditure + befaf) / persons) - (fare * 2), np.nan
 
-    # DVPackage is 0
+    def compute_non_package():
+        if expenditure == 0 and befaf == 0:
+            return 0
+        if (package == 9 or expenditure == 999999 or expenditure == np.nan
+                or befaf == 999999 or befaf == np.nan or persons == np.nan):
+            return np.nan
+        return (expenditure + befaf) / persons
 
+    reason = np.nan
+
+    if package == 1:
+        spend, reason = compute_package()
     else:
+        spend = compute_non_package()
 
-        if row[PACKAGE] == 9:
-            row[SPEND] = np.nan
-
-        elif row[DVEXPEND] == 0 and row[BEFAF] == 0:
-            row[SPEND] = 0
-
-        elif (row[DVEXPEND] == 999999
-              or row[DVEXPEND] == np.nan
-              or row[BEFAF] == 999999
-              or row[BEFAF] == np.nan
-              or row[DVPERSONS] == np.nan):
-            row[SPEND] = np.nan
-
-        else:
-            row[SPEND] = (row[DVEXPEND] + row[BEFAF]) / row[DVPERSONS]
-
-    if row[SPEND] != np.nan:  # and row[DUTY_FREE_PV] != np.nan:
-        row[SPEND] = row[SPEND] + row[DUTY_FREE_PV]
+    if spend != np.nan and duty_free != np.nan:
+        spend = spend + duty_free
 
     # Ensure the spend values are integers
-    row[SPEND] = round(row[SPEND], 0)
+    # spend = sas_rounding(spend)
+
+    row[SPEND] = spend
+    row[SPENDIMPREASON] = reason
 
     return row
 
