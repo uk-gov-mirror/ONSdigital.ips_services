@@ -1,4 +1,6 @@
 import math
+import random
+
 from ips.util.services_logging import log
 import numpy as np
 from pandas import DataFrame, Series, options
@@ -6,6 +8,7 @@ from pandas import DataFrame, Series, options
 from ips.services.calculations import ips_impute
 
 from ...util.sas_random import sas_random, seed
+
 # dataimport survey_support
 
 DATE_VARIABLE = 'INTDATE'
@@ -61,16 +64,54 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
     Requirements : NA
     Dependencies : NA
     """
-    options.mode.chained_assignment = None
+
+    df_input.OPERA_PV = df_input.OPERA_PV.astype(float)
+
+    # for index, row in df_input.iterrows():
+    #
+    #     if row['FLOW'] < 5:
+    #         if not math.isnan(row['DVLINECODE']):
+    #             carrier = int(row['DVLINECODE'])
+    #         else:
+    #             carrier = 0
+    #
+    #         if carrier >= 1000 and carrier <= 1999:
+    #             df_input.at[index, 'OPERA_PV'] = 1
+    #         elif carrier >= 2000 and carrier <= 88880:
+    #             df_input.at[index, 'OPERA_PV'] = 2
+    #
+    #     elif row['FLOW'] > 4:
+    #         df_input.at[index, 'OPERA_PV'] = 3
+    #
+    #     if math.isnan(row['OPERA_PV']):
+    #         df_input.at[index, 'OPERA_PV'] = round(random.random(),0) + 1
 
     seed(123456)
-    for x in range(0, len(df_input)):
-        if df_input["FLOW"][x] > 4:
-            df_input["OPERA_PV"][x] = 3
+
+    df_input.OPERA_PV = 0
+
+    for index, row in df_input.iterrows():
+
+        if row["FLOW"] > 4:
+            df_input.at[index, 'OPERA_PV'] = 3
         else:
-            df_input["OPERA_PV"][x] = round(sas_random(), 0) + 1
+            df_input.at[index, 'OPERA_PV'] = round(sas_random(), 0) + 1
 
     df_eligible = df_input.loc[df_input[ELIGIBLE_FLAG_VARIABLE] == 1.0]
+
+    df_ps = df_eligible[
+        [
+            var_serial,
+            'INTDATE', 'TYPE_PV',
+            'UKPORT1_PV', 'OSPORT1_PV',
+            'UKPORT2_PV', 'OSPORT2_PV',
+            'UKPORT3_PV', 'OSPORT3_PV',
+            'UKPORT4_PV', 'OSPORT4_PV',
+            DONOR_VARIABLE, OUTPUT_VARIABLE,
+            IMPUTATION_FLAG_VARIABLE,
+            IMPUTATION_LEVEL_VARIABLE
+        ]
+    ]
 
     # Perform the imputation on eligible dataset
     df_output = ips_impute.ips_impute(df_eligible, var_serial,
@@ -94,7 +135,6 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
 
     df_output = df_output.drop([OUTPUT_VARIABLE + '_x', IMPUTATION_LEVEL_VARIABLE + '_x'], axis=1)
 
-
     df_output.rename(index=str, columns={OUTPUT_VARIABLE + '_y': OUTPUT_VARIABLE,
                                          IMPUTATION_LEVEL_VARIABLE + '_y': IMPUTATION_LEVEL_VARIABLE},
                      inplace=True)
@@ -103,19 +143,17 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
 
     df_output.sort_index(axis=1, inplace=True)
 
-
     df_output = df_output.apply(compute_additional_fares, axis=1)
 
-
     df_output = df_output.apply(compute_additional_spend, axis=1)
-
 
     final_output_column_list = [var_serial, SPEND_VARIABLE, SPEND_REASON_KEY_VARIABLE, OUTPUT_VARIABLE,
                                 IMPUTATION_LEVEL_VARIABLE]
 
     df_output = df_output[final_output_column_list]
 
-    df_output = df_output.merge(df_input[["SERIAL", "OPERA_PV"]], left_on='SERIAL', right_on="SERIAL").rename(columns={'OPERA_PV_y': 'OPERA_PV'})
+    df_output = df_output.merge(df_input[["SERIAL", "OPERA_PV"]], left_on='SERIAL', right_on="SERIAL").rename(
+        columns={'OPERA_PV_y': 'OPERA_PV'})
 
     return df_output
 

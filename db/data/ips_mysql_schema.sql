@@ -1377,6 +1377,7 @@ if row[''FLOW''] in (1,3,5,7):
     row[''DISCNT_F1_PV''] = 0.85
 elif row[''FLOW''] in (2,4,6,8):
     row[''DISCNT_F1_PV''] = 0.85');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 23, 'discnt_package_cost_pv', 'discnt_package_cost_pv', '
 packagecost = None
@@ -1387,12 +1388,14 @@ if row[''PACKAGE''] in (1 ,2):
     else:
         row[''DISCNT_PACKAGE_COST_PV''] = packagecost
 row[''DISCNT_PACKAGE_COST_PV''] = round(row[''DISCNT_PACKAGE_COST_PV''], 1)');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 24, 'discnt_f2_pv', 'discnt_f2_pv', '
 if row[''PACKAGE''] in (1,2) and row[''FLOW''] in (1,3,5,7):
     row[''DISCNT_F2_PV''] = 0.85
 elif row[''PACKAGE''] in (1,2) and row[''FLOW''] in (2,4,6,8):
     row[''DISCNT_F2_PV''] = 0.85');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 25, 'fage_pv', 'fage_pv', '
 if row[''KIDAGE''] in (0, 1):
@@ -1406,30 +1409,32 @@ if (row[''AGE''] > 1) or math.isnan(row[''AGE'']):
     row[''FAGE_PV''] = 6
 elif (row[''AGE''] < 2) and math.isnan(row[''KIDAGE'']):
     row[''FAGE_PV''] = 2');
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 26, 'type_pv', 'type_pv', '
 if row[''PURPOSE''] in (20,21,22):
     row[''TYPE_PV''] = 1
 else:
     row[''TYPE_PV''] = 2');
-INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
-VALUES ('TEMPLATE', 27, 'opera_pv', 'opera_pv', '
-if row[''FLOW''] < 5:
-    if not math.isnan(row[''DVLINECODE'']):
-        carrier = int(row[''DVLINECODE''])
-    else:
-        carrier = 0
 
-    if carrier >= 1000 and carrier <= 1999:
-        row[''OPERA_PV''] = 1
-    elif carrier >= 2000 and carrier <= 88880:
-        row[''OPERA_PV''] = 2
-
-elif row[''FLOW''] > 4:
-    row[''OPERA_PV''] = 3
-
-if math.isnan(row[''OPERA_PV'']):
-    row[''OPERA_PV''] = round(random.random(),0) + 1');
+# INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
+# VALUES ('TEMPLATE', 27, 'opera_pv', 'opera_pv', '
+# if row[''FLOW''] < 5:
+#     if not math.isnan(row[''DVLINECODE'']):
+#         carrier = int(row[''DVLINECODE''])
+#     else:
+#         carrier = 0
+#
+#     if carrier >= 1000 and carrier <= 1999:
+#         row[''OPERA_PV''] = 1
+#     elif carrier >= 2000 and carrier <= 88880:
+#         row[''OPERA_PV''] = 2
+#
+# elif row[''FLOW''] > 4:
+#     row[''OPERA_PV''] = 3
+#
+# if math.isnan(row[''OPERA_PV'']):
+#     row[''OPERA_PV''] = round(random.random(),0) + 1');
 -- create table PROCESS_VARIABLE_PY_BACKUP
 -- (
 --     RUN_ID              varchar(40)   not null,
@@ -1688,21 +1693,21 @@ create table SAS_FARES_IMP
 create table SAS_FARES_SPV
 (
     SERIAL                 decimal(15)   not null,
-    FARES_IMP_FLAG_PV      decimal(1)    null,
+    FARES_IMP_FLAG_PV      float(9, 3)    null,
     FARES_IMP_ELIGIBLE_PV  decimal(1)    null,
     DISCNT_PACKAGE_COST_PV decimal(6)    null,
     DISCNT_F1_PV           decimal(4, 3) null,
     DISCNT_F2_PV           decimal(4, 3) null,
     FAGE_PV                decimal(2)    null,
-    TYPE_PV                decimal(2)    null,
-    UKPORT1_PV             decimal(4)    null,
-    UKPORT2_PV             decimal(4)    null,
-    UKPORT3_PV             decimal(4)    null,
-    UKPORT4_PV             decimal(4)    null,
+    TYPE_PV                float(9, 3)    null,
+    UKPORT1_PV             float(9, 3)    null,
+    UKPORT2_PV             float(9, 3)    null,
+    UKPORT3_PV             float(9, 3)    null,
+    UKPORT4_PV             float(9, 3)    null,
     OSPORT1_PV             decimal(8)    null,
     OSPORT2_PV             decimal(8)    null,
-    OSPORT3_PV             decimal(8)    null,
-    OSPORT4_PV             decimal(8)    null,
+    OSPORT3_PV             float(9, 3)    null,
+    OSPORT4_PV             float(9, 3)    null,
     APD_PV                 decimal(4)    null,
     QMFARE_PV              decimal(8)    null,
     DUTY_FREE_PV           decimal(4)    null
@@ -2116,7 +2121,7 @@ create table SAS_SURVEY_SUBSAMPLE
     CPORTLONDEG            decimal(3)     null,
     CPORTLONMIN            decimal(2)     null,
     CPORTLONSEC            decimal(2)     null,
-    CPORTLONEW             varchar(1)     null,
+    CPORTLONEW             varchar(3)     null,
     INTDATE                varchar(8)     null,
     DAYTYPE                decimal(1)     null,
     DIRECTLEG              decimal(6)     null,
@@ -2207,7 +2212,7 @@ create table SAS_SURVEY_SUBSAMPLE
     DUTY_FREE_PV           decimal(4)     null,
     FAGE_PV                decimal(2)     null,
     FARES_IMP_ELIGIBLE_PV  decimal(1)     null,
-    FARES_IMP_FLAG_PV      decimal(1)     null,
+    FARES_IMP_FLAG_PV      float(9, 3)     null,
     FLOW_PV                decimal(2)     null,
     FOOT_OR_VEHICLE_PV     decimal(2)     null,
     HAUL_PV                varchar(2)     null,
@@ -2231,8 +2236,8 @@ create table SAS_SURVEY_SUBSAMPLE
     OPERA_PV               decimal(2)     null,
     OSPORT1_PV             decimal(8)     null,
     OSPORT2_PV             decimal(8)     null,
-    OSPORT3_PV             decimal(8)     null,
-    OSPORT4_PV             decimal(8)     null,
+    OSPORT3_PV             float(9, 3)     null,
+    OSPORT4_PV             float(9, 3)     null,
     PUR1_PV                decimal(8)     null,
     PUR2_PV                decimal(8)     null,
     PUR3_PV                decimal(8)     null,
@@ -2252,12 +2257,12 @@ create table SAS_SURVEY_SUBSAMPLE
     STAY_PURPOSE_GRP_PV    decimal(2)     null,
     TOWNCODE_PV            varchar(10)    null,
     TOWN_IMP_ELIGIBLE_PV   decimal(1)     null,
-    TYPE_PV                decimal(2)     null,
+    TYPE_PV                float(9, 3)     null,
     UK_OS_PV               decimal(1)     null,
-    UKPORT1_PV             decimal(4)     null,
-    UKPORT2_PV             decimal(4)     null,
-    UKPORT3_PV             decimal(4)     null,
-    UKPORT4_PV             decimal(4)     null,
+    UKPORT1_PV             float(9, 3)     null,
+    UKPORT2_PV             float(9, 3)     null,
+    UKPORT3_PV             float(9, 3)     null,
+    UKPORT4_PV             float(9, 3)     null,
     UNSAMP_PORT_GRP_PV     varchar(10)    null,
     UNSAMP_REGION_GRP_PV   decimal(9,3)    null,
     WEEKDAY_END_PV         decimal(1)     null,
@@ -2528,7 +2533,7 @@ create table SURVEY_SUBSAMPLE
     CPORTLONDEG            decimal(3)     null,
     CPORTLONMIN            decimal(2)     null,
     CPORTLONSEC            decimal(2)     null,
-    CPORTLONEW             varchar(1)     null,
+    CPORTLONEW             varchar(3)     null,
     INTDATE                varchar(8)     null,
     DAYTYPE                decimal(1)     null,
     DIRECTLEG              decimal(6)     null,
@@ -2619,7 +2624,7 @@ create table SURVEY_SUBSAMPLE
     DUTY_FREE_PV           decimal(4)     null,
     FAGE_PV                decimal(2)     null,
     FARES_IMP_ELIGIBLE_PV  decimal(1)     null,
-    FARES_IMP_FLAG_PV      decimal(1)     null,
+    FARES_IMP_FLAG_PV      float(9, 3)     null,
     FLOW_PV                decimal(2)     null,
     FOOT_OR_VEHICLE_PV     decimal(2)     null,
     HAUL_PV                varchar(2)     null,
@@ -2643,8 +2648,8 @@ create table SURVEY_SUBSAMPLE
     OPERA_PV               decimal(2)     null,
     OSPORT1_PV             decimal(8)     null,
     OSPORT2_PV             decimal(8)     null,
-    OSPORT3_PV             decimal(8)     null,
-    OSPORT4_PV             decimal(8)     null,
+    OSPORT3_PV             float(9, 3)     null,
+    OSPORT4_PV             float(9, 3)     null,
     PUR1_PV                decimal(8)     null,
     PUR2_PV                decimal(8)     null,
     PUR3_PV                decimal(8)     null,
@@ -2664,12 +2669,12 @@ create table SURVEY_SUBSAMPLE
     STAY_PURPOSE_GRP_PV    decimal(2)     null,
     TOWNCODE_PV            varchar(10)    null,
     TOWN_IMP_ELIGIBLE_PV   decimal(1)     null,
-    TYPE_PV                decimal(2)     null,
+    TYPE_PV                float(9, 3)     null,
     UK_OS_PV               decimal(1)     null,
-    UKPORT1_PV             decimal(4)     null,
-    UKPORT2_PV             decimal(4)     null,
-    UKPORT3_PV             decimal(4)     null,
-    UKPORT4_PV             decimal(4)     null,
+    UKPORT1_PV             float(9, 3)     null,
+    UKPORT2_PV             float(9, 3)     null,
+    UKPORT3_PV             float(9, 3)     null,
+    UKPORT4_PV             float(9, 3)     null,
     UNSAMP_PORT_GRP_PV     varchar(10)    null,
     UNSAMP_REGION_GRP_PV   decimal(9,3)    null,
     WEEKDAY_END_PV         decimal(1)     null,

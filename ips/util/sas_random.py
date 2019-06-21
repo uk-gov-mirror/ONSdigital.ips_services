@@ -23,10 +23,3 @@ def sas_random():
     seedlist.append(outputseed)
 
     return outputseed / m
-
-
-
-
-
-
-
