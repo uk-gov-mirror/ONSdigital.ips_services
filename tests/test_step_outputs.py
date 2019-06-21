@@ -254,18 +254,13 @@ def test_stay_imputation():
 
 
 def test_fares_imputation():
-    # import ips.services.steps.stay_imputation as stay
-    # import ips.services.steps.fares_imputation as fares
-    #
-    # stay.stay_imputation_step(run_id)
-    # fares.fares_imputation_step(run_id)
-
     log.info("Testing Calculation  9 --> fares_imputation")
     survey_output(
         "FARES",
         "data/calculations/december_2017/stay/surveydata_dec2017.csv",
         [
-            'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
+            # 'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
+            'SERIAL', 'FAREK', 'SPEND', 'SPENDIMPREASON'
         ]
     )
 

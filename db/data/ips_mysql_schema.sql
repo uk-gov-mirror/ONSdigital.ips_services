@@ -1378,9 +1378,10 @@ if row[''FLOW''] in (1,3,5,7):
 elif row[''FLOW''] in (2,4,6,8):
     row[''DISCNT_F1_PV''] = 0.85');
 
+
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 23, 'discnt_package_cost_pv', 'discnt_package_cost_pv', '
-packagecost = None
+packagecost = row[''PACKAGECOST'']
 if row[''PACKAGE''] in (1 ,2):
     if packagecost != 999999:
         if not packagecost==None:
@@ -2129,6 +2130,7 @@ create table SAS_SURVEY_SUBSAMPLE
     DVFARE                 decimal(6)     null,
     DVLINECODE             decimal(6)     null,
     DVPACKAGE              decimal(1)     null,
+    PACKAGECOST            float          null,
     DVPACKCOST             decimal(6)     null,
     DVPERSONS              decimal(3)     null,
     DVPORTCODE             decimal(6)     null,
@@ -2541,6 +2543,7 @@ create table SURVEY_SUBSAMPLE
     DVFARE                 decimal(6)     null,
     DVLINECODE             decimal(6)     null,
     DVPACKAGE              decimal(1)     null,
+    PACKAGECOST            float          null,
     DVPACKCOST             decimal(6)     null,
     DVPERSONS              decimal(3)     null,
     DVPORTCODE             decimal(6)     null,

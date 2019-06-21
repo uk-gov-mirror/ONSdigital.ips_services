@@ -3,7 +3,7 @@ import random
 
 from ips.util.services_logging import log
 import numpy as np
-from pandas import DataFrame, Series
+from pandas import DataFrame, Series, to_numeric
 from ips.services.calculations import ips_impute
 
 from ...util.sas_random import sas_random, seed
@@ -50,8 +50,20 @@ STRATA_BASE_LIST = [
 ]
 
 
+def initialise_fields(df):
+    df['DVPACKCOST'] = to_numeric(df['DVPACKCOST'], errors='coerce')
+    df['DISCNT_PACKAGE_COST_PV'] = to_numeric(df['DISCNT_PACKAGE_COST_PV'], errors='coerce')
+    df['DVPERSONS'] = to_numeric(df['DVPERSONS'], errors='coerce')
+    df['FARE'] = to_numeric(df['FARE'], errors='coerce')
+    df['DVEXPEND'] = to_numeric(df['DVEXPEND'], errors='coerce')
+    df['SPEND'] = to_numeric(df['SPEND'], errors='coerce')
+    df['BEFAF'] = to_numeric(df['BEFAF'], errors='coerce')
+
+
 def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: int, measure: str) -> DataFrame:
     log.debug("Starting fares imputation")
+
+    initialise_fields(df_input)
 
     seed(123456)
 
@@ -81,12 +93,10 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
     df_input.sort_values(var_serial, inplace=True)
 
     # df_output = df_input.merge(df_output, on=var_serial, how='left')
-
     df_output = df_input.merge(df_output, how='left', left_on=var_serial, right_on=var_serial)
 
     # Above merge creates fares_x and fares_y column; this line removes the empty
     # fares_x column and keeps then renames the imputed fares_y column
-
     df_output = df_output.drop([OUTPUT_VARIABLE + '_x', IMPUTATION_LEVEL_VARIABLE + '_x'], axis=1)
 
     df_output.rename(index=str, columns={OUTPUT_VARIABLE + '_y': OUTPUT_VARIABLE,
@@ -94,36 +104,16 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
                      inplace=True)
 
     # Re-sort columns by column name in alphabetical order (may not be required)
-
     # df_output.sort_index(axis=1, inplace=True)
 
-    a = math.modf(df_output['FARE'].astype(float))
-    if a[0] > .5:
-        b = a[1] + 1
-    else:
-        b = a[1]
-
-    df_output['FARE'] = b
-
-    # TODO: Print df_output to csv and compare with El's 'before_apply_something.csv'
-    df_output.to_csv("/Users/paul/Desktop/ONSData/before-compute-no-fudgery.csv")
+    final_output_column_list = [var_serial, SPEND_VARIABLE, SPEND_REASON_KEY_VARIABLE, OUTPUT_VARIABLE,
+                                IMPUTATION_LEVEL_VARIABLE]
 
     df_output = df_output.apply(compute_additional_fares, axis=1)
 
     df_output = df_output.apply(compute_additional_spend, axis=1)
 
-    df_output['FARE'] = df_output['FARE'].astype(float).round()
-
-    # TODO: Print df_output to csv and compare with El's 'after_apply_something.csv'
-    df_output.to_csv("/Users/paul/Desktop/ONSData/after-compute.csv")
-
-    final_output_column_list = [var_serial, SPEND_VARIABLE, SPEND_REASON_KEY_VARIABLE, OUTPUT_VARIABLE,
-                                IMPUTATION_LEVEL_VARIABLE]
-
     df_output = df_output[final_output_column_list]
-
-    df_output = df_output.merge(df_input[["SERIAL", "OPERA_PV"]], left_on='SERIAL', right_on="SERIAL").rename(
-        columns={'OPERA_PV_y': 'OPERA_PV'})
 
     return df_output
 
@@ -193,6 +183,7 @@ def compute_additional_spend(row):
     # For package holidays, spend is imputed if the package cost is less
     # than the cost of the fares. If all relevant fields are 0, participant
     # is assumed to have spent no money.
+
     if row[PACKAGE_VARIABLE] == 1:
         if not row['DISCNT_PACKAGE_COST_PV']:
             row['DISCNT_PACKAGE_COST_PV'] = np.NaN
@@ -200,7 +191,8 @@ def compute_additional_spend(row):
         if row[PACKAGE_COST_VARIABLE] == 0 and row[EXPENDITURE_VARIABLE] == 0 and row[BEFAF_VARIABLE] == 0:
             row[SPEND_VARIABLE] = 0
 
-        elif (row[PACKAGE_COST_VARIABLE] == 999999 or row[PACKAGE_COST_VARIABLE] == np.nan
+        elif (row[PACKAGE_COST_VARIABLE] == 999999
+              or row[PACKAGE_COST_VARIABLE] == np.nan
               or row[DISCOUNTED_PACKAGE_COST_VARIABLE] == np.nan
               or row[PERSONS_VARIABLE] == np.nan
               or row[OUTPUT_VARIABLE] == np.nan
@@ -210,8 +202,8 @@ def compute_additional_spend(row):
               or row[BEFAF_VARIABLE] == 999999):
             row[SPEND_VARIABLE] = np.nan
 
-        elif (((row[DISCOUNTED_PACKAGE_COST_VARIABLE] + row[EXPENDITURE_VARIABLE] +
-                row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]) < (row[OUTPUT_VARIABLE] * 2)):
+        elif ((row[DISCOUNTED_PACKAGE_COST_VARIABLE] + row[EXPENDITURE_VARIABLE] +
+               row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]) < (row[OUTPUT_VARIABLE] * 2):
             row[SPEND_VARIABLE] = np.nan
             row[SPEND_REASON_KEY_VARIABLE] = 1
 
@@ -229,22 +221,20 @@ def compute_additional_spend(row):
         elif row[EXPENDITURE_VARIABLE] == 0 and row[BEFAF_VARIABLE] == 0:
             row[SPEND_VARIABLE] = 0
 
-        elif row[EXPENDITURE_VARIABLE] == 999999 or row[EXPENDITURE_VARIABLE] == np.nan \
-                or row[BEFAF_VARIABLE] == 999999 or row[BEFAF_VARIABLE] == np.nan \
-                or row[PERSONS_VARIABLE] == np.nan:
+        elif (row[EXPENDITURE_VARIABLE] == 999999
+              or row[EXPENDITURE_VARIABLE] == np.nan
+              or row[BEFAF_VARIABLE] == 999999
+              or row[BEFAF_VARIABLE] == np.nan
+              or row[PERSONS_VARIABLE] == np.nan):
             row[SPEND_VARIABLE] = np.nan
 
         else:
             row[SPEND_VARIABLE] = (row[EXPENDITURE_VARIABLE] + row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]
 
-    # if row[SPEND_VARIABLE] != np.nan and row[DUTY_FREE_VARIABLE] != np.nan:
-    #     row[SPEND_VARIABLE] = row[SPEND_VARIABLE] + row[DUTY_FREE_VARIABLE]
-    #
-    if row[SPEND_VARIABLE] != np.nan:
+    if row[SPEND_VARIABLE] != np.nan:  # and row[DUTY_FREE_VARIABLE] != np.nan:
         row[SPEND_VARIABLE] = row[SPEND_VARIABLE] + row[DUTY_FREE_VARIABLE]
 
     # Ensure the spend values are integers
     row[SPEND_VARIABLE] = round(row[SPEND_VARIABLE], 0)
 
     return row
-

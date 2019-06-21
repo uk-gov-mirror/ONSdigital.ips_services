@@ -118,20 +118,32 @@ def test_before_el():
 
 def test_subset_before_el():
     sas_csv = '/Users/paul/Desktop/ONSData/befre_apply_subset.csv'
-    python_csv = "/Users/paul/Desktop/ONSData/before-compute.csv"
+    python_csv = "/Users/paul/Desktop/ONSData/spend.csv"
 
     sas_df = pd.read_csv(sas_csv)
     python_df = pd.read_csv(python_csv)
 
+    # df_ps = python_df[
+    #     [
+    #         'SERIAL', 'INTDATE', 'FARES_IMP_FLAG_PV', 'FARES_IMP_ELIGIBLE_PV', 'FARE', 'DVFARE', 'FAGE_PV', 'BABYFARE',
+    #         'APD_PV', 'CHILDFARE', 'DVPACKAGE', 'DISCNT_F2_PV', 'QMFARE_PV', 'DISCNT_PACKAGE_COST_PV', 'DVPACKCOST',
+    #         'DVEXPEND', 'BEFAF', 'SPEND', 'DVPERSONS', 'SPENDIMPREASON', 'PACKAGE', 'DUTY_FREE_PV'
+    #     ]
+    # ]
+
     df_ps = python_df[
         [
-            'SERIAL', 'INTDATE', 'FARES_IMP_FLAG_PV', 'FARES_IMP_ELIGIBLE_PV', 'FARE', 'DVFARE', 'FAGE_PV', 'BABYFARE',
-            'APD_PV', 'CHILDFARE', 'DVPACKAGE', 'DISCNT_F2_PV', 'QMFARE_PV', 'DISCNT_PACKAGE_COST_PV', 'DVPACKCOST',
-            'DVEXPEND', 'BEFAF', 'SPEND', 'DVPERSONS', 'SPENDIMPREASON', 'PACKAGE', 'DUTY_FREE_PV'
+            'SERIAL', 'DVPACKAGE', 'DISCNT_PACKAGE_COST_PV', 'DVPACKCOST', 'DVEXPEND', 'BEFAF', 'SPEND', 'DISCNT_PACKAGE_COST_PV', 'DVPERSONS', 'SPENDIMPREASON', 'PACKAGE', 'DUTY_FREE_PV'
         ]
     ]
 
-    sas_df = sas_df.sort_values('SERIAL')
+    df_sas = sas_df[
+        [
+            'SERIAL', 'DVPACKAGE', 'DISCNT_PACKAGE_COST_PV', 'DVPACKCOST', 'DVEXPEND', 'BEFAF', 'SPEND', 'DISCNT_PACKAGE_COST_PV', 'DVPERSONS', 'SPENDIMPREASON', 'PACKAGE', 'DUTY_FREE_PV'
+        ]
+    ]
+
+    sas_df = df_sas.sort_values('SERIAL')
     python_df = df_ps.sort_values('SERIAL')
 
     python_df.reset_index(drop=True, inplace=True)
@@ -153,7 +165,7 @@ def test_fares():
     run_id = 'h3re-1s-y0ur-run-1d'
 
     # Load survey data
-    survey_data = pd.read_csv("/Users/paul/Desktop/ONSData/fares_input_survey_data.csv")
+    survey_data = pd.read_csv("/Users/paul/Desktop/ONSData/fares_calculation_input.csv")
 
     # Run fares calculation and subsequent db steps
     survey_data_out = calculate_fares_imputation.do_ips_fares_imputation(survey_data,
@@ -165,14 +177,15 @@ def test_fares():
     idm.store_survey_data_with_step_results(run_id, config)
 
     # Start testing shizznizz
-    survey_output_columns = ['SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON']
-    expected_survey_output = ['SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON']
+    # TODO --->
+    output_columns = ['SERIAL', 'FAREK', 'SPEND', 'SPENDIMPREASON']
 
     # Create comparison survey dataframes
     survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
-    survey_results = survey_subsample[survey_output_columns].copy()
-    survey_expected = pd.read_csv(expected_survey_output)
-    survey_expected = survey_expected[survey_output_columns].copy()
+
+    survey_results = survey_subsample[output_columns].copy()
+    survey_expected = pd.read_csv("data/calculations/december_2017/stay/surveydata_dec2017.csv")
+    survey_expected = survey_expected[output_columns].copy()
 
     # pandas.testing.faff
     survey_results.sort_values(by='SERIAL', axis=0, inplace=True)
@@ -181,5 +194,5 @@ def test_fares():
     survey_expected.sort_values(by='SERIAL', axis=0, inplace=True)
     survey_expected.index = range(0, len(survey_expected))
 
-    # TODO: run this and it should produce a result of 4.16397 % difference
+    # TODO: run this and it should produce a result of...
     assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)

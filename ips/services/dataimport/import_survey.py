@@ -17,7 +17,7 @@ columns = [
     'CPORTLATDEG', 'CPORTLATMIN', 'CPORTLATSEC', 'CPORTLATNS',
     'CPORTLONDEG', 'CPORTLONMIN', 'CPORTLONDSEC', 'CPORTLONEW',
     'INTDATE', 'DAYTYPE', 'DIRECTLEG', 'DVEXPEND', 'DVFARE',
-    'DVLINECODE', 'DVPACKAGE', 'DVPACKCOST', 'DVPERSONS', 'DVPORTCODE',
+    'DVLINECODE', 'DVPACKAGE', 'PACKAGECOST', 'DVPACKCOST', 'DVPERSONS', 'DVPORTCODE',
     'EXPENDCODE', 'EXPENDITURE', 'FARE', 'FAREK', 'FLOW', 'HAULKEY',
     'INTENDLOS', 'INTMONTH', 'KIDAGE', 'LOSKEY', 'MAINCONTRA', 'MIGSI',
     'NATIONALITY', 'NATIONNAME', 'NIGHTS1', 'NIGHTS2', 'NIGHTS3', 'NIGHTS4',
@@ -50,7 +50,8 @@ def import_survey(run_id, data, month, year):
     df.columns = df.columns.str.upper()
     df['TANDTSI'] = df['TANDTSI'].round(0)
 
-    [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'DVEXPEND', 'TANDTSI']]
+    # [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'DVEXPEND', 'TANDTSI']]
+    [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'TANDTSI']]
 
     errors = Errors()
     validation = validate.validate_survey_data(df, month, year, errors)
