@@ -37,7 +37,7 @@ def test_fares():
 
     # Start testing shizznizz
     # TODO --->
-    output_columns = ['SERIAL', 'FAREK', 'SPEND', 'SPENDIMPREASON']
+    output_columns = ['SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON']
 
     # Create comparison survey dataframes
     survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
@@ -196,27 +196,22 @@ def compute_additional_fares(row: Series):
             if math.isnan(non_pack_fare) or math.isnan(row[DISCNT_F2_PV]):
                 row[FARE] = np.NaN
             else:
-                row[FARE] = round(non_pack_fare * row[DISCNT_F2_PV])
+                row[FARE] = sas_round(non_pack_fare * row[DISCNT_F2_PV])
 
         else:
-            row[FARE] = round(non_pack_fare, 0)
+            row[FARE] = sas_round(non_pack_fare, 0)
 
     # Test for Queen Mary fare
     if row[FARE] == np.nan and row[QMFARE_PV] != np.nan:
         row[FARE] = row[QMFARE_PV]
 
     # Ensure the fare is rounded to nearest integer
-    row[FARE] = round(row[FARE], 0)
+    row[FARE] = sas_round(row[FARE], 0)
 
     return row
 
 
 def compute_additional_spend(row):
-    # Compute spend per person per visit
-    # For package holidays, spend is imputed if the package cost is less
-    # than the cost of the fares. If all relevant fields are 0, participant
-    # is assumed to have spent no money.
-
     package = row[DVPACKAGE]
     expenditure = row[DVEXPEND]
     befaf = row[BEFAF]
@@ -243,9 +238,11 @@ def compute_additional_spend(row):
     def compute_non_package():
         if expenditure == 0 and befaf == 0:
             return 0
+
         if (package == 9 or expenditure == 999999 or expenditure == np.nan
                 or befaf == 999999 or befaf == np.nan or persons == np.nan):
             return np.nan
+
         return (expenditure + befaf) / persons
 
     reason = np.nan
@@ -259,7 +256,7 @@ def compute_additional_spend(row):
         spend = spend + duty_free
 
     # Ensure the spend values are integers
-    # spend = sas_rounding(spend)
+    spend = sas_round(spend)
 
     row[SPEND] = spend
     row[SPENDIMPREASON] = reason
@@ -268,14 +265,9 @@ def compute_additional_spend(row):
 
 
 # use SAS style rounding
-def sas_rounding(a):
-    fare = to_numeric(a, errors="coerce")
+def sas_round(n, decimals=0):
+    fare = to_numeric(n, errors="coerce")
     if fare == np.nan:
-        return a
-    if isinstance(fare, float):
-        fraction, integer = math.modf(fare)
-        if fraction > .5:
-            return integer + 1
-        else:
-            return integer
-    return a
+        return n
+    multiplier = 10 ** decimals
+    return (n * multiplier) / multiplier
