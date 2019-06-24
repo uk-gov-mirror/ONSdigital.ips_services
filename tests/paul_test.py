@@ -54,7 +54,7 @@ def test_fares():
     survey_expected.index = range(0, len(survey_expected))
 
     # TODO: run this and it should produce a result of...
-    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
+    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=False)
 
 
 INTDATE = 'INTDATE'
@@ -137,9 +137,7 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
     # fares_x column and keeps then renames the imputed fares_y column
     df_output = df_output.drop([FARE + '_x', FAREK + '_x'], axis=1)
 
-    df_output.rename(index=str, columns={FARE + '_y': FARE,
-                                         FAREK + '_y': FAREK},
-                     inplace=True)
+    df_output.rename(index=str, columns={FARE + '_y': FARE, FAREK + '_y': FAREK}, inplace=True)
 
     # Re-sort columns by column name in alphabetical order (may not be required)
     # df_output.sort_index(axis=1, inplace=True)
@@ -151,62 +149,72 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
     return df_output[[var_serial, SPEND, SPENDIMPREASON, FARE, FAREK]]
 
 
-def compute_additional_fares(row: Series):
-    # Force the variable formatting to 8 digit date
+def calculate_non_pack_fare(row: Series) -> float:
+    intdate = row[INTDATE]
+    a = str(intdate)
+    intdate = a.zfill(8)
 
-    row[INTDATE] = str(row[INTDATE])
-    row[INTDATE] = row[INTDATE].zfill(8)
+    day = int(intdate[:2])
+    month = int(intdate[2:4])
+    year = int(intdate[4:8])
 
-    non_pack_fare = np.NaN
+    fage_pv = row[FAGE_PV]
+    baby_fare = row[BABYFARE]
+    child_fare = row[CHILDFARE]
+    apd_pv = row[APD_PV]
+    fare = row[FARE]
 
-    # Sort out child/baby fares
-    if row[FARES_IMP_FLAG_PV] == 0 or row[FARES_IMP_ELIGIBLE_PV] == 0:
-        row[FARE] = row[DVFARE]
-    else:
-        # Separate intdate column into usable integer values.
-        day = int(row[INTDATE][:2])
-        month = int(row[INTDATE][2:4])
-        year = int(row[INTDATE][4:8])
+    if fage_pv == 1:
+        return baby_fare * (fare - apd_pv)
 
+    if fage_pv == 2:
         # Ensure date is on or later than the 1st of May 2016
         # This is because APD for under 16's was removed from this date.
         if year >= 2016 and month >= 5 and day >= 1:
-            if row[FAGE_PV] == 1:
-                non_pack_fare = row[BABYFARE] * (row[FARE] - row[APD_PV])
-
-            elif row[FAGE_PV] == 2:
-                non_pack_fare = row[CHILDFARE] * (row[FARE] - row[APD_PV])
-
-            elif row[FAGE_PV] == 6:
-                non_pack_fare = row[FARE]
-
+            return child_fare * (fare - apd_pv)
         else:
-            if row[FAGE_PV] == 1:
-                non_pack_fare = row[BABYFARE] * (row[FARE] - row[APD_PV])
+            return (child_fare * (fare - apd_pv)) + apd_pv
 
-            elif row[FAGE_PV] == 2:
-                non_pack_fare = (row[CHILDFARE] * (row[FARE] - row[APD_PV])) + \
-                                row[APD_PV]
+    if fage_pv == 6:
+        return fare
 
-            elif row[FAGE_PV] == 6:
-                non_pack_fare = row[FARE]
+    return np.NaN
+
+
+def compute_additional_fares(row: Series):
+    fares_imp_flag_pv = row[FARES_IMP_FLAG_PV]
+    fares_imp_eligible_pv = row[FARES_IMP_ELIGIBLE_PV]
+
+    dvfare = row[DVFARE]
+
+    dv_package = row[DVPACKAGE]
+    discnt_f2 = row[DISCNT_F2_PV]
+    qm_fare = row[QMFARE_PV]
+
+    # Sort out child/baby fares
+    def calculate_fare():
+        non_pack_fare = calculate_non_pack_fare(row)
 
         # Compute package versions of fare
-        if row[DVPACKAGE] in (1, 2):
-            if math.isnan(non_pack_fare) or math.isnan(row[DISCNT_F2_PV]):
-                row[FARE] = np.NaN
+        if dv_package in (1, 2):
+            if math.isnan(non_pack_fare) or math.isnan(discnt_f2):
+                return np.NaN
             else:
-                row[FARE] = sas_round(non_pack_fare * row[DISCNT_F2_PV])
-
+                return sas_round(non_pack_fare * discnt_f2)
         else:
-            row[FARE] = sas_round(non_pack_fare, 0)
+            return sas_round(non_pack_fare)
+
+    if fares_imp_flag_pv == 0 or fares_imp_eligible_pv == 0:
+        fare = dvfare
+    else:
+        fare = calculate_fare()
 
     # Test for Queen Mary fare
-    if row[FARE] == np.nan and row[QMFARE_PV] != np.nan:
-        row[FARE] = row[QMFARE_PV]
+    if fare == np.nan and qm_fare != np.nan:
+        fare = qm_fare
 
     # Ensure the fare is rounded to nearest integer
-    row[FARE] = sas_round(row[FARE], 0)
+    row[FARE] = sas_round(fare, 0)
 
     return row
 
@@ -264,7 +272,8 @@ def compute_additional_spend(row):
     return row
 
 
-# use SAS style rounding
+# use SAS style rounding - truncates value to 'decimal' decimal places
+# if decimals is a zero then it simply converts to an int
 def sas_round(n, decimals=0):
     fare = to_numeric(n, errors="coerce")
     if fare == np.nan:
