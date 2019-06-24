@@ -41,46 +41,7 @@ MINIMUM_WEIGHT_THRESHOLD = '50'
 MAXIMUM_WEIGHT_THRESHOLD = '5000'
 
 
-# def calculate_factor(row, flag):
-#     """
-#     Author       : Thomas Mahoney / Nassir Mohammad
-#     Date         : Apr 2018
-#     Purpose      : Calculates the factor of the given row's values.
-#     Parameters   : row  - This parameter represents the row being manipulated
-#                           from the dataframe calling the function.
-#                    flag - Used to filter the rows being manipulated. If the
-#                           flag is true for the given row, the calculation would
-#                           be made to determine the factor.
-#     Returns      : The calculated factor value (float), or a np.nan.
-#     Requirements : NA
-#     Dependencies : NA
-#     """
-#
-#     if row[flag] != 0:
-#         return row['NUMERATOR'] / row['DENOMINATOR']
-#     else:
-#         return np.nan
-
-
 def calculate_ips_shift_factor(df_shiftsdata, df_surveydata):
-    """
-    Author       :  Thomas Mahoney / Nassir Mohammad
-    Date         :  Apr 2018
-    Purpose      :  Generates the shift factor by taking number of possible shifts over
-                    sampled shifts by stratum.  Uses the imported surveydata and shiftsdata to calculate the
-                    data sets records' shift factors. This calculated value is then appended to the original
-                    survey data set and used further in the process.
-    Parameters   :  df_shiftsdata = file holding number of total shifts (and crossings)
-                    df_surveydata = survey file
-    Returns      :  Three data frames that are used to calculate the overall shift
-                    weight and build the final output data set.
-                        - df_totalsampledshifts
-                        - df_possibleshifts
-                        - df_surveydata_merge
-    Requirements :  calculate_factor()
-    Dependencies :  NA
-    """
-
     # -----------------------------------------
     # Get survey records that are shift based
     # -----------------------------------------
@@ -528,6 +489,5 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
 
     if len(df_sw_thresholds_check) > 0:
         log_warnings("Shift weight outside thresholds for")(df_sw_thresholds_check, 4, run_id, 1)
-
 
     return final_output_data, final_summary_data

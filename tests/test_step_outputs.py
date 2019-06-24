@@ -259,8 +259,7 @@ def test_fares_imputation():
         "FARES",
         "data/calculations/december_2017/stay/surveydata_dec2017.csv",
         [
-            # 'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
-            'SERIAL', 'FAREK', 'SPEND', 'SPENDIMPREASON'
+             'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
         ]
     )
 

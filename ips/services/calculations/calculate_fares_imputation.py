@@ -1,12 +1,12 @@
 import math
-import random
+
+import numpy as np
+from pandas import DataFrame, Series
+from ips.services.calculations import ips_impute
+from ips.services.calculations.sas_random import SASRandom
+from ips.util.services_configuration import ips_rounding
 
 from ips.util.services_logging import log
-import numpy as np
-from pandas import DataFrame, Series, to_numeric
-from ips.services.calculations import ips_impute
-
-from ...util.sas_random import sas_random, seed
 
 # dataimport survey_support
 
@@ -56,14 +56,14 @@ STRATA_BASE_LIST = [
 def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: int, measure: str) -> DataFrame:
     log.debug("Starting fares imputation")
 
-    seed(123456)
+    sas_random = SASRandom(123456)
 
     for index, row in df_input.iterrows():
 
         if row['FLOW'] > 4:
             df_input.at[index, 'OPERA_PV'] = 3
         else:
-            df_input.at[index, 'OPERA_PV'] = round(sas_random(), 0) + 1
+            df_input.at[index, 'OPERA_PV'] = round(sas_random.random(), 0) + 1
 
     df_eligible = df_input.loc[df_input['FARES_IMP_ELIGIBLE_PV'] == 1.0]
 
@@ -153,9 +153,9 @@ def compute_additional_fares(row: Series):
             if math.isnan(non_pack_fare) or math.isnan(discnt_f2):
                 return np.NaN
             else:
-                return sas_round(non_pack_fare * discnt_f2)
+                return ips_rounding(non_pack_fare * discnt_f2, 0)
         else:
-            return sas_round(non_pack_fare)
+            return ips_rounding(non_pack_fare, 0)
 
     if fares_imp_flag_pv == 0 or fares_imp_eligible_pv == 0:
         fare = dvfare
@@ -167,7 +167,7 @@ def compute_additional_fares(row: Series):
         fare = qm_fare
 
     # Ensure the fare is rounded to nearest integer
-    row[FARE] = sas_round(fare, 0)
+    row[FARE] = ips_rounding(fare, 0)
 
     return row
 
@@ -217,19 +217,9 @@ def compute_additional_spend(row):
         spend = spend + duty_free
 
     # Ensure the spend values are integers
-    spend = sas_round(spend)
+    spend = ips_rounding(spend, 0)
 
     row[SPEND] = spend
     row[SPENDIMPREASON] = reason
 
     return row
-
-
-# use SAS style rounding - truncates value to 'decimal' decimal places
-# if decimals is a zero then it simply converts to an int
-def sas_round(n, decimals=0):
-    fare = to_numeric(n, errors="coerce")
-    if fare == np.nan:
-        return n
-    multiplier = 10 ** decimals
-    return (n * multiplier) / multiplier
