@@ -1,11 +1,11 @@
-from ips.services.calculations.sas_rounding import sas_round
+from ips.services.calculations.sas_rounding import ips_rounding
 import math
 
 
 def test_rounding():
-    assert sas_round(5.62354235523, 2) == 5.62
+    assert ips_rounding(5.62354235523, 2) == 5.62
 
-    assert sas_round(5.62354235523, 0) == 6
-    assert sas_round(5.123, 2) == 5.12
+    assert ips_rounding(5.62354235523, 0) == 6
+    assert ips_rounding(5.123, 2) == 5.12
 
-    assert math.isnan(sas_round(math.nan)) == True
+    assert math.isnan(ips_rounding(math.nan))
