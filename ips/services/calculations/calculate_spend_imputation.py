@@ -39,6 +39,9 @@ def do_ips_spend_imputation(df_survey_data, var_serial, measure):
     Returns       : Dataframe  
     """
 
+    # TODO: --->
+    df_survey_data.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/spend_input.csv')
+
     num_levels = len(STEM_THRESHOLD)
     log.debug("in do_ips_spend_imputation")
 
@@ -61,10 +64,16 @@ def do_ips_spend_imputation(df_survey_data, var_serial, measure):
 
     df_eligible = df_eligible.apply(selection, axis=1)
 
+    # TODO: --->
+    df_eligible.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/before_impute.csv')
+
     # Perform the imputation
     df_output = imp.ips_impute(df_eligible, var_serial,
                                STEM_VARIABLE, STEM_THRESHOLD, num_levels, OTHER_DONOR_VARIABLE,
                                OUTPUT_VARIABLE, measure, IMPUTATION_FLAG_VARIABLE, IMPUTATION_LEVEL_VARIABLE)
+
+    # TODO: --->
+    df_output.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/after_impute.csv')
 
     # Merge and cleanse
     df_final_output = pd.merge(df_eligible, df_output, on=var_serial, how='left')
@@ -80,5 +89,8 @@ def do_ips_spend_imputation(df_survey_data, var_serial, measure):
 
     # Cleanse df before returning
     df_final_output = df_final_output[[var_serial, IMPUTATION_LEVEL_VARIABLE, OUTPUT_VARIABLE]]
+
+    # TODO: --->
+    df_final_output.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/spend_calc_final.csv')
 
     return df_final_output
