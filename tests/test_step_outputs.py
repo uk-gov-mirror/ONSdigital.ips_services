@@ -246,7 +246,7 @@ def test_stay_imputation():
     log.info("Testing Calculation  8 --> stay_imputation")
     survey_output(
         "STAY",
-        "data/calculations/december_2017/stay/surveydata_dec2017.csv",
+        "data/calculations/december_2017/fares/surveydata_fares.csv",
         [
             'SERIAL', 'STAY', 'STAYK'
         ]
