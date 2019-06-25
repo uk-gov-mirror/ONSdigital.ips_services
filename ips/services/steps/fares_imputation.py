@@ -39,8 +39,6 @@ def fares_imputation_step(run_id):
     # Retrieve data from SQL
     survey_data = get_survey_data()
 
-    survey_data.to_csv("/Users/paul/Desktop/ONSData/fares_calculation_input.csv")
-
     # Calculate Fares Imputation
     survey_data_out = calculate_fares_imputation.do_ips_fares_imputation(survey_data,
                                                                          var_serial='SERIAL',

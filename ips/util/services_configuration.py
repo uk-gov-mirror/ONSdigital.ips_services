@@ -1,6 +1,4 @@
 from ips.util.Configuration import Configuration
-from ips.util.services_logging import log
-from ips.services.calculations.sas_rounding import sas_round
 
 
 class ServicesConfiguration(Configuration):
@@ -55,13 +53,3 @@ class ServicesConfiguration(Configuration):
 
     def sas_rounding(self):
         return self.cfg['rounding']['sas_rounding']
-
-
-# set to python default rounding unless overridden in configuration
-ips_rounding = round
-
-if ServicesConfiguration().sas_rounding():
-    log.debug("Selecting SAS style rounding")
-    ips_rounding = sas_round
-else:
-    log.debug("Selecting Python style rounding")

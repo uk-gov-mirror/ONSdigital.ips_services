@@ -5,7 +5,7 @@ import pandas as pd
 from pandas import DataFrame, Series
 from ips.services.calculations import ips_impute
 from ips.services.calculations.sas_random import SASRandom
-from ips.util.services_configuration import ips_rounding
+from ips.services.calculations.sas_rounding import ips_rounding
 
 from ips.util.services_logging import log
 

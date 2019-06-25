@@ -309,10 +309,6 @@ def survey_output(test_name, expected_survey_output, survey_output_columns):
     survey_expected.sort_values(by='SERIAL', axis=0, inplace=True)
     survey_expected.index = range(0, len(survey_expected))
 
-    if test_name == 'FARES':
-        survey_results.to_csv("/Users/paul/Desktop/results.csv")
-        survey_expected.to_csv("/Users/paul/Desktop/expected.csv")
-
     # Test survey outputs
     log.info(f"Testing survey results for {test_name}")
     assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
