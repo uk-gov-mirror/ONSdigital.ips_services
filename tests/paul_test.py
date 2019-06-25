@@ -43,18 +43,21 @@ def test_fares():
     survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
 
     survey_results = survey_subsample[output_columns].copy()
-    survey_expected = pd.read_csv("data/calculations/december_2017/stay/surveydata_dec2017.csv")
+    survey_expected = pd.read_csv(
+        "/Users/paul/ONS/ips_services/tests/data/calculations/december_2017/fares/surveydata_fares.csv")
     survey_expected = survey_expected[output_columns].copy()
 
     # pandas.testing.faff
     survey_results.sort_values(by='SERIAL', axis=0, inplace=True)
     survey_results.index = range(0, len(survey_results))
 
+    survey_results.to_csv("/Users/paul/Desktop/test.csv")
+
     survey_expected.sort_values(by='SERIAL', axis=0, inplace=True)
     survey_expected.index = range(0, len(survey_expected))
 
     # TODO: run this and it should produce a result of...
-    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=False)
+    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
 
 
 INTDATE = 'INTDATE'
@@ -116,6 +119,12 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
 
     # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.
     df_eligible['INTMONTH'].fillna(99, inplace=True)
+
+    df_eligible['DVPACKCOST'].fillna(0, inplace=True)
+    df_eligible['PERSONS'].fillna(0, inplace=True)
+    df_eligible['DVEXPEND'].fillna(0, inplace=True)
+    df_eligible['FARE'].fillna(0, inplace=True)
+    df_eligible['BEFAF'].fillna(0, inplace=True)
 
     # Perform the imputation on eligible dataset
     df_output = ips_impute.ips_impute(df_eligible, var_serial,
@@ -209,8 +218,13 @@ def compute_additional_fares(row: Series):
     else:
         fare = calculate_fare()
 
+    if not isinstance(fare, (float, int)):
+        fare = pd.to_numeric(fare, errors="coerce")
+    if not isinstance(qm_fare, (float, int)):
+        qm_fare = pd.to_numeric(qm_fare, errors="coerce")
+
     # Test for Queen Mary fare
-    if fare == np.nan and qm_fare != np.nan:
+    if np.isnan(fare) and not np.isnan(qm_fare):
         fare = qm_fare
 
     # Ensure the fare is rounded to nearest integer
@@ -220,22 +234,23 @@ def compute_additional_fares(row: Series):
 
 
 def compute_additional_spend(row):
-    package = row[DVPACKAGE]
-    expenditure = row[DVEXPEND]
+    dv_package = row[DVPACKAGE]
+    package = row[PACKAGE]
     befaf = row[BEFAF]
-    persons = row[DVPERSONS]
-    package_cost = row[DVPACKCOST]
-    discounted_package_cost = row[DISCNT_PACKAGE_COST_PV]
     fare = row[FARE]
     duty_free = row[DUTY_FREE_PV]
+    package_cost = row[DVPACKCOST]
+    discounted_package_cost = row[DISCNT_PACKAGE_COST_PV]
+    persons = row[DVPERSONS]
+    expenditure = row[DVEXPEND]
 
     def compute_package():
         if package_cost == 0 and expenditure == 0 and befaf == 0:
             return 0, np.nan
 
-        if (package_cost == 999999 or package_cost == np.nan or discounted_package_cost == np.nan
-                or persons == np.nan or expenditure == 999999 or expenditure == np.nan or fare == np.nan
-                or befaf == 999999 or befaf == np.nan):
+        if (package_cost == 999999 or np.isnan(package_cost) or np.isnan(discounted_package_cost)
+                or np.isnan(persons) or expenditure == 999999 or np.isnan(expenditure) or np.isnan(fare)
+                or befaf == 999999 or np.isnan(befaf)):
             return np.nan, np.nan
 
         if ((discounted_package_cost + expenditure + befaf) / persons) < (fare * 2):
@@ -244,23 +259,26 @@ def compute_additional_spend(row):
         return ((discounted_package_cost + expenditure + befaf) / persons) - (fare * 2), np.nan
 
     def compute_non_package():
+        if package == 9:
+            return np.nan
+
         if expenditure == 0 and befaf == 0:
             return 0
 
-        if (package == 9 or expenditure == 999999 or expenditure == np.nan
-                or befaf == 999999 or befaf == np.nan or persons == np.nan):
+        if (expenditure == 999999 or np.isnan(expenditure)
+                or befaf == 999999 or np.isnan(befaf) or np.isnan(persons)):
             return np.nan
 
         return (expenditure + befaf) / persons
 
     reason = np.nan
 
-    if package == 1:
+    if dv_package == 1:
         spend, reason = compute_package()
     else:
         spend = compute_non_package()
 
-    if spend != np.nan and duty_free != np.nan:
+    if not np.isnan(spend) and not np.isnan(duty_free):
         spend = spend + duty_free
 
     # Ensure the spend values are integers
@@ -270,4 +288,3 @@ def compute_additional_spend(row):
     row[SPENDIMPREASON] = reason
 
     return row
-

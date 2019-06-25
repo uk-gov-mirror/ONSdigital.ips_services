@@ -1432,11 +1432,13 @@ if row[''FLOW''] in (1, 2, 3, 4, 5, 6, 7, 8):
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 23, 'discnt_package_cost_pv', 'discnt_package_cost_pv', '
-if row[''PACKAGE''] in (1, 2):
-   if row[''PACKAGECOST''] != 999999:
-      row[''DISCNT_PACKAGE_COST_PV''] = row[''DISCNT_F1_PV''] * row[''PACKAGECOST'']
-else:
-    row[''DISCNT_PACKAGE_COST_PV''] = row[''PACKAGECOST'']
+packagecost = None
+if row[''PACKAGE''] in (1 ,2):
+    if packagecost != 999999:
+        if not packagecost==None:
+            row[''DISCNT_PACKAGE_COST_PV''] = row[''DISCNT_F1_PV''] * packagecost
+    else:
+        row[''DISCNT_PACKAGE_COST_PV''] = packagecost
 row[''DISCNT_PACKAGE_COST_PV''] = round(row[''DISCNT_PACKAGE_COST_PV''], 1)');
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)

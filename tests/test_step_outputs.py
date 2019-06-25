@@ -257,7 +257,7 @@ def test_fares_imputation():
     log.info("Testing Calculation  9 --> fares_imputation")
     survey_output(
         "FARES",
-        "data/calculations/december_2017/stay/surveydata_dec2017.csv",
+        "data/calculations/december_2017/fares/surveydata_fares.csv",
         [
              'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
         ]

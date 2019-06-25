@@ -1,6 +1,7 @@
 import math
 
 import numpy as np
+import pandas as pd
 from pandas import DataFrame, Series
 from ips.services.calculations import ips_impute
 from ips.services.calculations.sas_random import SASRandom
@@ -162,8 +163,13 @@ def compute_additional_fares(row: Series):
     else:
         fare = calculate_fare()
 
+    if not isinstance(fare, (float, int)):
+        fare = pd.to_numeric(fare, errors="coerce")
+    if not isinstance(qm_fare, (float, int)):
+        qm_fare = pd.to_numeric(qm_fare, errors="coerce")
+
     # Test for Queen Mary fare
-    if fare == np.nan and qm_fare != np.nan:
+    if np.isnan(fare) and not np.isnan(qm_fare):
         fare = qm_fare
 
     # Ensure the fare is rounded to nearest integer
@@ -173,22 +179,43 @@ def compute_additional_fares(row: Series):
 
 
 def compute_additional_spend(row):
-    package = row[DVPACKAGE]
-    expenditure = row[DVEXPEND]
+    dv_package = row[DVPACKAGE]
+    package = row[PACKAGE]
     befaf = row[BEFAF]
-    persons = row[DVPERSONS]
-    package_cost = row[DVPACKCOST]
-    discounted_package_cost = row[DISCNT_PACKAGE_COST_PV]
     fare = row[FARE]
     duty_free = row[DUTY_FREE_PV]
+    package_cost = row[DVPACKCOST]
+    discounted_package_cost = row[DISCNT_PACKAGE_COST_PV]
+    persons = row[DVPERSONS]
+    expenditure = row[DVEXPEND]
+    expenditure = row[DVEXPEND]
+    persons = row[DVPERSONS]
+
+    if not isinstance(package_cost, (float, int)):
+        package_cost = pd.to_numeric(package_cost, errors="coerce")
+
+    if not isinstance(discounted_package_cost, (float, int)):
+        discounted_package_cost = pd.to_numeric(discounted_package_cost, errors="coerce")
+
+    if not isinstance(persons, (float, int)):
+        persons = pd.to_numeric(persons, errors="coerce")
+
+    if not isinstance(expenditure, (float, int)):
+        expenditure = pd.to_numeric(expenditure, errors="coerce")
+
+    if not isinstance(fare, (float, int)):
+        fare = pd.to_numeric(fare, errors="coerce")
+
+    if not isinstance(befaf, (float, int)):
+        befaf = pd.to_numeric(befaf, errors="coerce")
 
     def compute_package():
         if package_cost == 0 and expenditure == 0 and befaf == 0:
             return 0, np.nan
 
-        if (package_cost == 999999 or package_cost == np.nan or discounted_package_cost == np.nan
-                or persons == np.nan or expenditure == 999999 or expenditure == np.nan or fare == np.nan
-                or befaf == 999999 or befaf == np.nan):
+        if (package_cost == 999999 or np.isnan(package_cost) or np.isnan(discounted_package_cost)
+                or np.isnan(persons) or expenditure == 999999 or np.isnan(expenditure) or np.isnan(fare)
+                or befaf == 999999 or np.isnan(befaf)):
             return np.nan, np.nan
 
         if ((discounted_package_cost + expenditure + befaf) / persons) < (fare * 2):
@@ -197,23 +224,26 @@ def compute_additional_spend(row):
         return ((discounted_package_cost + expenditure + befaf) / persons) - (fare * 2), np.nan
 
     def compute_non_package():
+        if package == 9:
+            return np.nan
+
         if expenditure == 0 and befaf == 0:
             return 0
 
-        if (package == 9 or expenditure == 999999 or expenditure == np.nan
-                or befaf == 999999 or befaf == np.nan or persons == np.nan):
+        if (expenditure == 999999 or np.isnan(expenditure)
+                or befaf == 999999 or np.isnan(befaf) or np.isnan(persons)):
             return np.nan
 
         return (expenditure + befaf) / persons
 
     reason = np.nan
 
-    if package == 1:
+    if dv_package == 1:
         spend, reason = compute_package()
     else:
         spend = compute_non_package()
 
-    if spend != np.nan and duty_free != np.nan:
+    if not np.isnan(spend) and not np.isnan(duty_free):
         spend = spend + duty_free
 
     # Ensure the spend values are integers
