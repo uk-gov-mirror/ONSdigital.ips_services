@@ -13,6 +13,7 @@ from ips.services.dataimport.import_unsampled import import_unsampled
 from ips.services.dataimport.import_traffic import import_air
 from ips.services.dataimport.import_traffic import import_sea
 from ips.services.dataimport.import_traffic import import_tunnel
+from ips.services.steps import shift_weight, non_response_weight, minimums_weight, traffic_weight, unsampled_weight, imbalance_weight, final_weight, stay_imputation, fares_imputation, spend_imputation
 
 from ips.services import ips_workflow
 
@@ -64,11 +65,6 @@ def setup_module(module):
     log.info("Setting up PVs for testing")
     setup_pv()
 
-    # Run steps
-    workflow = ips_workflow.IPSWorkflow()
-    workflow.run_calculations(run_id)
-
-
 def setup_pv():
     df = db.select_data('*', 'PROCESS_VARIABLE_PY', 'RUN_ID', 'TEMPLATE')
     df['RUN_ID'] = run_id
@@ -81,6 +77,7 @@ def teardown_module(module):
 
 def test_shift_weight():
     log.info("Testing Calculation  1 --> shift_weight")
+    shift_weight.shift_weight_step(run_id)
 
     survey_output(
         "SHIFT",
@@ -103,6 +100,8 @@ def test_shift_weight():
 
 def test_non_response_weight():
     log.info("Testing Calculation  2 --> non_response_weight")
+    non_response_weight.non_response_weight_step(run_id)
+
     survey_output(
         "NON_RESPONSE",
         "data/calculations/december_2017/non_response_weight/dec_output.csv",
@@ -124,6 +123,8 @@ def test_non_response_weight():
 
 def test_minimums_weight():
     log.info("Testing Calculation  3 --> minimums_weight")
+    minimums_weight.minimums_weight_step(run_id)
+
 
     survey_output(
         "MINIMUMS",
@@ -147,6 +148,8 @@ def test_minimums_weight():
 
 def test_traffic_weight():
     log.info("Testing Calculation  4 --> traffic_weight")
+    traffic_weight.traffic_weight_step(run_id)
+
     survey_output(
         "TRAFFIC",
         "data/calculations/december_2017/traffic_weight/surveydata_dec2017.csv",
@@ -167,6 +170,8 @@ def test_traffic_weight():
 
 def test_unsampled_weight():
     log.info("Testing Calculation  5 --> unsampled_weight")
+    unsampled_weight.unsampled_weight_step(run_id)
+
     survey_output(
         "UNSAMPLED",
         "data/calculations/december_2017/unsampled_weight/surveydata_dec2017utf8.csv",
@@ -188,6 +193,8 @@ def test_unsampled_weight():
 
 def test_imbalance_weight():
     log.info("Testing Calculation  6 --> imbalance_weight")
+    imbalance_weight.imbalance_weight_step(run_id)
+
     survey_output(
         "IMBALANCE",
         "data/calculations/december_2017/imbalance_weight/surveydata_dec2017_utf8.csv",
@@ -208,6 +215,8 @@ def test_imbalance_weight():
 
 def test_final_weight():
     log.info("Testing Calculation  7 --> final_weight")
+    final_weight.final_weight_step(run_id)
+
     survey_output(
         "FINAL",
         "data/calculations/december_2017/final_weight/surveydata_dec2017_utf8.csv",
@@ -229,6 +238,8 @@ def test_final_weight():
 
 def test_stay_imputation():
     log.info("Testing Calculation  8 --> stay_imputation")
+    stay_imputation.stay_imputation_step(run_id)
+
     survey_output(
         "STAY",
         "data/calculations/december_2017/fares/surveydata_fares.csv",
@@ -240,6 +251,8 @@ def test_stay_imputation():
 
 def test_fares_imputation():
     log.info("Testing Calculation  9 --> fares_imputation")
+    fares_imputation.fares_imputation_step(run_id)
+
     survey_output(
         "FARES",
         "data/calculations/december_2017/fares/surveydata_fares.csv",
@@ -251,6 +264,7 @@ def test_fares_imputation():
 
 def test_spend_imputation():
     log.info("Testing Calculation 10 --> spend_imputation")
+    spend_imputation.spend_imputation_step(run_id)
     survey_output(
         "SPEND",
         "data/calculations/december_2017/stay/surveydata_dec2017.csv",
