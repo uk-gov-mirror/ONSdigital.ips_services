@@ -13,7 +13,7 @@ from ips.api.dataimport.import_unsampled import ImportUnsampled
 from ips.api.export import ExportApi
 from ips.api.login_api import LoginApi
 from ips.api.pv_api import PvApi
-from ips.api.pv_builder_api import PvBuilderApi, PvBuilderVariablesApi
+from ips.api.pv_builder_api import PvBuilderApi
 from ips.api.pv_sets import PvSetsApi
 from ips.api.run_api import RunApi
 from ips.api.run_steps_api import RunStepsApi, RunStepsValueApi, RunStepsValueStepApi
@@ -45,7 +45,6 @@ app.add_route("/login/{user_name}/{password}", LoginApi(workflow))
 app.add_route("/process_variables/{run_id}", PvApi(workflow))
 
 app.add_route("/builder/{run_id}", PvBuilderApi(workflow))
-app.add_route("/builder/variables", PvBuilderVariablesApi(workflow))
 
 app.add_route("/import/survey/{run_id}", ImportSurvey(workflow))
 app.add_route("/import/air/{run_id}", ImportAir(workflow))
