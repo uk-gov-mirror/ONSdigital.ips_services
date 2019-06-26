@@ -29,21 +29,10 @@ STAYDAYS_VARIABLE = "STAYDAYS"
 
 
 def do_ips_spend_imputation(df_survey_data, var_serial, measure):
-    """
-    Author        : thorne1
-    Date          : 7 Mar 2018
-    Purpose       : Imputes spend for IPS system  
-    Parameters    : df_survey_data = the IPS survey dataset
-                    var_serial = the serial number field name
-                    measure = Measure function (e.g. mean)
-    Returns       : Dataframe  
-    """
-
     # TODO: --->
-    df_survey_data.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/spend_input.csv')
+    df_survey_data.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/spend_calc_in.csv')
 
     num_levels = len(STEM_THRESHOLD)
-    log.debug("in do_ips_spend_imputation")
 
     # Select only the eligible donors and recipients
     df_eligible = df_survey_data.copy()
@@ -72,15 +61,15 @@ def do_ips_spend_imputation(df_survey_data, var_serial, measure):
                                STEM_VARIABLE, STEM_THRESHOLD, num_levels, OTHER_DONOR_VARIABLE,
                                OUTPUT_VARIABLE, measure, IMPUTATION_FLAG_VARIABLE, IMPUTATION_LEVEL_VARIABLE)
 
-    # TODO: --->
-    df_output.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/after_impute.csv')
-
     # Merge and cleanse
     df_final_output = pd.merge(df_eligible, df_output, on=var_serial, how='left')
     df_final_output.drop(IMPUTATION_LEVEL_VARIABLE + "_x", axis=1, inplace=True)
     df_final_output.rename(columns={IMPUTATION_LEVEL_VARIABLE + "_y": IMPUTATION_LEVEL_VARIABLE}, inplace=True)
 
-    # Create final output with required columns 
+    # TODO: --->
+    df_output.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/after_impute.csv')
+
+    # Create final output with required columns
     df_final_output = df_final_output[[var_serial, OUTPUT_VARIABLE, IMPUTATION_LEVEL_VARIABLE,
                                        STAYDAYS_VARIABLE]]
     df_final_output.loc[df_final_output[IMPUTATION_LEVEL_VARIABLE].notnull(),

@@ -68,7 +68,7 @@ def setup_module(module):
     # Run steps
     # TODO: Replace this with ips_workflow before committing -->
     from ips.services.steps import shift_weight, non_response_weight, minimums_weight, traffic_weight, unsampled_weight, \
-        imbalance_weight, final_weight, stay_imputation, fares_imputation, spend_imputation
+        imbalance_weight, final_weight, stay_imputation, fares_imputation
     shift_weight.shift_weight_step(run_id)
     non_response_weight.non_response_weight_step(run_id)
     minimums_weight.minimums_weight_step(run_id)
@@ -78,7 +78,6 @@ def setup_module(module):
     final_weight.final_weight_step(run_id)
     stay_imputation.stay_imputation_step(run_id)
     fares_imputation.fares_imputation_step(run_id)
-    spend_imputation.spend_imputation_step(run_id)
 
     # workflow = ips_workflow.IPSWorkflow()
     # workflow.run_calculations(run_id)
@@ -247,7 +246,7 @@ def test_stay_imputation():
     log.info("Testing Calculation  8 --> stay_imputation")
     survey_output(
         "STAY",
-        "data/calculations/december_2017/stay/surveydata_dec2017.csv",
+        "data/calculations/december_2017/fares/surveydata_fares.csv",
         [
             'SERIAL', 'STAY', 'STAYK'
         ]
@@ -269,10 +268,9 @@ def test_spend_imputation():
     log.info("Testing Calculation 10 --> spend_imputation")
     survey_output(
         "SPEND",
-        "data/calculations/december_2017/spend/surveydata_spend.csv",
+        "data/calculations/december_2017/stay/surveydata_dec2017.csv",
         [
-            'SERIAL', 'SPEND_IMP_FLAG_PV', 'SPEND_IMP_EIGIBLE_PV', 'UK_OS_PV', 'PUR1_PV', 'PUR2_PV', 'PUR3_PV',
-            'DUR1_PV', 'DUR2_PV', 'SPEND', 'SPENDK'
+            'SERIAL', 'SPENDK', 'NEWSPEND'
         ]
     )
 
@@ -299,7 +297,7 @@ def survey_output(test_name, expected_survey_output, survey_output_columns):
 
     # Create comparison survey dataframes
     survey_results = survey_subsample[survey_output_columns].copy()
-    survey_expected = pd.read_csv(expected_survey_output, engine='python')
+    survey_expected = pd.read_csv(expected_survey_output)
     survey_expected = survey_expected[survey_output_columns].copy()
 
     # pandas.testing.faff

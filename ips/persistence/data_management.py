@@ -377,6 +377,9 @@ def update_spend_imputation(table, results_columns):
     execute_sql(sql1)
     execute_sql(sql2)
 
+    print(sql1)
+    print(sql2)
+
 
 def update_others(table):
     sql1 = f"""
