@@ -309,7 +309,7 @@ def survey_output(test_name, expected_survey_output, survey_output_columns):
 
     # Test survey outputs
     log.info(f"Testing survey results for {test_name}")
-    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
+    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=False)
 
 
 def summary_output(test_name, expected_summary_output, summary_output_table, summary_output_columns):
