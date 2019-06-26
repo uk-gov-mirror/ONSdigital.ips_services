@@ -31,7 +31,6 @@ def create_pv_build(request, run_id):
         pv = pvs[pv_id]['pv']
         pv_name = pvs[pv_id]['pv_name']
         pv_desc = pvs[pv_id]['pv_desc']
-        _delete_pv_build(run_id, pv_id)
         _delete_pv_bytes(run_id, pv_id)
         if pv != "":
             pv = pv.replace("\\","\\\\")
