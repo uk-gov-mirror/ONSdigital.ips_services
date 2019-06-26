@@ -8,6 +8,16 @@ from pkg_resources import resource_filename
 from ips.util.services_logging import log
 import ips.persistence.persistence as db
 from ips.services.calculations import log_warnings
+from ips.services.calculations.sas_rounding import ips_rounding
+from pandas.testing import assert_frame_equal
+import math
+
+from ips.util.services_logging import log
+
+from ips.persistence import data_management as idm
+from ips.persistence.persistence import insert_from_dataframe, truncate_table
+from ips.util.services_configuration import ServicesConfiguration
+from ips.persistence.persistence import select_data
 
 OOH_STRATA = [
     'UNSAMP_PORT_GRP_PV',
@@ -24,18 +34,90 @@ PREVIOUS_TOTAL_COLUMN = 'PREVTOTAL'
 POST_WEIGHT_COLUMN = 'POSTWEIGHT'
 
 
+def test_unsampled():
+    survey_subsample_table = 'SURVEY_SUBSAMPLE'
+    config = ServicesConfiguration().get_unsampled_weight()
+    run_id = 'h3re-1s-y0ur-run-1d'
+
+    # Load survey data
+    survey_data = pd.read_csv('/Users/paul/ONS/ips_services/tests/pauls scratch folder/unsampled_survey_data.csv')
+    unsampled_data = pd.read_csv('/Users/paul/ONS/ips_services/tests/pauls scratch folder/unsampled_reference_data.csv')
+
+    survey_data.drop(survey_data.columns[0], inplace=True, axis=1)
+    unsampled_data.drop(unsampled_data.columns[0], inplace=True, axis=1)
+
+    truncate_table("SAS_SURVEY_SUBSAMPLE")()
+    truncate_table("PS_UNSAMPLED_OOH")()
+    insert_from_dataframe('SAS_SURVEY_SUBSAMPLE')(survey_data)
+
+    # Calculate Unsampled Weight
+    output_data, summary_data = do_ips_unsampled_weight_calculation(
+        df_surveydata=survey_data,
+        serial_num='SERIAL',
+        shift_weight='SHIFT_WT',
+        nr_weight='NON_RESPONSE_WT',
+        min_weight='MINS_WT',
+        traffic_weight='TRAFFIC_WT',
+        out_of_hours_weight="UNSAMP_TRAFFIC_WT",
+        df_ustotals=unsampled_data,
+        min_count_threshold=30,
+        run_id=run_id)
+
+    # Insert data to SQL
+    insert_from_dataframe(config["temp_table"])(output_data)
+    insert_from_dataframe(config["sas_ps_table"])(summary_data)
+
+    # Update Survey Data With Unsampled Wt Results
+    idm.update_survey_data_with_step_results(config)
+
+    # Store Survey Data With Unsampled Wt Results
+    idm.store_survey_data_with_step_results(run_id, config)
+
+    # Store Unsampled Weight Summary
+    idm.store_step_summary(run_id, config)
+
+    ###
+
+    # Start testing shizznizz
+    output_columns = ['SERIAL', 'UNSAMP_TRAFFIC_WT']
+    summary_output_columns = ['UNSAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'UNSAMP_REGION_GRP_PV', 'CASES', 'SUM_PRIOR_WT',
+                              'SUM_UNSAMP_TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT']
+
+    # Create comparison survey dataframes
+    survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
+
+    survey_results = survey_subsample[output_columns].copy()
+    survey_expected = pd.read_csv(
+        "data/calculations/december_2017/unsampled_weight/surveydata_dec2017utf8.csv")
+    survey_expected = survey_expected[output_columns].copy()
+
+    survey_results.sort_values(by='SERIAL', axis=0, inplace=True)
+    survey_results.index = range(0, len(survey_results))
+
+    survey_expected.sort_values(by='SERIAL', axis=0, inplace=True)
+    survey_expected.index = range(0, len(survey_expected))
+
+    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=False)
+
+    # now the summary
+    summary_data = select_data("*", 'PS_UNSAMPLED_OOH', "RUN_ID", run_id)
+    summary_results = summary_data[summary_output_columns].copy()
+
+    summary_expected = pd.read_csv(
+        "data/calculations/december_2017/unsampled_weight/ps_unsampled_ooh.csv")
+    summary_expected = summary_expected[summary_output_columns].copy()
+
+    summary_results.sort_values(by=summary_output_columns, axis=0, inplace=True)
+    summary_results.index = range(0, len(summary_results))
+
+    summary_expected.sort_values(by=summary_output_columns, axis=0, inplace=True)
+    summary_expected.index = range(0, len(summary_expected))
+
+    assert_frame_equal(summary_results, summary_expected, check_dtype=False, check_less_precise=True)
+
+
 # Prepare survey data
 def r_survey_input(survey_input: pd.DataFrame) -> None:
-    """
-    Author       : David Powell
-    Date         : 07/06/2018
-    Purpose      : Creates input data that feeds into the R GES weighting
-    Parameters   : df_survey_input - A data frame containing the survey data for
-                   processing month
-    Returns      : A data frame containing the information needed for GES weighting
-    Requirements : NA
-    Dependencies : NA
-    """
 
     # Load survey Data
     df_survey_input = survey_input
@@ -96,18 +178,6 @@ def r_survey_input(survey_input: pd.DataFrame) -> None:
 
 # Prepare population totals to create AUX lookup variables
 def r_population_input(survey_input: pd.DataFrame, ustotals: pd.DataFrame) -> None:
-    """
-    Author       : David Powell
-    Date         : 07/06/2018
-    Purpose      : Creates population data that feeds into the R GES weighting
-    Parameters   : df_survey_input - A data frame containing the survey data for
-                   processing month
-                   trtotals - A data frame containing population information for
-                   processing year
-    Returns      : A data frame containing the information needed for GES weighting
-    Requirements : NA
-    Dependencies : NA
-    """
 
     df_survey_input = survey_input
     df_us_totals = ustotals
@@ -140,11 +210,7 @@ def r_population_input(survey_input: pd.DataFrame, ustotals: pd.DataFrame) -> No
     # df_survey_input = df_survey_input.round({'SHIFT_WT': 3})
     # df_survey_input['SHIFT_WT'] = df_survey_input['SHIFT_WT'].apply(lambda x: ips_rounding(x, 3))
 
-    values = (
-            df_survey_input.SHIFT_WT * df_survey_input.NON_RESPONSE_WT
-            * df_survey_input.MINS_WT * df_survey_input.TRAFFIC_WT
-    )
-
+    values = df_survey_input.SHIFT_WT * df_survey_input.NON_RESPONSE_WT * df_survey_input.MINS_WT * df_survey_input.TRAFFIC_WT
     df_survey_input['OOH_DESIGN_WEIGHT'] = values
     df_survey_input = df_survey_input.sort_values(sort1)
 
@@ -199,19 +265,10 @@ def r_population_input(survey_input: pd.DataFrame, ustotals: pd.DataFrame) -> No
 
 
 def run_r_ges_script() -> None:
-    """
-    Author       : David Powell
-    Date         : 07/06/2018
-    Purpose      : Calls R Script to run GES Weighting
-    Parameters   :
-    Returns      : Writes GES output to SQL Database
-    Requirements : NA
-    Dependencies : NA
-    """
 
     log.info("Starting R script.....")
 
-    step5 = resource_filename(__name__, 'r_scripts/step5.R')
+    step5 = resource_filename(__name__, '../ips/services/calculations/r_scripts/step5.R')
 
     config = Configuration().cfg['database']
 
@@ -253,8 +310,6 @@ def do_ips_ges_weighting(df_surveydata: pd.DataFrame, df_ustotals: pd.DataFrame)
 
     df_summarydata = db.read_table_values('R_UNSAMPLED')()
     df_summarydata = df_summarydata[['SERIAL', 'UNSAMP_TRAFFIC_WT']]
-    # df_summarydata['UNSAMP_TRAFFIC_WT'] = df_summarydata['UNSAMP_TRAFFIC_WT'].apply(lambda x: round(x, 3))
-    # df_summarydata['UNSAMP_TRAFFIC_WT'] = df_summarydata['UNSAMP_TRAFFIC_WT'].apply(lambda x: ips_rounding(x, 3))
 
     return df_surveydata, df_summarydata
 
@@ -262,31 +317,6 @@ def do_ips_ges_weighting(df_surveydata: pd.DataFrame, df_ustotals: pd.DataFrame)
 def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num: str, shift_weight: str,
                                         nr_weight: str, min_weight: str, traffic_weight: str, out_of_hours_weight: str,
                                         df_ustotals: pd.DataFrame, min_count_threshold: int, run_id=None):
-    """
-    Author       : Thomas Mahoney / Nassir Mohammad
-    Date         : Apr 2018
-    Purpose      : Performs calculations to determine the unsampled weight values
-                   of the imported dataset.
-    Parameters   : df_surveydata - the IPS df_surveydata records for the period                                
-                   var_serialNum - variable holding the record serial number (UID)
-                   var_shiftWeight - variable holding the shift weight field name                
-                   var_NRWeight - variable holding the non-response weight field name        
-                   var_minWeight - variable holding the minimum weight field name            
-                   var_trafficWeight - variable holding the traffic weight field name        
-                   df_ustotals - Population totals file
-                   minCountThresh - The minimum cell count threshold
-    Returns      : df_summary(dataframe containing random sample of rows)
-                   df_output(dataframe containing serial number and calculated unsampled weight)
-    Requirements : do_ips_ges_weighting()
-    Dependencies : NA
-
-    NOTES        : Currently GES weighing has not been written. Therefore the current solution
-                   does not generate the output data frame. Once the function is written and we
-                   are aware of what is being returned from the GES weighting function as well
-                   as what is actually needed to be *sent* passed to the function we will rewrite the 
-                   function call and implement its return functionality 
-                   be rewriting the 
-    """
 
     ooh_design_weight_column = 'OOHDESIGNWEIGHT'
     # Create new column for design weights (Generate the design weights)
@@ -303,14 +333,14 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     # Re-index the data frame
     df_ustotals.index = range(df_ustotals.shape[0])
 
-    # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.  
+    # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.
     pop_totals = df_ustotals.fillna('NOTHING')
 
     # Summarise the uplift totals over the strata
     pop_totals = pop_totals.groupby(OOH_STRATA)[TOTALS_COLUMN].agg([(UPLIFT_COLUMN, 'sum')])
     pop_totals.reset_index(inplace=True)
 
-    # Replace the previously added 'NOTHING' values with their original blank values  
+    # Replace the previously added 'NOTHING' values with their original blank values
     pop_totals = pop_totals.replace('NOTHING', np.NaN)
 
     # Summarise the previous totals over the strata
@@ -319,12 +349,12 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
 
     prev_totals = df_surveydata.loc[df_surveydata[ooh_design_weight_column] > 0]
 
-    # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.  
+    # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.
     prev_totals = prev_totals.fillna('NOTHING')
     prev_totals = prev_totals.groupby(OOH_STRATA)[ooh_design_weight_column].agg([(PREVIOUS_TOTAL_COLUMN, 'sum')])
     prev_totals.reset_index(inplace=True)
 
-    # Replace the previously added 'NOTHING' values with their original blank values  
+    # Replace the previously added 'NOTHING' values with their original blank values
     prev_totals = prev_totals.replace('NOTHING', np.NaN)
 
     pop_totals = pop_totals.sort_values(OOH_STRATA)
@@ -339,6 +369,9 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
 
     # Calculate the totals column from the prevtotal and uplift values
     lifted_totals[TOTALS_COLUMN] = lifted_totals[PREVIOUS_TOTAL_COLUMN] + lifted_totals[UPLIFT_COLUMN]
+
+    # Remove any records where var_totals value is not greater than zero
+    lifted_totals = lifted_totals[lifted_totals[TOTALS_COLUMN] > 0]
 
     ges_dataframes = do_ips_ges_weighting(df_surveydata, df_ustotals)
 
@@ -360,13 +393,13 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     # Generate POSTWEIGHT values from the UNSAMP_TRAFFIC_WT and ooh_design_weight_column values
     df_survey[POST_WEIGHT_COLUMN] = df_survey[out_of_hours_weight] * df_survey[ooh_design_weight_column]
 
-    # Sort the data ready for summarising    
+    # Sort the data ready for summarising
     df_survey = df_survey.sort_values(OOH_STRATA)
 
     # Create the summary data frame from the sample with ooh_design_weight_column not equal to zero
     df_summary = df_survey[df_survey[ooh_design_weight_column] != 0]
 
-    # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.  
+    # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.
     df_summary = df_summary.fillna('NOTHING')
 
     # Generate a dataframe containing the count of each evaluated group
@@ -416,5 +449,10 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     # Collect data outside of specified threshold
     if len(df_unsampled_thresholds_check) > 0:
         log_warnings("Shift weight outside thresholds for")(df_unsampled_thresholds_check, 4, run_id, 5)
+
+    # df_summary[PRIOR_WEIGHT_SUM_COLUMN] = df_summary[PRIOR_WEIGHT_SUM_COLUMN].apply(lambda x: ips_rounding(x, 3))
+    # df_summary[OOH_WEIGHT_SUM_COLUMN] = df_summary[OOH_WEIGHT_SUM_COLUMN].apply(lambda x: ips_rounding(x, 10))
+    # df_summary['UNSAMP_TRAFFIC_WT'] = df_summary['UNSAMP_TRAFFIC_WT'].apply(lambda x: ips_rounding(x, 3))
+    # df_summary['UNSAMP_TRAFFIC_WT'] = df_summary['UNSAMP_TRAFFIC_WT'].apply(lambda x: ips_rounding(x, 3))
 
     return df_output, df_summary
