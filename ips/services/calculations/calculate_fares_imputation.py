@@ -1,15 +1,12 @@
 import math
-
-import numpy as np
 import pandas as pd
-from pandas import DataFrame, Series
-from ips.services.calculations import ips_impute
-from ips.services.calculations.sas_random import SASRandom
-from ips.services.calculations.sas_rounding import ips_rounding
+import numpy as np
 
 from ips.util.services_logging import log
-
-# dataimport survey_support
+from pandas import DataFrame, Series, options
+from ips.services.calculations import ips_impute
+from ips.services.calculations.sas_rounding import ips_rounding
+from ips.services.calculations.sas_random import SASRandom
 
 INTDATE = 'INTDATE'
 DVFARE = 'DVFARE'
@@ -79,9 +76,7 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
                                       FAREK)
 
     # Merge df_output_final and df_input by var_serial_num
-
     df_output.sort_values(var_serial, inplace=True)
-
     df_input.sort_values(var_serial, inplace=True)
 
     # df_output = df_input.merge(df_output, on=var_serial, how='left')
@@ -90,14 +85,12 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
     # Above merge creates fares_x and fares_y column; this line removes the empty
     # fares_x column and keeps then renames the imputed fares_y column
     df_output = df_output.drop([FARE + '_x', FAREK + '_x'], axis=1)
-
     df_output.rename(index=str, columns={FARE + '_y': FARE, FAREK + '_y': FAREK}, inplace=True)
 
     # Re-sort columns by column name in alphabetical order (may not be required)
     # df_output.sort_index(axis=1, inplace=True)
 
     df_output = df_output.apply(compute_additional_fares, axis=1)
-
     df_output = df_output.apply(compute_additional_spend, axis=1)
 
     return df_output[[var_serial, SPEND, SPENDIMPREASON, FARE, FAREK]]
