@@ -6,6 +6,7 @@ from ips.util.services_logging import log
 import ips.persistence.sql as db
 import numpy as np
 # for exec
+# noinspection PyUnresolvedReferences
 import math
 from ips.persistence.persistence import insert_from_dataframe
 

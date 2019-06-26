@@ -48,10 +48,7 @@ def fares_imputation_step(run_id):
     insert_from_dataframe(config["temp_table"])(survey_data_out)
 
     # Update Survey Data With Fares Imp Results
-
-    log.debug("before update_survey_data_with_step_results")
     idm.update_survey_data_with_step_results(config)
-    log.debug("after update_survey_data_with_step_results")
 
     # Store Survey Data With Fares Imp Results
     idm.store_survey_data_with_step_results(run_id, config)

@@ -207,7 +207,7 @@ class IPSWorkflow:
                 mesg = e.message
             else:
                 mesg = str(e).strip("'")
-            self.set_step_status(run_id, runs.FAILED, runs.get_step(run_id)[-1:])
+            self.set_step_status(run_id, runs.FAILED, "")
             self.set_status(run_id, runs.FAILED, mesg)
             log.error(f"Run {run_id} has failed : {mesg}")
             runs.set_percent_done(run_id, 100)

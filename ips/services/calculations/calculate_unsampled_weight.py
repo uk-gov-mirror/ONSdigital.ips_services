@@ -136,8 +136,15 @@ def r_population_input(survey_input: pd.DataFrame, ustotals: pd.DataFrame) -> No
 
     # Create unsampled design weight used within GES weighting
     df_survey_input['SHIFT_WT'] = df_survey_input.SHIFT_WT.astype(np.float)
-    df_survey_input = df_survey_input.round({'SHIFT_WT': 3})
-    values = df_survey_input.SHIFT_WT * df_survey_input.NON_RESPONSE_WT * df_survey_input.MINS_WT * df_survey_input.TRAFFIC_WT
+
+    # df_survey_input = df_survey_input.round({'SHIFT_WT': 3})
+    # df_survey_input['SHIFT_WT'] = df_survey_input['SHIFT_WT'].apply(lambda x: ips_rounding(x, 3))
+
+    values = (
+            df_survey_input.SHIFT_WT * df_survey_input.NON_RESPONSE_WT
+            * df_survey_input.MINS_WT * df_survey_input.TRAFFIC_WT
+    )
+
     df_survey_input['OOH_DESIGN_WEIGHT'] = values
     df_survey_input = df_survey_input.sort_values(sort1)
 
@@ -183,9 +190,7 @@ def r_population_input(survey_input: pd.DataFrame, ustotals: pd.DataFrame) -> No
     df_mod_totals = df_mod_totals.drop(['ARRIVEDEPART', 'UNSAMP_PORT_GRP_PV', 'UNSAMP_REGION_GRP_PV'], axis=1)
 
     # # ROUND VALUES - Added to match SAS output
-    df_mod_totals = df_mod_totals.pivot_table(index='C_GROUP',
-                                              columns='T1',
-                                              values='UNSAMP_TOTAL')
+    df_mod_totals = df_mod_totals.pivot_table(index='C_GROUP', columns='T1', values='UNSAMP_TOTAL')
 
     df_mod_totals = df_mod_totals.add_prefix('T_')
 
@@ -248,7 +253,8 @@ def do_ips_ges_weighting(df_surveydata: pd.DataFrame, df_ustotals: pd.DataFrame)
 
     df_summarydata = db.read_table_values('R_UNSAMPLED')()
     df_summarydata = df_summarydata[['SERIAL', 'UNSAMP_TRAFFIC_WT']]
-    df_summarydata['UNSAMP_TRAFFIC_WT'] = df_summarydata['UNSAMP_TRAFFIC_WT'].apply(lambda x: round(x, 3))
+    # df_summarydata['UNSAMP_TRAFFIC_WT'] = df_summarydata['UNSAMP_TRAFFIC_WT'].apply(lambda x: round(x, 3))
+    # df_summarydata['UNSAMP_TRAFFIC_WT'] = df_summarydata['UNSAMP_TRAFFIC_WT'].apply(lambda x: ips_rounding(x, 3))
 
     return df_surveydata, df_summarydata
 
@@ -334,9 +340,6 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     # Calculate the totals column from the prevtotal and uplift values
     lifted_totals[TOTALS_COLUMN] = lifted_totals[PREVIOUS_TOTAL_COLUMN] + lifted_totals[UPLIFT_COLUMN]
 
-    # Remove any records where var_totals value is not greater than zero
-    lifted_totals = lifted_totals[lifted_totals[TOTALS_COLUMN] > 0]
-
     ges_dataframes = do_ips_ges_weighting(df_surveydata, df_ustotals)
 
     df_survey = ges_dataframes[0]
@@ -413,10 +416,5 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     # Collect data outside of specified threshold
     if len(df_unsampled_thresholds_check) > 0:
         log_warnings("Shift weight outside thresholds for")(df_unsampled_thresholds_check, 4, run_id, 5)
-
-    df_summary[PRIOR_WEIGHT_SUM_COLUMN] = df_summary[PRIOR_WEIGHT_SUM_COLUMN].round(3)
-    df_summary[OOH_WEIGHT_SUM_COLUMN] = df_summary[OOH_WEIGHT_SUM_COLUMN].round(3)
-    df_summary['UNSAMP_TRAFFIC_WT'] = df_summary['UNSAMP_TRAFFIC_WT'].round(3)
-    df_output['UNSAMP_TRAFFIC_WT'] = df_output['UNSAMP_TRAFFIC_WT'].round(3)
 
     return df_output, df_summary

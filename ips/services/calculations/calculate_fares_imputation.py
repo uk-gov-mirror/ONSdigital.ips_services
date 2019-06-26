@@ -1,286 +1,248 @@
 import math
-import random
+import pandas as pd
+import numpy as np
 
 from ips.util.services_logging import log
-import numpy as np
 from pandas import DataFrame, Series, options
-
 from ips.services.calculations import ips_impute
+from ips.services.calculations.sas_rounding import ips_rounding
+from ips.services.calculations.sas_random import SASRandom
 
-from ...util.sas_random import sas_random, seed
-
-# dataimport survey_support
-
-DATE_VARIABLE = 'INTDATE'
-DONOR_VARIABLE = 'DVFARE'
-OUTPUT_VARIABLE = 'FARE'
-ELIGIBLE_FLAG_VARIABLE = 'FARES_IMP_ELIGIBLE_PV'
-IMPUTATION_FLAG_VARIABLE = 'FARES_IMP_FLAG_PV'
-IMPUTATION_LEVEL_VARIABLE = 'FAREK'
-AGE_FARE_VARIABLE = 'FAGE_PV'
-BABY_FARE_VARIABLE = 'BABYFARE'
-CHILD_FARE_VARIABLE = 'CHILDFARE'
-APD_VARIABLE = 'APD_PV'
-PACKAGE_VARIABLE = 'DVPACKAGE'
-FARE_DISCOUNT_VARIABLE = 'DISCNT_F2_PV'
-QM_FARE_VARIABLE = 'QMFARE_PV'
-PACKAGE_COST_VARIABLE = 'DVPACKCOST'
-DISCOUNTED_PACKAGE_COST_VARIABLE = 'DISCNT_PACKAGE_COST_PV'
-PERSONS_VARIABLE = 'DVPERSONS'
-EXPENDITURE_VARIABLE = 'DVEXPEND'
-BEFAF_VARIABLE = 'BEFAF'
-SPEND_VARIABLE = 'SPEND'
-SPEND_REASON_KEY_VARIABLE = 'SPENDIMPREASON'
-DUTY_FREE_VARIABLE = 'DUTY_FREE_PV'
-OLD_PACKAGE_VARIABLE = 'PACKAGE'
+INTDATE = 'INTDATE'
+DVFARE = 'DVFARE'
+FARE = 'FARE'
+FARES_IMP_ELIGIBLE_PV = 'FARES_IMP_ELIGIBLE_PV'
+FARES_IMP_FLAG_PV = 'FARES_IMP_FLAG_PV'
+FAREK = 'FAREK'
+FAGE_PV = 'FAGE_PV'
+BABYFARE = 'BABYFARE'
+CHILDFARE = 'CHILDFARE'
+APD_PV = 'APD_PV'
+DVPACKAGE = 'DVPACKAGE'
+DISCNT_F2_PV = 'DISCNT_F2_PV'
+QMFARE_PV = 'QMFARE_PV'
+PACKAGECOST = 'PACKAGECOST'
+DVPACKCOST = 'DVPACKCOST'
+DISCNT_PACKAGE_COST_PV = 'DISCNT_PACKAGE_COST_PV'
+DVPERSONS = 'DVPERSONS'
+PERSONS = 'PERSONS'
+DVEXPEND = 'DVEXPEND'
+EXPENDITURE = 'EXPENDITURE'
+BEFAF = 'BEFAF'
+SPEND = 'SPEND'
+SPENDIMPREASON = 'SPENDIMPREASON'
+DUTY_FREE_PV = 'DUTY_FREE_PV'
+PACKAGE = 'PACKAGE'
 
 # Setup thresh and strata base nested lists. These are used to group the data
 # differently at each iteration.
 THRESH_BASE_LIST = [3, 3, 3, 3, 3, 3, 3, 0, 0]
 
 STRATA_BASE_LIST = [
-    ['INTDATE', 'TYPE_PV', 'UKPORT1_PV', 'OSPORT1_PV', 'OPERA_PV'],
-    ['INTDATE', 'TYPE_PV', 'UKPORT2_PV', 'OSPORT1_PV', 'OPERA_PV'],
-    ['INTDATE', 'TYPE_PV', 'UKPORT1_PV', 'OSPORT2_PV', 'OPERA_PV'],
-    ['INTDATE', 'TYPE_PV', 'UKPORT2_PV', 'OSPORT2_PV', 'OPERA_PV'],
-    ['INTDATE', 'TYPE_PV', 'UKPORT3_PV', 'OSPORT2_PV', 'OPERA_PV'],
-    ['INTDATE', 'TYPE_PV', 'UKPORT3_PV', 'OSPORT3_PV', 'OPERA_PV'],
-    ['INTDATE', 'TYPE_PV', 'UKPORT4_PV', 'OSPORT3_PV', 'OPERA_PV'],
-    ['INTDATE', 'TYPE_PV', 'UKPORT4_PV', 'OSPORT4_PV'],
-    ['INTDATE', 'TYPE_PV', 'OSPORT4_PV']
+    ['INTMONTH', 'TYPE_PV', 'UKPORT1_PV', 'OSPORT1_PV', 'OPERA_PV'],
+    ['INTMONTH', 'TYPE_PV', 'UKPORT2_PV', 'OSPORT1_PV', 'OPERA_PV'],
+    ['INTMONTH', 'TYPE_PV', 'UKPORT1_PV', 'OSPORT2_PV', 'OPERA_PV'],
+    ['INTMONTH', 'TYPE_PV', 'UKPORT2_PV', 'OSPORT2_PV', 'OPERA_PV'],
+    ['INTMONTH', 'TYPE_PV', 'UKPORT3_PV', 'OSPORT2_PV', 'OPERA_PV'],
+    ['INTMONTH', 'TYPE_PV', 'UKPORT3_PV', 'OSPORT3_PV', 'OPERA_PV'],
+    ['INTMONTH', 'TYPE_PV', 'UKPORT4_PV', 'OSPORT3_PV', 'OPERA_PV'],
+    ['INTMONTH', 'TYPE_PV', 'UKPORT4_PV', 'OSPORT4_PV'],
+    ['INTMONTH', 'TYPE_PV', 'OSPORT4_PV']
 ]
 
 
 def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: int, measure: str) -> DataFrame:
-    """
-    Author       : James Burr
-    Date         : 19 Feb 2018
-    Purpose      : Imputes fares for the IPS system.
-    Parameters   : df_input - the IPS survey dataset.
-                   var_serial - the serial number field name
-                   num_levels - number of imputation levels
-                   measure - measure function, such as mean
-    Returns      : Dataframe - df_output_final
-    Requirements : NA
-    Dependencies : NA
-    """
+    log.debug("Starting fares imputation")
 
-    df_input.OPERA_PV = df_input.OPERA_PV.astype(float)
-
-    # for index, row in df_input.iterrows():
-    #
-    #     if row['FLOW'] < 5:
-    #         if not math.isnan(row['DVLINECODE']):
-    #             carrier = int(row['DVLINECODE'])
-    #         else:
-    #             carrier = 0
-    #
-    #         if carrier >= 1000 and carrier <= 1999:
-    #             df_input.at[index, 'OPERA_PV'] = 1
-    #         elif carrier >= 2000 and carrier <= 88880:
-    #             df_input.at[index, 'OPERA_PV'] = 2
-    #
-    #     elif row['FLOW'] > 4:
-    #         df_input.at[index, 'OPERA_PV'] = 3
-    #
-    #     if math.isnan(row['OPERA_PV']):
-    #         df_input.at[index, 'OPERA_PV'] = round(random.random(),0) + 1
-
-    seed(123456)
-
-    df_input.OPERA_PV = 0
+    sas_random = SASRandom(123456)
 
     for index, row in df_input.iterrows():
 
-        if row["FLOW"] > 4:
+        if row['FLOW'] > 4:
             df_input.at[index, 'OPERA_PV'] = 3
         else:
-            df_input.at[index, 'OPERA_PV'] = round(sas_random(), 0) + 1
+            df_input.at[index, 'OPERA_PV'] = round(sas_random.random(), 0) + 1
 
-    df_eligible = df_input.loc[df_input[ELIGIBLE_FLAG_VARIABLE] == 1.0]
+    df_eligible = df_input.loc[df_input['FARES_IMP_ELIGIBLE_PV'] == 1.0]
 
-    df_ps = df_eligible[
-        [
-            var_serial,
-            'INTDATE', 'TYPE_PV',
-            'UKPORT1_PV', 'OSPORT1_PV',
-            'UKPORT2_PV', 'OSPORT2_PV',
-            'UKPORT3_PV', 'OSPORT3_PV',
-            'UKPORT4_PV', 'OSPORT4_PV',
-            DONOR_VARIABLE, OUTPUT_VARIABLE,
-            IMPUTATION_FLAG_VARIABLE,
-            IMPUTATION_LEVEL_VARIABLE
-        ]
-    ]
+    # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.
+    df_eligible['INTMONTH'].fillna(99, inplace=True)
 
     # Perform the imputation on eligible dataset
     df_output = ips_impute.ips_impute(df_eligible, var_serial,
                                       STRATA_BASE_LIST, THRESH_BASE_LIST,
-                                      num_levels, DONOR_VARIABLE, OUTPUT_VARIABLE,
-                                      measure, IMPUTATION_FLAG_VARIABLE,
-                                      IMPUTATION_LEVEL_VARIABLE)
+                                      num_levels, DVFARE, FARE,
+                                      measure, FARES_IMP_FLAG_PV,
+                                      FAREK)
 
     # Merge df_output_final and df_input by var_serial_num
-
     df_output.sort_values(var_serial, inplace=True)
-
     df_input.sort_values(var_serial, inplace=True)
 
     # df_output = df_input.merge(df_output, on=var_serial, how='left')
-
     df_output = df_input.merge(df_output, how='left', left_on=var_serial, right_on=var_serial)
 
     # Above merge creates fares_x and fares_y column; this line removes the empty
     # fares_x column and keeps then renames the imputed fares_y column
-
-    df_output = df_output.drop([OUTPUT_VARIABLE + '_x', IMPUTATION_LEVEL_VARIABLE + '_x'], axis=1)
-
-    df_output.rename(index=str, columns={OUTPUT_VARIABLE + '_y': OUTPUT_VARIABLE,
-                                         IMPUTATION_LEVEL_VARIABLE + '_y': IMPUTATION_LEVEL_VARIABLE},
-                     inplace=True)
+    df_output = df_output.drop([FARE + '_x', FAREK + '_x'], axis=1)
+    df_output.rename(index=str, columns={FARE + '_y': FARE, FAREK + '_y': FAREK}, inplace=True)
 
     # Re-sort columns by column name in alphabetical order (may not be required)
-
-    df_output.sort_index(axis=1, inplace=True)
+    # df_output.sort_index(axis=1, inplace=True)
 
     df_output = df_output.apply(compute_additional_fares, axis=1)
-
     df_output = df_output.apply(compute_additional_spend, axis=1)
 
-    final_output_column_list = [var_serial, SPEND_VARIABLE, SPEND_REASON_KEY_VARIABLE, OUTPUT_VARIABLE,
-                                IMPUTATION_LEVEL_VARIABLE]
-
-    df_output = df_output[final_output_column_list]
-
-    df_output = df_output.merge(df_input[["SERIAL", "OPERA_PV"]], left_on='SERIAL', right_on="SERIAL").rename(
-        columns={'OPERA_PV_y': 'OPERA_PV'})
-
-    return df_output
+    return df_output[[var_serial, SPEND, SPENDIMPREASON, FARE, FAREK]]
 
 
-def compute_additional_fares(row: Series):
-    """
-    Author       : James Burr
-    Date         : 13 March 2018
-    Purpose      : Computes spend based on fares data and updates output dataframe.
-    Parameters   : Each individal row of the df_output data frame.
-    Returns      : The same row with extra calculations/edits applied.
-    Requirements : NA
-    Dependencies : NA
-    """
+def calculate_non_pack_fare(row: Series) -> float:
+    intdate = row[INTDATE]
+    a = str(intdate)
+    intdate = a.zfill(8)
 
-    # Force the variable formatting to 8digit date
+    day = int(intdate[:2])
+    month = int(intdate[2:4])
+    year = int(intdate[4:8])
 
-    row[DATE_VARIABLE] = str(row[DATE_VARIABLE])
-    row[DATE_VARIABLE] = row[DATE_VARIABLE].zfill(8)
+    fage_pv = row[FAGE_PV]
+    baby_fare = row[BABYFARE]
+    child_fare = row[CHILDFARE]
+    apd_pv = row[APD_PV]
+    fare = row[FARE]
 
-    non_pack_fare = np.NaN
+    if fage_pv == 1:
+        return baby_fare * (fare - apd_pv)
 
-    # Sort out child/baby fares
-    if row[IMPUTATION_FLAG_VARIABLE] == 0 or row[ELIGIBLE_FLAG_VARIABLE] == 0:
-        row[OUTPUT_VARIABLE] = row[DONOR_VARIABLE]
-    else:
-        # Separate intdate column into usable integer values.
-        day = int(row[DATE_VARIABLE][:2])
-        month = int(row[DATE_VARIABLE][2:4])
-        year = int(row[DATE_VARIABLE][4:8])
-
+    if fage_pv == 2:
         # Ensure date is on or later than the 1st of May 2016
         # This is because APD for under 16's was removed from this date.
         if year >= 2016 and month >= 5 and day >= 1:
-            if row[AGE_FARE_VARIABLE] == 1:
-                non_pack_fare = row[BABY_FARE_VARIABLE] * (row[OUTPUT_VARIABLE] - row[APD_VARIABLE])
-
-            elif row[AGE_FARE_VARIABLE] == 2:
-                non_pack_fare = row[CHILD_FARE_VARIABLE] * (row[OUTPUT_VARIABLE] - row[APD_VARIABLE])
-
-            elif row[AGE_FARE_VARIABLE] == 6:
-                non_pack_fare = row[OUTPUT_VARIABLE]
-
+            return child_fare * (fare - apd_pv)
         else:
-            if row[AGE_FARE_VARIABLE] == 1:
-                non_pack_fare = row[BABY_FARE_VARIABLE] * (row[OUTPUT_VARIABLE] - row[APD_VARIABLE])
+            return (child_fare * (fare - apd_pv)) + apd_pv
 
-            elif row[AGE_FARE_VARIABLE] == 2:
-                non_pack_fare = (row[CHILD_FARE_VARIABLE] * (row[OUTPUT_VARIABLE] - row[APD_VARIABLE])) + \
-                                row[APD_VARIABLE]
+    if fage_pv == 6:
+        return fare
 
-            elif row[AGE_FARE_VARIABLE] == 6:
-                non_pack_fare = row[OUTPUT_VARIABLE]
+    return np.NaN
+
+
+def compute_additional_fares(row: Series):
+    fares_imp_flag_pv = row[FARES_IMP_FLAG_PV]
+    fares_imp_eligible_pv = row[FARES_IMP_ELIGIBLE_PV]
+
+    dvfare = row[DVFARE]
+
+    dv_package = row[DVPACKAGE]
+    discnt_f2 = row[DISCNT_F2_PV]
+    qm_fare = row[QMFARE_PV]
+
+    # Sort out child/baby fares
+    def calculate_fare():
+        non_pack_fare = calculate_non_pack_fare(row)
 
         # Compute package versions of fare
-        if row[PACKAGE_VARIABLE] in (1, 2):
-            if math.isnan(non_pack_fare) or math.isnan(row[FARE_DISCOUNT_VARIABLE]):
-                row[OUTPUT_VARIABLE] = np.NaN
+        if dv_package in (1, 2):
+            if math.isnan(non_pack_fare) or math.isnan(discnt_f2):
+                return np.NaN
             else:
-                row[OUTPUT_VARIABLE] = round(non_pack_fare * row[FARE_DISCOUNT_VARIABLE])
-
+                return ips_rounding(non_pack_fare * discnt_f2, 0)
         else:
-            row[OUTPUT_VARIABLE] = round(non_pack_fare, 0)
+            return ips_rounding(non_pack_fare, 0)
+
+    if fares_imp_flag_pv == 0 or fares_imp_eligible_pv == 0:
+        fare = dvfare
+    else:
+        fare = calculate_fare()
+
+    if not isinstance(fare, (float, int)):
+        fare = pd.to_numeric(fare, errors="coerce")
+    if not isinstance(qm_fare, (float, int)):
+        qm_fare = pd.to_numeric(qm_fare, errors="coerce")
 
     # Test for Queen Mary fare
-    if row[OUTPUT_VARIABLE] == np.nan and row[QM_FARE_VARIABLE] != np.nan:
-        row[OUTPUT_VARIABLE] = row[QM_FARE_VARIABLE]
+    if np.isnan(fare) and not np.isnan(qm_fare):
+        fare = qm_fare
 
     # Ensure the fare is rounded to nearest integer
-    row[OUTPUT_VARIABLE] = round(row[OUTPUT_VARIABLE], 0)
+    row[FARE] = ips_rounding(fare, 0)
 
     return row
 
 
 def compute_additional_spend(row):
-    # Compute spend per person per visit
-    # For package holidays, spend is imputed if the package cost is less
-    # than the cost of the fares. If all relevant fields are 0, participant
-    # is assumed to have spent no money.
-    if row[PACKAGE_VARIABLE] == 1:
-        if not row['DISCNT_PACKAGE_COST_PV']:
-            row['DISCNT_PACKAGE_COST_PV'] = np.NaN
+    dv_package = row[DVPACKAGE]
+    package = row[PACKAGE]
+    befaf = row[BEFAF]
+    fare = row[FARE]
+    duty_free = row[DUTY_FREE_PV]
+    package_cost = row[DVPACKCOST]
+    discounted_package_cost = row[DISCNT_PACKAGE_COST_PV]
+    persons = row[DVPERSONS]
+    expenditure = row[DVEXPEND]
+    expenditure = row[DVEXPEND]
+    persons = row[DVPERSONS]
 
-        if row[PACKAGE_COST_VARIABLE] == 0 and row[EXPENDITURE_VARIABLE] == 0 and row[BEFAF_VARIABLE] == 0:
-            row[SPEND_VARIABLE] = 0
+    if not isinstance(package_cost, (float, int)):
+        package_cost = pd.to_numeric(package_cost, errors="coerce")
 
-        elif (row[PACKAGE_COST_VARIABLE] == 999999 or row[PACKAGE_COST_VARIABLE] == np.nan
-              or row[DISCOUNTED_PACKAGE_COST_VARIABLE] == np.nan
-              or row[PERSONS_VARIABLE] == np.nan
-              or row[OUTPUT_VARIABLE] == np.nan
-              or row[EXPENDITURE_VARIABLE] == 999999
-              or row[EXPENDITURE_VARIABLE] == np.nan
-              or row[BEFAF_VARIABLE] == np.nan
-              or row[BEFAF_VARIABLE] == 999999):
-            row[SPEND_VARIABLE] = np.nan
+    if not isinstance(discounted_package_cost, (float, int)):
+        discounted_package_cost = pd.to_numeric(discounted_package_cost, errors="coerce")
 
-        elif (((row[DISCOUNTED_PACKAGE_COST_VARIABLE] + row[EXPENDITURE_VARIABLE] +
-                row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]) < (row[OUTPUT_VARIABLE] * 2)):
-            row[SPEND_VARIABLE] = np.nan
-            row[SPEND_REASON_KEY_VARIABLE] = 1
+    if not isinstance(persons, (float, int)):
+        persons = pd.to_numeric(persons, errors="coerce")
 
-        else:
-            row[SPEND_VARIABLE] = ((row[DISCOUNTED_PACKAGE_COST_VARIABLE] + row[EXPENDITURE_VARIABLE]
-                                    + row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]) - (row[OUTPUT_VARIABLE] - 2)
+    if not isinstance(expenditure, (float, int)):
+        expenditure = pd.to_numeric(expenditure, errors="coerce")
 
-    # DVPackage is 0
+    if not isinstance(fare, (float, int)):
+        fare = pd.to_numeric(fare, errors="coerce")
 
+    if not isinstance(befaf, (float, int)):
+        befaf = pd.to_numeric(befaf, errors="coerce")
+
+    def compute_package():
+        if package_cost == 0 and expenditure == 0 and befaf == 0:
+            return 0, np.nan
+
+        if (package_cost == 999999 or np.isnan(package_cost) or np.isnan(discounted_package_cost)
+                or np.isnan(persons) or expenditure == 999999 or np.isnan(expenditure) or np.isnan(fare)
+                or befaf == 999999 or np.isnan(befaf)):
+            return np.nan, np.nan
+
+        if ((discounted_package_cost + expenditure + befaf) / persons) < (fare * 2):
+            return np.nan, 1
+
+        return ((discounted_package_cost + expenditure + befaf) / persons) - (fare * 2), np.nan
+
+    def compute_non_package():
+        if package == 9:
+            return np.nan
+
+        if expenditure == 0 and befaf == 0:
+            return 0
+
+        if (expenditure == 999999 or np.isnan(expenditure)
+                or befaf == 999999 or np.isnan(befaf) or np.isnan(persons)):
+            return np.nan
+
+        return (expenditure + befaf) / persons
+
+    reason = np.nan
+
+    if dv_package == 1:
+        spend, reason = compute_package()
     else:
+        spend = compute_non_package()
 
-        if row[OLD_PACKAGE_VARIABLE] == 9:
-            row[SPEND_VARIABLE] = np.nan
-
-        elif row[EXPENDITURE_VARIABLE] == 0 and row[BEFAF_VARIABLE] == 0:
-            row[SPEND_VARIABLE] = 0
-
-        elif row[EXPENDITURE_VARIABLE] == 999999 or row[EXPENDITURE_VARIABLE] == np.nan \
-                or row[BEFAF_VARIABLE] == 999999 or row[BEFAF_VARIABLE] == np.nan \
-                or row[PERSONS_VARIABLE] == np.nan:
-            row[SPEND_VARIABLE] = np.nan
-
-        else:
-            row[SPEND_VARIABLE] = (row[EXPENDITURE_VARIABLE] + row[BEFAF_VARIABLE]) / row[PERSONS_VARIABLE]
-
-    if row[SPEND_VARIABLE] != np.nan and row[DUTY_FREE_VARIABLE] != np.nan:
-        row[SPEND_VARIABLE] = row[SPEND_VARIABLE] + row[DUTY_FREE_VARIABLE]
+    if not np.isnan(spend) and not np.isnan(duty_free):
+        spend = spend + duty_free
 
     # Ensure the spend values are integers
-    row[SPEND_VARIABLE] = round(row[SPEND_VARIABLE], 0)
+    spend = ips_rounding(spend, 0)
+
+    row[SPEND] = spend
+    row[SPENDIMPREASON] = reason
 
     return row

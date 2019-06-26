@@ -231,7 +231,7 @@ def test_stay_imputation():
     log.info("Testing Calculation  8 --> stay_imputation")
     survey_output(
         "STAY",
-        "data/calculations/december_2017/stay/surveydata_dec2017.csv",
+        "data/calculations/december_2017/fares/surveydata_fares.csv",
         [
             'SERIAL', 'STAY', 'STAYK'
         ]
@@ -240,24 +240,24 @@ def test_stay_imputation():
 
 def test_fares_imputation():
     log.info("Testing Calculation  9 --> fares_imputation")
-    # survey_output(
-    #     "FARES",
-    #     "data/calculations/december_2017/stay/surveydata_dec2017.csv",
-    #     [
-    #         'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON', 'OPERA_PV'
-    #     ]
-    # )
+    survey_output(
+        "FARES",
+        "data/calculations/december_2017/fares/surveydata_fares.csv",
+        [
+             'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
+        ]
+    )
 
 
 def test_spend_imputation():
     log.info("Testing Calculation 10 --> spend_imputation")
-    # survey_output(
-    #     "SPEND",
-    #     "data/calculations/december_2017/stay/surveydata_dec2017.csv",
-    #     [
-    #         'SERIAL', 'SPENDK', 'NEWSPEND'
-    #     ]
-    # )
+    survey_output(
+        "SPEND",
+        "data/calculations/december_2017/stay/surveydata_dec2017.csv",
+        [
+            'SERIAL', 'SPENDK', 'NEWSPEND'
+        ]
+    )
 
 
 def test_rail_imputation():
@@ -301,7 +301,7 @@ def survey_output(test_name, expected_survey_output, survey_output_columns):
 
     # Test survey outputs
     log.info(f"Testing survey results for {test_name}")
-    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
+    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=False)
 
 
 def summary_output(test_name, expected_summary_output, summary_output_table, summary_output_columns):

@@ -50,3 +50,6 @@ class ServicesConfiguration(Configuration):
 
     def get_air_miles(self):
         return self.cfg['air_miles']
+
+    def sas_rounding(self):
+        return self.cfg['rounding']['sas_rounding']
