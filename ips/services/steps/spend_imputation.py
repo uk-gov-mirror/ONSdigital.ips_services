@@ -35,11 +35,11 @@ def spend_imputation_step(run_id):
     # Update Survey Data with Spend Imp PV Output
     idm.update_survey_data_with_step_pv_output(config)
 
+    if ServicesConfiguration().sas_pur2_pv():
+        idm.pur2_pv()
+
     # Retrieve data from SQL
     survey_data = get_survey_data()
-
-    # TODO: --->
-    survey_data.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/spend_calc_in.csv')
 
     # Calculate Spend Imputation
     survey_data_out = calculate_spend_imputation.do_ips_spend_imputation(survey_data,

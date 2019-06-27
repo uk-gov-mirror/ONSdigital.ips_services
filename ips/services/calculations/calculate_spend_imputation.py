@@ -4,6 +4,7 @@ import pandas as pd
 
 from ips.services.calculations import ips_impute as imp
 
+
 OUTPUT_TABLE_NAME = "SAS_SPEND_IMP"
 STEM_VARIABLE = [
     ["UK_OS_PV", "STAYIMPCTRYLEVEL1_PV", "DUR1_PV", "PUR1_PV"],
@@ -29,10 +30,8 @@ STAYDAYS_VARIABLE = "STAYDAYS"
 
 
 def do_ips_spend_imputation(df_survey_data, var_serial, measure):
-    # TODO: --->
-    df_survey_data.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/spend_calc_in.csv')
-
     num_levels = len(STEM_THRESHOLD)
+    log.debug("in do_ips_spend_imputation")
 
     # Select only the eligible donors and recipients
     df_eligible = df_survey_data.copy()
@@ -53,9 +52,6 @@ def do_ips_spend_imputation(df_survey_data, var_serial, measure):
 
     df_eligible = df_eligible.apply(selection, axis=1)
 
-    # TODO: --->
-    df_eligible.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/before_impute.csv')
-
     # Perform the imputation
     df_output = imp.ips_impute(df_eligible, var_serial,
                                STEM_VARIABLE, STEM_THRESHOLD, num_levels, OTHER_DONOR_VARIABLE,
@@ -66,9 +62,6 @@ def do_ips_spend_imputation(df_survey_data, var_serial, measure):
     df_final_output.drop(IMPUTATION_LEVEL_VARIABLE + "_x", axis=1, inplace=True)
     df_final_output.rename(columns={IMPUTATION_LEVEL_VARIABLE + "_y": IMPUTATION_LEVEL_VARIABLE}, inplace=True)
 
-    # TODO: --->
-    df_output.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/after_impute.csv')
-
     # Create final output with required columns
     df_final_output = df_final_output[[var_serial, OUTPUT_VARIABLE, IMPUTATION_LEVEL_VARIABLE,
                                        STAYDAYS_VARIABLE]]
@@ -78,8 +71,5 @@ def do_ips_spend_imputation(df_survey_data, var_serial, measure):
 
     # Cleanse df before returning
     df_final_output = df_final_output[[var_serial, IMPUTATION_LEVEL_VARIABLE, OUTPUT_VARIABLE]]
-
-    # TODO: --->
-    df_final_output.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/spend_calc_final.csv')
 
     return df_final_output
