@@ -43,6 +43,7 @@ def run_step(func: [[W, str], None]) -> Callable[[str], None]:
 class IPSWorkflow:
     num_done: int = 0
     in_progress = False
+    CURRENT_STEP = ""
 
     def __init__(self):
         log.info("IPSWorkflow starting")
@@ -98,70 +99,84 @@ class IPSWorkflow:
     @run_step
     def _step_1(self, run_id: str) -> None:
         log.info("Calculation  1 --> shift_weight")
+        self.CURRENT_STEP = "1"
         shift_weight.shift_weight_step(run_id)
 
     @run_step
     def _step_2(self, run_id: str) -> None:
+        self.CURRENT_STEP = "2"
         log.info("Calculation  2 --> non_response_weight")
         non_response_weight.non_response_weight_step(run_id)
 
     @run_step
     def _step_3(self, run_id: str) -> None:
+        self.CURRENT_STEP = "3"
         log.info("Calculation  3 --> minimums_weight")
         minimums_weight.minimums_weight_step(run_id)
 
     @run_step
     def _step_4(self, run_id: str) -> None:
+        self.CURRENT_STEP = "4"
         log.info("Calculation  4 --> traffic_weight")
         traffic_weight.traffic_weight_step(run_id)
 
     @run_step
     def _step_5(self, run_id: str) -> None:
+        self.CURRENT_STEP = "5"
         log.info("Calculation  5 --> unsampled_weight")
         unsampled_weight.unsampled_weight_step(run_id)
 
     @run_step
     def _step_6(self, run_id: str) -> None:
+        self.CURRENT_STEP = "6"
         log.info("Calculation  6 --> imbalance_weight")
         imbalance_weight.imbalance_weight_step(run_id)
 
     @run_step
     def _step_7(self, run_id: str) -> None:
+        self.CURRENT_STEP = "7"
         log.info("Calculation  7 --> final_weight")
         final_weight.final_weight_step(run_id)
 
     @run_step
     def _step_8(self, run_id: str) -> None:
+        self.CURRENT_STEP = "8"
         log.info("Calculation  8 --> stay_imputation")
         stay_imputation.stay_imputation_step(run_id)
 
     @run_step
     def _step_9(self, run_id: str) -> None:
+        self.CURRENT_STEP = "9"
         log.info("Calculation  9 --> fares_imputation")
         fares_imputation.fares_imputation_step(run_id)
 
     @run_step
     def _step_10(self, run_id: str) -> None:
+        self.CURRENT_STEP = "10"
         log.info("Calculation 10 --> spend_imputation")
         spend_imputation.spend_imputation_step(run_id)
 
     @run_step
     def _step_11(self, run_id: str) -> None:
+        self.CURRENT_STEP = "11"
         log.info("Calculation 11 --> rail_imputation")
         rail_imputation.rail_imputation_step(run_id)
 
     @run_step
     def _step_12(self, run_id: str) -> None:
+        self.CURRENT_STEP = "12"
         log.info("Calculation 12 --> regional_weights")
         regional_weights.regional_weights_step(run_id)
 
     @run_step
     def _step_13(self, run_id: str) -> None:
+        self.CURRENT_STEP = "13"
         log.info("Calculation 13 --> town_stay_expenditure_imputation")
         town_stay_expenditure.town_stay_expenditure_imputation_step(run_id)
 
     @run_step
     def _step_14(self, run_id: str) -> None:
+        self.CURRENT_STEP = "14"
         log.info("Calculation 14 --> airmiles")
         airmiles.airmiles_step(run_id)
 
@@ -205,10 +220,13 @@ class IPSWorkflow:
         except Exception as e:
             if hasattr(e, 'message'):
                 mesg = e.message
+                mesg = mesg.replace("\"", "").replace("`", "").replace("'", "").replace("%", "%%")
             else:
                 mesg = str(e).strip("'")
-            self.set_step_status(run_id, runs.FAILED, "")
-            self.set_status(run_id, runs.FAILED, mesg)
+                mesg = mesg.replace("\"", "").replace("`", "").replace("'", "").replace("%", "%%")
+                mesg = mesg[0:250]+"..."
+            self.set_step_status(run_id, runs.FAILED, self.CURRENT_STEP)
+            self.set_status(run_id, runs.FAILED, mesg.replace("'", ""))
             log.error(f"Run {run_id} has failed : {mesg}")
             runs.set_percent_done(run_id, 100)
             return
