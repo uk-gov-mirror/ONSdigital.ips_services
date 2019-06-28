@@ -259,7 +259,7 @@ def test_fares_imputation():
 def test_spend_imputation():
     log.info("Testing Calculation 10 --> spend_imputation")
     spend_imputation.spend_imputation_step(run_id)
-    bool = ServicesConfiguration().sas_pur2_pv()
+    status = ServicesConfiguration().sas_pur2_pv()
 
     survey_output(
         "SPEND",
@@ -268,24 +268,8 @@ def test_spend_imputation():
             'SERIAL', 'SPEND_IMP_FLAG_PV', 'SPEND_IMP_ELIGIBLE_PV', 'UK_OS_PV', 'PUR1_PV', 'PUR2_PV',
             'PUR3_PV', 'DUR1_PV', 'DUR2_PV', 'SPENDK', 'SPEND'
         ],
-        status=bool
+        status=status
     )
-
-    # if status:
-    #     # PUR2_PV has been overwritten to match SAS outputs
-    #     log.info(f"Alter PUR2_PV: {status}")
-    #     survey_output(
-    #         "SPEND",
-    #         "data/calculations/december_2017/spend/surveydata_spend.csv",
-    #         output_columns
-    #     )
-    # else:
-    #     # PUR2_PV has not been overwritten
-    #     log.info(f"Alter PUR2_PV: {status}")
-    #     python_spend_output(
-    #         "data/calculations/december_2017/spend/surveydata_spend.csv",
-    #         output_columns
-    #     )
 
 
 def test_rail_imputation():
@@ -337,14 +321,6 @@ def survey_output(test_name, expected_survey_output, survey_output_columns, stat
 
         # Assert SPENDK column  does not match SAS output
         assert_frame_not_equal(survey_results, survey_expected, 'SPENDK')
-
-    # TODO: --->
-    if test_name == 'SPEND':
-        survey_results.to_csv(
-            f'/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/spend_results_{status}.csv')
-        survey_expected.to_csv(
-            f'/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/spend_expected_{status}.csv')
-        # TODO: <---
 
         # Assert remaining dataframe for Spend Imputation matches for accuracy
         survey_results.drop(['PUR2_PV', 'SPEND', 'SPENDK'], axis=1, inplace=True)
