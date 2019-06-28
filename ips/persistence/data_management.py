@@ -535,15 +535,6 @@ def is_valid_run_id(run_id: str) -> bool:
 
 
 def pur2_pv():
-    """
-    Author       : Elinor Thorne
-    Date         : April 2018
-    Purpose      : Stores the survey data with the results
-    Parameters   : run_id -
-                 : conn - connection object pointing at the database.
-    Returns      : NA
-    """
-
     sql = f"""
         UPDATE SAS_SURVEY_SUBSAMPLE
         SET PUR2_PV = '2'

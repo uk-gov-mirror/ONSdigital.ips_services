@@ -16,7 +16,7 @@ rounding:
   sas_rounding: True
 
 spend_work_around:
-  change_pur2_pv: True
+  change_pur2_pv: False
 
 shift_weight:
   name: SHIFT_WEIGHT

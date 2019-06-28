@@ -18,7 +18,6 @@ from ips.services.steps import shift_weight, non_response_weight, minimums_weigh
     imbalance_weight, final_weight, stay_imputation, fares_imputation, spend_imputation, air_miles
 from ips.util.services_configuration import ServicesConfiguration
 
-
 input_survey_data = 'data/import_data/dec/ips1712bv4_amtspnd.csv'
 input_shift_data = 'data/calculations/december_2017/New_Dec_Data/Poss shifts Dec 2017.csv'
 input_nr_data = 'data/calculations/december_2017/New_Dec_Data/Dec17_NR.csv'
@@ -260,28 +259,33 @@ def test_fares_imputation():
 def test_spend_imputation():
     log.info("Testing Calculation 10 --> spend_imputation")
     spend_imputation.spend_imputation_step(run_id)
+    bool = ServicesConfiguration().sas_pur2_pv()
 
-    if ServicesConfiguration().sas_pur2_pv():
-        survey_output(
-            "SPEND",
-            "data/calculations/december_2017/spend/surveydata_spend.csv",
-            [
-                'SERIAL', 'SPEND_IMP_FLAG_PV', 'SPEND_IMP_ELIGIBLE_PV', 'UK_OS_PV', 'PUR1_PV', 'PUR2_PV', 'PUR3_PV',
-                'DUR1_PV', 'DUR2_PV', 'SPENDK', 'SPEND'
-            ]
-        )
-    else:
-        # TODO: Ensure this fails on SPENDK only
-        spend_output(
-            "SPEND",
-            "data/calculations/december_2017/spend/surveydata_spend.csv",
-            [
-                'SERIAL', 'SPEND_IMP_FLAG_PV', 'SPEND_IMP_ELIGIBLE_PV', 'UK_OS_PV', 'PUR1_PV', 'PUR2_PV' 'PUR3_PV',
-                'DUR1_PV', 'DUR2_PV', 'SPENDK', 'SPEND'
-            ]
-        )
+    survey_output(
+        "SPEND",
+        "data/calculations/december_2017/spend/surveydata_spend.csv",
+        [
+            'SERIAL', 'SPEND_IMP_FLAG_PV', 'SPEND_IMP_ELIGIBLE_PV', 'UK_OS_PV', 'PUR1_PV', 'PUR2_PV',
+            'PUR3_PV', 'DUR1_PV', 'DUR2_PV', 'SPENDK', 'SPEND'
+        ],
+        status=bool
+    )
 
-
+    # if status:
+    #     # PUR2_PV has been overwritten to match SAS outputs
+    #     log.info(f"Alter PUR2_PV: {status}")
+    #     survey_output(
+    #         "SPEND",
+    #         "data/calculations/december_2017/spend/surveydata_spend.csv",
+    #         output_columns
+    #     )
+    # else:
+    #     # PUR2_PV has not been overwritten
+    #     log.info(f"Alter PUR2_PV: {status}")
+    #     python_spend_output(
+    #         "data/calculations/december_2017/spend/surveydata_spend.csv",
+    #         output_columns
+    #     )
 
 
 def test_rail_imputation():
@@ -308,7 +312,7 @@ def test_airmiles():
     )
 
 
-def survey_output(test_name, expected_survey_output, survey_output_columns):
+def survey_output(test_name, expected_survey_output, survey_output_columns, status=True):
     # Get survey results
     survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
 
@@ -323,6 +327,28 @@ def survey_output(test_name, expected_survey_output, survey_output_columns):
 
     survey_expected.sort_values(by='SERIAL', axis=0, inplace=True)
     survey_expected.index = range(0, len(survey_expected))
+
+    if not status:
+        # Assert PUR2_PV column does not match SAS output
+        assert_frame_not_equal(survey_results, survey_expected, 'PUR2_PV')
+
+        # Assert SPEND column  does not match SAS output
+        assert_frame_not_equal(survey_results, survey_expected, 'SPEND')
+
+        # Assert SPENDK column  does not match SAS output
+        assert_frame_not_equal(survey_results, survey_expected, 'SPENDK')
+
+    # TODO: --->
+    if test_name == 'SPEND':
+        survey_results.to_csv(
+            f'/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/spend_results_{status}.csv')
+        survey_expected.to_csv(
+            f'/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/spend_expected_{status}.csv')
+        # TODO: <---
+
+        # Assert remaining dataframe for Spend Imputation matches for accuracy
+        survey_results.drop(['PUR2_PV', 'SPEND', 'SPENDK'], axis=1, inplace=True)
+        survey_expected.drop(['PUR2_PV', 'SPEND', 'SPENDK'], axis=1, inplace=True)
 
     # Test survey outputs
     log.info(f"Testing survey results for {test_name}")
@@ -358,23 +384,19 @@ def summary_output(test_name, expected_summary_output, summary_output_table, sum
     assert_frame_equal(summary_results, summary_expected, check_dtype=False, check_less_precise=True)
 
 
-@pytest.mark.xfail()
-def spend_output(test_name, expected_survey_output, survey_output_columns):
-    # Get survey results
-    survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
+def assert_frame_not_equal(results, expected, col):
+    # Mismatching dataframes will result in a positive result
+    python_df = results[['SERIAL', col]]
+    sas_df = expected[['SERIAL', col]]
 
-    # Create comparison survey dataframes
-    survey_results = survey_subsample[survey_output_columns].copy()
-    survey_expected = pd.read_csv(expected_survey_output, engine='python')
-    survey_expected = survey_expected[survey_output_columns].copy()
+    try:
+        assert_frame_equal(python_df, sas_df)
+    except AssertionError:
+        # frames are not equal
+        log.info(f"Dataframe for {col} test does not match SAS output:  Expected behaviour")
+        return True
+    else:
+        # frames are equal
+        log.warning(f"Dataframe for {col} test matches SAS output: Unexpected behaviour.")
 
-    # pandas.testing.faff
-    survey_results.sort_values(by='SERIAL', axis=0, inplace=True)
-    survey_results.index = range(0, len(survey_results))
 
-    survey_expected.sort_values(by='SERIAL', axis=0, inplace=True)
-    survey_expected.index = range(0, len(survey_expected))
-
-    # Test survey outputs
-    log.info(f"Testing survey results for {test_name}")
-    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
