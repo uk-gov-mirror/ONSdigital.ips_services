@@ -31,7 +31,6 @@ STAYDAYS_VARIABLE = "STAYDAYS"
 
 def do_ips_spend_imputation(df_survey_data, var_serial, measure):
     num_levels = len(STEM_THRESHOLD)
-    log.debug("in do_ips_spend_imputation")
 
     # Select only the eligible donors and recipients
     df_eligible = df_survey_data.copy()

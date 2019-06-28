@@ -459,11 +459,11 @@ INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DE
 VALUES ('TEMPLATE', 44, 'dur1_pv', 'dur1_pv', '
 if row[''STAY''] == 0:
     row[''DUR1_PV''] = 0
-elif  row[''STAY''] >= 1 and row[''STAY''] <= 7:
+elif row[''STAY''] >= 1 and row[''STAY''] <= 7:
     row[''DUR1_PV''] = 1
-elif  row[''STAY''] >= 8 and row[''STAY''] <= 21:
+elif row[''STAY''] >= 8 and row[''STAY''] <= 21:
     row[''DUR1_PV''] = 2
-elif  row[''STAY''] >= 22 and row[''STAY''] <= 35:
+elif row[''STAY''] >= 22 and row[''STAY''] <= 35:
     row[''DUR1_PV''] = 3
 elif row[''STAY''] >= 36 and row[''STAY''] <= 91:
     row[''DUR1_PV''] = 4

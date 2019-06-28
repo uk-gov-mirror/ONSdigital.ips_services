@@ -103,6 +103,7 @@ def test_shift_weight():
 def test_non_response_weight():
     log.info("Testing Calculation  2 --> non_response_weight")
     non_response_weight.non_response_weight_step(run_id)
+
     survey_output(
         "NON_RESPONSE",
         "data/calculations/december_2017/non_response_weight/dec_output.csv",
