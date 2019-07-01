@@ -1,6 +1,7 @@
 import time
 import pandas as pd
 import ips.persistence.sql as db
+import pytest
 
 from pandas.testing import assert_frame_equal
 from ips.util.services_logging import log
@@ -13,9 +14,9 @@ from ips.services.dataimport.import_unsampled import import_unsampled
 from ips.services.dataimport.import_traffic import import_air
 from ips.services.dataimport.import_traffic import import_sea
 from ips.services.dataimport.import_traffic import import_tunnel
-from ips.services.steps import shift_weight, non_response_weight, minimums_weight, traffic_weight, unsampled_weight, imbalance_weight, final_weight, stay_imputation, fares_imputation, spend_imputation
-
-from ips.services import ips_workflow
+from ips.services.steps import shift_weight, non_response_weight, minimums_weight, traffic_weight, unsampled_weight, \
+    imbalance_weight, final_weight, stay_imputation, fares_imputation, spend_imputation, air_miles
+from ips.util.services_configuration import ServicesConfiguration
 
 input_survey_data = 'data/import_data/dec/ips1712bv4_amtspnd.csv'
 input_shift_data = 'data/calculations/december_2017/New_Dec_Data/Poss shifts Dec 2017.csv'
@@ -64,6 +65,7 @@ def setup_module(module):
 
     log.info("Setting up PVs for testing")
     setup_pv()
+
 
 def setup_pv():
     df = db.select_data('*', 'PROCESS_VARIABLE_PY', 'RUN_ID', 'TEMPLATE')
@@ -125,7 +127,6 @@ def test_minimums_weight():
     log.info("Testing Calculation  3 --> minimums_weight")
     minimums_weight.minimums_weight_step(run_id)
 
-
     survey_output(
         "MINIMUMS",
         "data/calculations/december_2017/min_weight/dec2017_survey.csv",
@@ -149,7 +150,6 @@ def test_minimums_weight():
 def test_traffic_weight():
     log.info("Testing Calculation  4 --> traffic_weight")
     traffic_weight.traffic_weight_step(run_id)
-
     survey_output(
         "TRAFFIC",
         "data/calculations/december_2017/traffic_weight/surveydata_dec2017.csv",
@@ -171,7 +171,6 @@ def test_traffic_weight():
 def test_unsampled_weight():
     log.info("Testing Calculation  5 --> unsampled_weight")
     unsampled_weight.unsampled_weight_step(run_id)
-
     survey_output(
         "UNSAMPLED",
         "data/calculations/december_2017/unsampled_weight/surveydata_dec2017utf8.csv",
@@ -194,7 +193,6 @@ def test_unsampled_weight():
 def test_imbalance_weight():
     log.info("Testing Calculation  6 --> imbalance_weight")
     imbalance_weight.imbalance_weight_step(run_id)
-
     survey_output(
         "IMBALANCE",
         "data/calculations/december_2017/imbalance_weight/surveydata_dec2017_utf8.csv",
@@ -216,7 +214,6 @@ def test_imbalance_weight():
 def test_final_weight():
     log.info("Testing Calculation  7 --> final_weight")
     final_weight.final_weight_step(run_id)
-
     survey_output(
         "FINAL",
         "data/calculations/december_2017/final_weight/surveydata_dec2017_utf8.csv",
@@ -239,7 +236,6 @@ def test_final_weight():
 def test_stay_imputation():
     log.info("Testing Calculation  8 --> stay_imputation")
     stay_imputation.stay_imputation_step(run_id)
-
     survey_output(
         "STAY",
         "data/calculations/december_2017/fares/surveydata_fares.csv",
@@ -252,7 +248,6 @@ def test_stay_imputation():
 def test_fares_imputation():
     log.info("Testing Calculation  9 --> fares_imputation")
     fares_imputation.fares_imputation_step(run_id)
-
     survey_output(
         "FARES",
         "data/calculations/december_2017/fares/surveydata_fares.csv",
@@ -265,12 +260,16 @@ def test_fares_imputation():
 def test_spend_imputation():
     log.info("Testing Calculation 10 --> spend_imputation")
     spend_imputation.spend_imputation_step(run_id)
+    status = ServicesConfiguration().sas_pur2_pv()
+
     survey_output(
         "SPEND",
-        "data/calculations/december_2017/stay/surveydata_dec2017.csv",
+        "data/calculations/december_2017/spend/surveydata_spend.csv",
         [
-            'SERIAL', 'SPENDK', 'NEWSPEND'
-        ]
+            'SERIAL', 'SPEND_IMP_FLAG_PV', 'SPEND_IMP_ELIGIBLE_PV', 'UK_OS_PV', 'PUR1_PV', 'PUR2_PV',
+            'PUR3_PV', 'DUR1_PV', 'DUR2_PV', 'SPENDK', 'SPEND'
+        ],
+        status=status
     )
 
 
@@ -288,6 +287,7 @@ def test_town_stay_expenditure_imputation():
 
 def test_airmiles():
     log.info("Testing Calculation 14 --> airiles")
+    air_miles.airmiles_step(run_id)
     survey_output(
         "AIRMILES",
         "data/calculations/december_2017/stay/surveydata_dec2017.csv",
@@ -297,13 +297,13 @@ def test_airmiles():
     )
 
 
-def survey_output(test_name, expected_survey_output, survey_output_columns):
+def survey_output(test_name, expected_survey_output, survey_output_columns, status=True):
     # Get survey results
     survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
 
     # Create comparison survey dataframes
     survey_results = survey_subsample[survey_output_columns].copy()
-    survey_expected = pd.read_csv(expected_survey_output)
+    survey_expected = pd.read_csv(expected_survey_output, engine='python')
     survey_expected = survey_expected[survey_output_columns].copy()
 
     # pandas.testing.faff
@@ -313,17 +313,32 @@ def survey_output(test_name, expected_survey_output, survey_output_columns):
     survey_expected.sort_values(by='SERIAL', axis=0, inplace=True)
     survey_expected.index = range(0, len(survey_expected))
 
+    if not status:
+        # Assert PUR2_PV column does not match SAS output
+        assert_frame_not_equal(survey_results, survey_expected, 'PUR2_PV')
+
+        # Assert SPEND column  does not match SAS output
+        assert_frame_not_equal(survey_results, survey_expected, 'SPEND')
+
+        # Assert SPENDK column  does not match SAS output
+        assert_frame_not_equal(survey_results, survey_expected, 'SPENDK')
+
+        # Assert remaining dataframe for Spend Imputation matches for accuracy
+        survey_results.drop(['PUR2_PV', 'SPEND', 'SPENDK'], axis=1, inplace=True)
+        survey_expected.drop(['PUR2_PV', 'SPEND', 'SPENDK'], axis=1, inplace=True)
+
     # Test survey outputs
     log.info(f"Testing survey results for {test_name}")
-    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=False)
+    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
 
 
 def summary_output(test_name, expected_summary_output, summary_output_table, summary_output_columns):
     # Get summary results
+
     log.info(f"Testing summary results for {test_name}")
 
     # Create comparison summary dataframes
-    summary_expected = pd.read_csv(expected_summary_output)
+    summary_expected = pd.read_csv(expected_summary_output, engine='python')
 
     if test_name != 'FINAL':
         # Summary data is exported from table
@@ -344,3 +359,21 @@ def summary_output(test_name, expected_summary_output, summary_output_table, sum
 
     # Test summary outputs
     assert_frame_equal(summary_results, summary_expected, check_dtype=False, check_less_precise=True)
+
+
+def assert_frame_not_equal(results, expected, col):
+    # Mismatching dataframes will result in a positive result
+    python_df = results[['SERIAL', col]]
+    sas_df = expected[['SERIAL', col]]
+
+    try:
+        assert_frame_equal(python_df, sas_df)
+    except AssertionError:
+        # frames are not equal
+        log.info(f"Dataframe for {col} test does not match SAS output:  Expected behaviour")
+        return True
+    else:
+        # frames are equal
+        log.warning(f"Dataframe for {col} test matches SAS output: Unexpected behaviour.")
+
+

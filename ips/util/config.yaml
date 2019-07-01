@@ -15,6 +15,9 @@ logging:
 rounding:
   sas_rounding: True
 
+spend_work_around:
+  change_pur2_pv: False
+
 shift_weight:
   name: SHIFT_WEIGHT
   nullify_pvs: [SHIFT_PORT_GRP_PV, WEEKDAY_END_PV, AM_PM_NIGHT_PV, SHIFT_FLAG_PV, CROSSINGS_FLAG_PV, SHIFT_WT]

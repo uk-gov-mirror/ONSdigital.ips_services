@@ -4,7 +4,6 @@ from ips.persistence.persistence import insert_from_dataframe
 from ips.services.calculations import calculate_spend_imputation
 from ips.util import process_variables
 from ips.util.services_configuration import ServicesConfiguration
-from ips.util.services_logging import log
 
 
 def spend_imputation_step(run_id):
@@ -34,6 +33,9 @@ def spend_imputation_step(run_id):
 
     # Update Survey Data with Spend Imp PV Output
     idm.update_survey_data_with_step_pv_output(config)
+
+    if ServicesConfiguration().sas_pur2_pv():
+        idm.pur2_pv()
 
     # Retrieve data from SQL
     survey_data = get_survey_data()

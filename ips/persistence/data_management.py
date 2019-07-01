@@ -532,3 +532,13 @@ def is_valid_run_id(run_id: str) -> bool:
         return False
     else:
         return True
+
+
+def pur2_pv():
+    sql = f"""
+        UPDATE SAS_SURVEY_SUBSAMPLE
+        SET PUR2_PV = '2'
+        WHERE PUR2_PV = '1'
+    """
+
+    execute_sql(sql)

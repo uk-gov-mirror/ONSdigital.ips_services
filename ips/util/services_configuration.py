@@ -53,3 +53,6 @@ class ServicesConfiguration(Configuration):
 
     def sas_rounding(self):
         return self.cfg['rounding']['sas_rounding']
+
+    def sas_pur2_pv(self):
+        return self.cfg['spend_work_around']['change_pur2_pv']

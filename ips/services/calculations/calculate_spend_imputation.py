@@ -4,6 +4,7 @@ import pandas as pd
 
 from ips.services.calculations import ips_impute as imp
 
+
 OUTPUT_TABLE_NAME = "SAS_SPEND_IMP"
 STEM_VARIABLE = [
     ["UK_OS_PV", "STAYIMPCTRYLEVEL1_PV", "DUR1_PV", "PUR1_PV"],
@@ -29,9 +30,6 @@ STAYDAYS_VARIABLE = "STAYDAYS"
 
 
 def do_ips_spend_imputation(df_survey_data, var_serial, measure):
-    # TODO: --->
-    # df_survey_data.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/els scratch folder/spend_calc_in.csv')
-
     num_levels = len(STEM_THRESHOLD)
 
     # Select only the eligible donors and recipients
