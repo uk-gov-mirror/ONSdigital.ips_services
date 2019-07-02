@@ -17,6 +17,8 @@ import ips.services.steps.traffic_weight as traffic_weight
 import ips.services.steps.unsampled_weight as unsampled_weight
 from ips.persistence.persistence import truncate_table
 from ips.util.services_logging import log
+from ips.services.calculations import log_errors
+import pandas as pd
 
 
 class IPSWorkflow:
@@ -227,6 +229,7 @@ class IPSWorkflow:
                 mesg = mesg[0:250]+"..."
             self.set_step_status(run_id, runs.FAILED, self.CURRENT_STEP)
             self.set_status(run_id, runs.FAILED, mesg.replace("'", ""))
+            log_errors(mesg)(pd.DataFrame(), run_id, self.CURRENT_STEP)
             log.error(f"Run {run_id} has failed : {mesg}")
             runs.set_percent_done(run_id, 100)
             return
