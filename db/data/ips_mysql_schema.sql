@@ -2138,6 +2138,7 @@ create table SAS_SURVEY_SUBSAMPLE
     APORTLATNS             varchar(1)     null,
     APORTLONDEG            decimal(3)     null,
     APORTLONMIN            decimal(2)     null,
+
     APORTLONSEC            decimal(2)     null,
     APORTLONEW             varchar(1)     null,
     ARRIVEDEPART           decimal(1)     null,
@@ -2148,6 +2149,7 @@ create table SAS_SURVEY_SUBSAMPLE
     COUNTRYVISIT           decimal(4)     null,
     CPORTLATDEG            decimal(2)     null,
     CPORTLATMIN            decimal(2)     null,
+
     CPORTLATSEC            decimal(2)     null,
     CPORTLATNS             varchar(1)     null,
     CPORTLONDEG            decimal(3)     null,
@@ -2158,6 +2160,7 @@ create table SAS_SURVEY_SUBSAMPLE
     DAYTYPE                decimal(1)     null,
     DIRECTLEG              decimal(6)     null,
     DVEXPEND               decimal(6)     null,
+
     DVFARE                 decimal(6)     null,
     DVLINECODE             decimal(6)     null,
     DVPACKAGE              decimal(1)     null,
@@ -2168,6 +2171,7 @@ create table SAS_SURVEY_SUBSAMPLE
     EXPENDCODE             varchar(4)     null,
     EXPENDITURE            decimal(6)     null,
     FARE                   decimal(6)     null,
+
     FAREK                  decimal(2)     null,
     FLOW                   decimal(2)     null,
     HAULKEY                decimal(2)     null,
@@ -2178,6 +2182,7 @@ create table SAS_SURVEY_SUBSAMPLE
     MIGSI                  int            null,
     INTMONTH               decimal(2)     null,
     NATIONALITY            decimal(4)     null,
+
     NATIONNAME             varchar(50)    null,
     NIGHTS1                decimal(3)     null,
     NIGHTS2                decimal(3)     null,
@@ -2188,6 +2193,7 @@ create table SAS_SURVEY_SUBSAMPLE
     NIGHTS7                decimal(3)     null,
     NIGHTS8                decimal(3)     null,
     NUMADULTS              decimal(3)     null,
+
     NUMDAYS                decimal(3)     null,
     NUMNIGHTS              decimal(3)     null,
     NUMPEOPLE              decimal(3)     null,
@@ -2198,6 +2204,7 @@ create table SAS_SURVEY_SUBSAMPLE
     PACKAGE                decimal(2)     null,
     PROUTELATDEG           decimal(2)     null,
     PROUTELATMIN           decimal(2)     null,
+
     PROUTELATSEC           decimal(2)     null,
     PROUTELATNS            varchar(1)     null,
     PROUTELONDEG           decimal(3)     null,
@@ -2208,6 +2215,7 @@ create table SAS_SURVEY_SUBSAMPLE
     QUARTER                decimal(1)     null,
     RESIDENCE              decimal(4)     null,
     RESPNSE                decimal(2)     null,
+
     SEX                    decimal(1)     null,
     SHIFTNO                decimal(6)     null,
     SHUTTLE                decimal(1)     null,
@@ -2218,6 +2226,7 @@ create table SAS_SURVEY_SUBSAMPLE
     TOWNCODE2              decimal(6)     null,
     TOWNCODE3              decimal(6)     null,
     TOWNCODE4              decimal(6)     null,
+
     TOWNCODE5              decimal(6)     null,
     TOWNCODE6              decimal(6)     null,
     TOWNCODE7              decimal(6)     null,
@@ -2228,6 +2237,7 @@ create table SAS_SURVEY_SUBSAMPLE
     VISITBEGAN             varchar(8)     null,
     WELSHNIGHTS            decimal(3)     null,
     WELSHTOWN              decimal(6)     null,
+
     AM_PM_NIGHT_PV         decimal(1)     null,
     APD_PV                 decimal(4)     null,
     ARRIVEDEPART_PV        decimal(1)     null,
@@ -2238,6 +2248,7 @@ create table SAS_SURVEY_SUBSAMPLE
     STAYIMPCTRYLEVEL4_PV   decimal(8)     null,
     DAY_PV                 decimal(2)     null,
     DISCNT_F1_PV           decimal(4, 3)  null,
+
     DISCNT_F2_PV           decimal(4, 3)  null,
     DISCNT_PACKAGE_COST_PV decimal(6)     null,
     DUR1_PV                decimal(3)     null,
@@ -2248,6 +2259,7 @@ create table SAS_SURVEY_SUBSAMPLE
     FARES_IMP_FLAG_PV      decimal(1)     null,
     FLOW_PV                decimal(2)     null,
     FOOT_OR_VEHICLE_PV     decimal(2)     null,
+
     HAUL_PV                varchar(2)     null,
     IMBAL_CTRY_FACT_PV     decimal(5, 3)  null,
     IMBAL_CTRY_GRP_PV      decimal(3)     null,
@@ -2258,6 +2270,7 @@ create table SAS_SURVEY_SUBSAMPLE
     LOS_PV                 decimal(3)     null,
     LOSDAYS_PV             decimal(3)     null,
     MIG_FLAG_PV            decimal(1)     null,
+
     MINS_CTRY_GRP_PV       decimal(6)     null,
     MINS_CTRY_PORT_GRP_PV  varchar(10)    null,
     MINS_FLAG_PV           decimal(1)     null,
@@ -2268,6 +2281,7 @@ create table SAS_SURVEY_SUBSAMPLE
     NR_PORT_GRP_PV         decimal(3)     null,
     OPERA_PV               decimal(2)     null,
     OSPORT1_PV             decimal(8)     null,
+
     OSPORT2_PV             decimal(8)     null,
     OSPORT3_PV             decimal(8)     null,
     OSPORT4_PV             decimal(8)     null,
@@ -2278,6 +2292,7 @@ create table SAS_SURVEY_SUBSAMPLE
     QMFARE_PV              decimal(8)     null,
     RAIL_CNTRY_GRP_PV      decimal(3)     null,
     RAIL_EXERCISE_PV       decimal(6)     null,
+
     RAIL_IMP_ELIGIBLE_PV   decimal(1)     null,
     REG_IMP_ELIGIBLE_PV    decimal(1)     null,
     SAMP_PORT_GRP_PV       varchar(10)    null,
@@ -2288,6 +2303,7 @@ create table SAS_SURVEY_SUBSAMPLE
     STAY_IMP_ELIGIBLE_PV   decimal(1)     null,
     STAY_IMP_FLAG_PV       decimal(1)     null,
     STAY_PURPOSE_GRP_PV    decimal(2)     null,
+
     TOWNCODE_PV            varchar(10)    null,
     TOWN_IMP_ELIGIBLE_PV   decimal(1)     null,
     TYPE_PV                float(9, 3)    null,
@@ -2298,6 +2314,7 @@ create table SAS_SURVEY_SUBSAMPLE
     UKPORT4_PV             decimal(8)     null,
     UNSAMP_PORT_GRP_PV     varchar(10)    null,
     UNSAMP_REGION_GRP_PV   decimal(9, 3)  null,
+
     WEEKDAY_END_PV         decimal(1)     null,
     DIRECT                 decimal(6)     null,
     EXPENDITURE_WT         decimal(6, 3)  null,
@@ -2308,6 +2325,7 @@ create table SAS_SURVEY_SUBSAMPLE
     SPEND1                 decimal(7)     null,
     SPEND2                 decimal(7)     null,
     SPEND3                 decimal(7)     null,
+
     SPEND4                 decimal(7)     null,
     SPEND5                 decimal(7)     null,
     SPEND6                 decimal(7)     null,
@@ -2318,6 +2336,7 @@ create table SAS_SURVEY_SUBSAMPLE
     SPENDK                 decimal(2)     null,
     STAY                   decimal(3)     null,
     STAYK                  decimal(1)     null,
+
     STAY1K                 varchar(10)    null,
     STAY2K                 varchar(10)    null,
     STAY3K                 varchar(10)    null,
@@ -2328,6 +2347,7 @@ create table SAS_SURVEY_SUBSAMPLE
     STAY8K                 varchar(10)    null,
     STAY9K                 varchar(10)    null,
     STAYTLY                decimal(6)     null,
+
     STAY_WT                decimal(6, 3)  null,
     STAY_WTK               varchar(10)    null,
     TYPEINTERVIEW          decimal(3)     null,
@@ -2338,6 +2358,7 @@ create table SAS_SURVEY_SUBSAMPLE
     NON_RESPONSE_WT        decimal(9, 3)  null,
     MINS_WT                decimal(9, 3)  null,
     TRAFFIC_WT             decimal(9, 3)  null,
+
     UNSAMP_TRAFFIC_WT      decimal(9, 3)  null,
     IMBAL_WT               decimal(9, 3)  null,
     FINAL_WT               decimal(12, 3) null,
@@ -2541,6 +2562,7 @@ create index SHIFT_DATA_RUN_ID_index
 create table SURVEY_SUBSAMPLE
 (
     RUN_ID                 varchar(40)    not null,
+
     SERIAL                 decimal(15)    not null,
     AGE                    decimal(3)     null,
     AM_PM_NIGHT            decimal(1)     null,
@@ -2551,6 +2573,7 @@ create table SURVEY_SUBSAMPLE
     APORTLATNS             varchar(1)     null,
     APORTLONDEG            decimal(3)     null,
     APORTLONMIN            decimal(2)     null,
+
     APORTLONSEC            decimal(2)     null,
     APORTLONEW             varchar(1)     null,
     ARRIVEDEPART           decimal(1)     null,
@@ -2561,6 +2584,7 @@ create table SURVEY_SUBSAMPLE
     COUNTRYVISIT           decimal(4)     null,
     CPORTLATDEG            decimal(2)     null,
     CPORTLATMIN            decimal(2)     null,
+
     CPORTLATSEC            decimal(2)     null,
     CPORTLATNS             varchar(1)     null,
     CPORTLONDEG            decimal(3)     null,
@@ -2571,6 +2595,7 @@ create table SURVEY_SUBSAMPLE
     DAYTYPE                decimal(1)     null,
     DIRECTLEG              decimal(6)     null,
     DVEXPEND               decimal(6)     null,
+
     DVFARE                 decimal(6)     null,
     DVLINECODE             decimal(6)     null,
     DVPACKAGE              decimal(1)     null,
@@ -2581,6 +2606,7 @@ create table SURVEY_SUBSAMPLE
     EXPENDCODE             varchar(4)     null,
     EXPENDITURE            decimal(6)     null,
     FARE                   decimal(6)     null,
+
     FAREK                  decimal(2)     null,
     FLOW                   decimal(2)     null,
     HAULKEY                decimal(2)     null,
@@ -2591,6 +2617,7 @@ create table SURVEY_SUBSAMPLE
     MIGSI                  int            null,
     INTMONTH               decimal(2)     null,
     NATIONALITY            decimal(4)     null,
+
     NATIONNAME             varchar(50)    null,
     NIGHTS1                decimal(3)     null,
     NIGHTS2                decimal(3)     null,
@@ -2601,6 +2628,7 @@ create table SURVEY_SUBSAMPLE
     NIGHTS7                decimal(3)     null,
     NIGHTS8                decimal(3)     null,
     NUMADULTS              decimal(3)     null,
+
     NUMDAYS                decimal(3)     null,
     NUMNIGHTS              decimal(3)     null,
     NUMPEOPLE              decimal(3)     null,
@@ -2611,6 +2639,7 @@ create table SURVEY_SUBSAMPLE
     PACKAGE                decimal(2)     null,
     PROUTELATDEG           decimal(2)     null,
     PROUTELATMIN           decimal(2)     null,
+
     PROUTELATSEC           decimal(2)     null,
     PROUTELATNS            varchar(1)     null,
     PROUTELONDEG           decimal(3)     null,
@@ -2621,6 +2650,7 @@ create table SURVEY_SUBSAMPLE
     QUARTER                decimal(1)     null,
     RESIDENCE              decimal(4)     null,
     RESPNSE                decimal(2)     null,
+
     SEX                    decimal(1)     null,
     SHIFTNO                decimal(6)     null,
     SHUTTLE                decimal(1)     null,
@@ -2631,6 +2661,7 @@ create table SURVEY_SUBSAMPLE
     TOWNCODE2              decimal(6)     null,
     TOWNCODE3              decimal(6)     null,
     TOWNCODE4              decimal(6)     null,
+
     TOWNCODE5              decimal(6)     null,
     TOWNCODE6              decimal(6)     null,
     TOWNCODE7              decimal(6)     null,
@@ -2641,6 +2672,7 @@ create table SURVEY_SUBSAMPLE
     VISITBEGAN             varchar(8)     null,
     WELSHNIGHTS            decimal(3)     null,
     WELSHTOWN              decimal(6)     null,
+
     AM_PM_NIGHT_PV         decimal(1)     null,
     APD_PV                 decimal(4)     null,
     ARRIVEDEPART_PV        decimal(1)     null,
@@ -2651,6 +2683,7 @@ create table SURVEY_SUBSAMPLE
     STAYIMPCTRYLEVEL4_PV   decimal(8)     null,
     DAY_PV                 decimal(2)     null,
     DISCNT_F1_PV           decimal(4, 3)  null,
+
     DISCNT_F2_PV           decimal(4, 3)  null,
     DISCNT_PACKAGE_COST_PV decimal(6)     null,
     DUR1_PV                decimal(3)     null,
@@ -2661,6 +2694,7 @@ create table SURVEY_SUBSAMPLE
     FARES_IMP_FLAG_PV      decimal(1)     null,
     FLOW_PV                decimal(2)     null,
     FOOT_OR_VEHICLE_PV     decimal(2)     null,
+
     HAUL_PV                varchar(2)     null,
     IMBAL_CTRY_FACT_PV     decimal(5, 3)  null,
     IMBAL_CTRY_GRP_PV      decimal(3)     null,
@@ -2671,6 +2705,7 @@ create table SURVEY_SUBSAMPLE
     LOS_PV                 decimal(3)     null,
     LOSDAYS_PV             decimal(3)     null,
     MIG_FLAG_PV            decimal(1)     null,
+
     MINS_CTRY_GRP_PV       decimal(6)     null,
     MINS_CTRY_PORT_GRP_PV  varchar(10)    null,
     MINS_FLAG_PV           decimal(1)     null,
@@ -2681,6 +2716,7 @@ create table SURVEY_SUBSAMPLE
     NR_PORT_GRP_PV         decimal(3)     null,
     OPERA_PV               decimal(2)     null,
     OSPORT1_PV             decimal(8)     null,
+
     OSPORT2_PV             decimal(8)     null,
     OSPORT3_PV             decimal(8)     null,
     OSPORT4_PV             decimal(8)     null,
@@ -2691,6 +2727,7 @@ create table SURVEY_SUBSAMPLE
     QMFARE_PV              decimal(8)     null,
     RAIL_CNTRY_GRP_PV      decimal(3)     null,
     RAIL_EXERCISE_PV       decimal(6)     null,
+
     RAIL_IMP_ELIGIBLE_PV   decimal(1)     null,
     REG_IMP_ELIGIBLE_PV    decimal(1)     null,
     SAMP_PORT_GRP_PV       varchar(10)    null,
@@ -2701,6 +2738,7 @@ create table SURVEY_SUBSAMPLE
     STAY_IMP_ELIGIBLE_PV   decimal(1)     null,
     STAY_IMP_FLAG_PV       decimal(1)     null,
     STAY_PURPOSE_GRP_PV    decimal(2)     null,
+
     TOWNCODE_PV            varchar(10)    null,
     TOWN_IMP_ELIGIBLE_PV   decimal(1)     null,
     TYPE_PV                decimal(2)     null,
@@ -2711,6 +2749,7 @@ create table SURVEY_SUBSAMPLE
     UKPORT4_PV             decimal(8)     null,
     UNSAMP_PORT_GRP_PV     varchar(10)    null,
     UNSAMP_REGION_GRP_PV   decimal(9, 3)  null,
+
     WEEKDAY_END_PV         decimal(1)     null,
     DIRECT                 decimal(6)     null,
     EXPENDITURE_WT         decimal(6, 3)  null,
@@ -2721,6 +2760,7 @@ create table SURVEY_SUBSAMPLE
     SPEND1                 decimal(7)     null,
     SPEND2                 decimal(7)     null,
     SPEND3                 decimal(7)     null,
+
     SPEND4                 decimal(7)     null,
     SPEND5                 decimal(7)     null,
     SPEND6                 decimal(7)     null,
@@ -2731,6 +2771,7 @@ create table SURVEY_SUBSAMPLE
     SPENDK                 decimal(2)     null,
     STAY                   decimal(3)     null,
     STAYK                  decimal(1)     null,
+
     STAY1K                 varchar(10)    null,
     STAY2K                 varchar(10)    null,
     STAY3K                 varchar(10)    null,
@@ -2741,6 +2782,7 @@ create table SURVEY_SUBSAMPLE
     STAY8K                 varchar(10)    null,
     STAY9K                 varchar(10)    null,
     STAYTLY                decimal(6)     null,
+
     STAY_WT                decimal(6, 3)  null,
     STAY_WTK               varchar(10)    null,
     TYPEINTERVIEW          decimal(3)     null,
@@ -2751,6 +2793,7 @@ create table SURVEY_SUBSAMPLE
     NON_RESPONSE_WT        decimal(9, 3)  null,
     MINS_WT                decimal(9, 3)  null,
     TRAFFIC_WT             decimal(9, 3)  null,
+
     UNSAMP_TRAFFIC_WT      decimal(9, 3)  null,
     IMBAL_WT               decimal(9, 3)  null,
     FINAL_WT               decimal(12, 3) null
