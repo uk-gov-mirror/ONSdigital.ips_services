@@ -1656,7 +1656,7 @@ create table RUN
     LAST_MODIFIED timestamp  default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
     STEP          varchar(255) charset utf8            null,
     PERCENT       int        default 0                 null,
-    constraint RUN_RUN_ID_uindex
+    constraint
         unique (RUN_ID)
 );
 

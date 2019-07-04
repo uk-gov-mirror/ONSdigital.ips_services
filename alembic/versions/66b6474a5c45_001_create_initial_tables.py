@@ -165,7 +165,7 @@ def upgrade():
 
     op.create_table(
         "RUN",
-        sa.Column('RUN', sa.VARCHAR(length=40), nullable=False, primary_key=True), ###unique
+        sa.Column('RUN', sa.VARCHAR(length=40), nullable=False, primary_key=True),
         sa.Column('RUN_NAME', sa.VARCHAR(length=30), nullable=True),
         sa.Column('RUN_DESC', sa.VARCHAR(length=250), nullable=True),
         sa.Column('USER_ID', sa.VARCHAR(length=20), nullable=True),
@@ -181,23 +181,23 @@ def upgrade():
 
     op.create_table(
         "RUN_STEPS",
-        sa.Column('RUN', sa.VARCHAR(length=40), nullable=False),  ###unique
-        sa.Column('STEP_NUMBER', sa.VARCHAR(length=2), nullable=False),
+        sa.Column('RUN', sa.VARCHAR(length=40), nullable=False),
+        sa.Column('STEP_NUMBER', sa.DECIMAL(precision=2), nullable=False),
         sa.Column('STEP_NAME', sa.VARCHAR(length=50), nullable=False),
-        sa.Column('STEP_STATUS', sa.VARCHAR(length=2), nullable=False),
+        sa.Column('STEP_STATUS', sa.DECIMAL(precision=2), nullable=False),
     )
 
     op.create_table(
         "SAS_AIR_MILES",
-        sa.Column('SERIAL', sa.DECIMAL(precision=15), nullable=False),  ###unique
-        sa.Column('DIRECTLEG', sa.VARCHAR(length=6), nullable=True),
-        sa.Column('OVLEG', sa.VARCHAR(length=6), nullable=True),
-        sa.Column('UKLEG', sa.VARCHAR(length=6), nullable=True),
+        sa.Column('SERIAL', sa.DECIMAL(precision=15), nullable=False),
+        sa.Column('DIRECTLEG', sa.DECIMAL(precision=6), nullable=True),
+        sa.Column('OVLEG', sa.DECIMAL(precision=2), nullable=True),
+        sa.Column('UKLEG', sa.DECIMAL(precision=2), nullable=True),
     )
 
     op.create_table(
         "SAS_FARES_IMP",
-        sa.Column('SERIAL', sa.DECIMAL(precision=15), nullable=False),  ###unique
+        sa.Column('SERIAL', sa.DECIMAL(precision=15), nullable=False),
         sa.Column('FARE', sa.DECIMAL(precision=6), nullable=True),
         sa.Column('FAREK', sa.DECIMAL(precision=2), nullable=True),
         sa.Column('SPEND', sa.DECIMAL(precision=7), nullable=True),
@@ -208,7 +208,7 @@ def upgrade():
 
     op.create_table(
         "SAS_FARES_SPV",
-        sa.Column('SERIAL', sa.DECIMAL(precision=15), nullable=False),  ###unique
+        sa.Column('SERIAL', sa.DECIMAL(precision=15), nullable=False),
         sa.Column('FARES_IMP_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('FARES_IMP_ELIGIBLE_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('DISCNT_PACKAGE_COST_PV', sa.DECIMAL(precision=6), nullable=True),
@@ -237,7 +237,7 @@ def upgrade():
 
     op.create_table(
         "SAS_IMBALANCE_SPV",
-        sa.Column('SERIAL', sa.DECIMAL(precisionL=15), nullable=False),
+        sa.Column('SERIAL', sa.DECIMAL(precision=15), nullable=False),
         sa.Column('IMBAL_PORT_GRP_PV', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('IMBAL_PORT_SUBGRP_PV', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('IMBAL_PORT_FACT_PV', sa.DECIMAL(precision=5, scale=3), nullable=True),
@@ -256,11 +256,11 @@ def upgrade():
 
     op.create_table(
         "SAS_MINIMUMS_SPV",
-        sa.Column('SERIAL', sa.DECIMAL(precisionL=15), nullable=False),
+        sa.Column('SERIAL', sa.DECIMAL(precision=15), nullable=False),
         sa.Column('MINS_PORT_GRP_PV', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('MINS_CTRY_GRP_PV', sa.DECIMAL(precision=6), nullable=True),
         sa.Column('MINS_NAT_GRP_PV', sa.DECIMAL(precision=6), nullable=True),
-        sa.Column('MINS_CTRY_PORT_GRP_PV', sa.DECIMAL(precision=10), nullable=True),
+        sa.Column('MINS_CTRY_PORT_GRP_PV', sa.VARCHAR(lengrth=10), nullable=True),
         sa.Column('MINS_QUALITY_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('MINS_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
     )
@@ -273,8 +273,8 @@ def upgrade():
 
     op.create_table(
         "SAS_NON_RESPONSE_DATA",
-        sa.Column('REC_ID', sa.INTEGER, nullable=False, primary_key=True),
-        sa.Column('PORTROUTE', sa.DECIMAL(precision=4), nullable=True),
+        sa.Column('REC_ID', sa.INTEGER, nullable=False, primary_key=True, autoincrement=True),
+        sa.Column('PORTROUTE', sa.DECIMAL(precision=4), nullable=False),
         sa.Column('WEEKDAY', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('ARRIVEDEPART', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('AM_PM_NIGHT', sa.DECIMAL(precision=1), nullable=True),
@@ -339,7 +339,7 @@ def upgrade():
         sa.Column('ARRIVEDEPART', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('MINS_CTRY_GRP_PV', sa.DECIMAL(precision=6), nullable=True),
         sa.Column('MINS_NAT_GRP_PV', sa.DECIMAL(precision=6), nullable=True),
-        sa.Column('MINS_CTRY_PORT_GRP_PV', sa.DECIMAL(precision=10), nullable=True),
+        sa.Column('MINS_CTRY_PORT_GRP_PV', sa.VARCHAR(length=10), nullable=True),
         sa.Column('MINS_CASES', sa.DECIMAL(precision=6), nullable=True),
         sa.Column('FULLS_CASES', sa.DECIMAL(precision=6), nullable=True),
         sa.Column('PRIOR_GROSS_MINS', sa.DECIMAL(precision=12, scale=3), nullable=True),
@@ -432,14 +432,14 @@ def upgrade():
         sa.Column('NIGHTS6', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('NIGHTS7', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('NIGHTS8', sa.DECIMAL(precision=3), nullable=True),
-        sa.Column('STAY1K', sa.DECIMAL(precision=10), nullable=True),
-        sa.Column('STAY2K', sa.DECIMAL(precision=10), nullable=True),
-        sa.Column('STAY3K', sa.DECIMAL(precision=10), nullable=True),
-        sa.Column('STAY4K', sa.DECIMAL(precision=10), nullable=True),
-        sa.Column('STAY5K', sa.DECIMAL(precision=10), nullable=True),
-        sa.Column('STAY6K', sa.DECIMAL(precision=10), nullable=True),
-        sa.Column('STAY7K', sa.DECIMAL(precision=10), nullable=True),
-        sa.Column('STAY8K', sa.DECIMAL(precision=10), nullable=True),
+        sa.Column('STAY1K', sa.VARCHAR(length=10), nullable=True),
+        sa.Column('STAY2K', sa.VARCHAR(length=10), nullable=True),
+        sa.Column('STAY3K', sa.VARCHAR(length=10), nullable=True),
+        sa.Column('STAY4K', sa.VARCHAR(length=10), nullable=True),
+        sa.Column('STAY5K', sa.VARCHAR(length=10), nullable=True),
+        sa.Column('STAY6K', sa.VARCHAR(length=10), nullable=True),
+        sa.Column('STAY7K', sa.VARCHAR(length=10), nullable=True),
+        sa.Column('STAY8K', sa.VARCHAR(length=10), nullable=True),
     )
 
     op.create_table(
@@ -476,12 +476,13 @@ def upgrade():
 
     op.create_table(
         "SAS_SHIFT_SPV",
-        sa.Column('REC_ID', sa.DECIMAL(precision=15), nullable=False), #unique
+        sa.Column('REC_ID', sa.DECIMAL(precision=15), nullable=False),
         sa.Column('SHIFT_PORT_GRP_PV', sa.VARCHAR(length=10), nullable=True),
         sa.Column('AM_PM_NIGHT_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('WEEKDAY_END_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('SHIFT_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('CROSSINGS_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
+        UniqueConstraint('SERIAL', name='SAS_SHIFT_SPV_pk')
     )
 
     op.create_table(
@@ -543,7 +544,7 @@ def upgrade():
         sa.Column('APORTLONMIN', sa.DECIMAL(precision=2), nullable=True),
 
         sa.Column('APORTLONSEC', sa.DECIMAL(precision=2), nullable=True),
-        sa.Column('APORTLONEW', sa.VARCHAR(length=2), nullable=True),
+        sa.Column('APORTLONEW', sa.VARCHAR(length=1), nullable=True),
         sa.Column('ARRIVEDEPART', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('BABYFARE', sa.DECIMAL(precision=4, scale=2), nullable=True),
         sa.Column('BEFAF', sa.DECIMAL(precision=6), nullable=True),
@@ -558,8 +559,8 @@ def upgrade():
         sa.Column('CPORTLONDEG', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('CPORTLONMIN', sa.DECIMAL(precision=2), nullable=True),
         sa.Column('CPORTLONSEC', sa.DECIMAL(precision=2), nullable=True),
-        sa.Column('CPORTLONEW', sa.DECIMAL(precision=3), nullable=True),
-        sa.Column('INTDATE', sa.DECIMAL(precision=8), nullable=True),
+        sa.Column('CPORTLONEW', sa.VARCHAR(length=3), nullable=True),
+        sa.Column('INTDATE', sa.VARCHAR(length=8), nullable=True),
         sa.Column('DAYTYPE', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('DIRECTLEG', sa.DECIMAL(precision=6), nullable=True),
         sa.Column('DVEXPEND', sa.DECIMAL(precision=6), nullable=True),
@@ -571,18 +572,7 @@ def upgrade():
         sa.Column('DVPACKCOST', sa.DECIMAL(precision=6), nullable=True),
         sa.Column('DVPERSONS', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('DVPORTCODE', sa.DECIMAL(precision=6), nullable=True),
-        sa.Column('EXPENDCODE', sa.VARCHAR(precision=4), nullable=True),
-        sa.Column('EXPENDITURE', sa.DECIMAL(precision=6), nullable=True),
-        sa.Column('FARE', sa.DECIMAL(precision=6), nullable=True),
-
-        sa.Column('DVFARE', sa.DECIMAL(precision=6), nullable=True),
-        sa.Column('DVLINECODE', sa.DECIMAL(precision=6), nullable=True),
-        sa.Column('DVPACKAGE', sa.DECIMAL(precision=1), nullable=True),
-        sa.Column('PACKAGECOST', sa.FLOAT, nullable=True),
-        sa.Column('DVPACKCOST', sa.DECIMAL(precision=6), nullable=True),
-        sa.Column('DVPERSONS', sa.DECIMAL(precision=3), nullable=True),
-        sa.Column('DVPORTCODE', sa.DECIMAL(precision=6), nullable=True),
-        sa.Column('EXPENDCODE', sa.VARCHAR(precision=4), nullable=True),
+        sa.Column('EXPENDCODE', sa.VARCHAR(length=4), nullable=True),
         sa.Column('EXPENDITURE', sa.DECIMAL(precision=6), nullable=True),
         sa.Column('FARE', sa.DECIMAL(precision=6), nullable=True),
 
@@ -696,16 +686,16 @@ def upgrade():
         sa.Column('LOSDAYS_PV', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('MIG_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
 
-        sa.Column('MINS_CTRY_GRP_PV', sa.VARCHAR(length=2), nullable=True),
-        sa.Column('MINS_CTRY_GRP_PV', sa.DECIMAL(precision=5, scale=3), nullable=True),
-        sa.Column('MINS_FLAG_PV', sa.DECIMAL(precision=3), nullable=True),
-        sa.Column('MINS_NAT_GRP_PV', sa.DECIMAL(precision=1), nullable=True),
-        sa.Column('MINS_PORT_GRP_PV', sa.DECIMAL(precision=5, scale=3), nullable=True),
-        sa.Column('MINS_QUALITY_PV', sa.DECIMAL(precision=3), nullable=True),
-        sa.Column('NR_FLAG_PV', sa.DECIMAL(precision=3), nullable=True),
-        sa.Column('NR_PORT_GRP_PV', sa.VARCHAR(length=3), nullable=True),
-        sa.Column('OPERA_PV', sa.DECIMAL(precision=3), nullable=True),
-        sa.Column('OSPORT1_PV', sa.DECIMAL(precision=1), nullable=True),
+        sa.Column('MINS_CTRY_GRP_PV', sa.DECIMAL(precision=6), nullable=True),
+        sa.Column('MINS_CTRY_PORT_GRP_PV', sa.VARCHAR(length=10), nullable=True),
+        sa.Column('MINS_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
+        sa.Column('MINS_NAT_GRP_PV', sa.DECIMAL(precision=6), nullable=True),
+        sa.Column('MINS_PORT_GRP_PV', sa.DECIMAL(precision=3), nullable=True),
+        sa.Column('MINS_QUALITY_PV', sa.DECIMAL(precision=1), nullable=True),
+        sa.Column('NR_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
+        sa.Column('NR_PORT_GRP_PV', sa.DECIMAL(precision=3), nullable=True),
+        sa.Column('OPERA_PV', sa.DECIMAL(precision=2), nullable=True),
+        sa.Column('OSPORT1_PV', sa.DECIMAL(precision=8), nullable=True),
 
         sa.Column('OSPORT2_PV', sa.DECIMAL(precision=8), nullable=True),
         sa.Column('OSPORT3_PV', sa.DECIMAL(precision=8), nullable=True),
@@ -725,7 +715,7 @@ def upgrade():
         sa.Column('SHIFT_PORT_GRP_PV', sa.VARCHAR(length=10), nullable=True),
         sa.Column('SPEND_IMP_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('SPEND_IMP_ELIGIBLE_PV', sa.DECIMAL(precision=1), nullable=True),
-        sa.Column('STAY_IMP_ELIGIBLE_PV', sa.VARCHAR(length=1), nullable=True),
+        sa.Column('STAY_IMP_ELIGIBLE_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('STAY_IMP_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('STAY_PURPOSE_GRP_PV', sa.DECIMAL(precision=2), nullable=True),
 
@@ -737,7 +727,7 @@ def upgrade():
         sa.Column('UKPORT2_PV', sa.DECIMAL(precision=8), nullable=True),
         sa.Column('UKPORT3_PV', sa.DECIMAL(precision=8), nullable=True),
         sa.Column('UKPORT4_PV', sa.DECIMAL(precision=8), nullable=True),
-        sa.Column('UNSAMP_PORT_GRP_PV', sa.DECIMAL(precision=10), nullable=True),
+        sa.Column('UNSAMP_PORT_GRP_PV', sa.VARCHAR(length=10), nullable=True),
         sa.Column('UNSAMP_REGION_GRP_PV', sa.DECIMAL(precision=9, scale=3), nullable=True),
 
         sa.Column('WEEKDAY_END_PV', sa.DECIMAL(precision=1), nullable=True),
@@ -755,7 +745,7 @@ def upgrade():
         sa.Column('SPEND5', sa.DECIMAL(precision=7), nullable=True),
         sa.Column('SPEND6', sa.DECIMAL(precision=7), nullable=True),
         sa.Column('SPEND7', sa.DECIMAL(precision=7), nullable=True),
-        sa.Column('SPEND8', sa.sa.DECIMAL(precision=7), nullable=True),
+        sa.Column('SPEND8', sa.DECIMAL(precision=7), nullable=True),
         sa.Column('SPEND9', sa.DECIMAL(precision=7), nullable=True),
         sa.Column('SPENDIMPREASON', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('SPENDK', sa.DECIMAL(precision=2), nullable=True),
@@ -787,7 +777,7 @@ def upgrade():
         sa.Column('UNSAMP_TRAFFIC_WT', sa.DECIMAL(precision=9, scale=3), nullable=True),
         sa.Column('IMBAL_WT', sa.DECIMAL(precision=9, scale=3), nullable=True),
         sa.Column('FINAL_WT', sa.DECIMAL(precision=12, scale=3), nullable=True),
-        #uniqueconstraint
+        UniqueConstraint('SERIAL', name='SAS_SURVEY_SUBSAMPLE_pk')
     )
 
     op.create_table(
@@ -801,6 +791,17 @@ def upgrade():
         sa.Column('SPEND6', sa.DECIMAL(precision=7), nullable=True),
         sa.Column('SPEND7', sa.DECIMAL(precision=7), nullable=True),
         sa.Column('SPEND8', sa.DECIMAL(precision=7), nullable=True),
+    )
+
+    op.create_table(
+        "SAS_TOWN_STAY_SPV",
+        sa.Column('SERIAL', sa.DECIMAL(precision=15), nullable=False),
+        sa.Column('PURPOSE_PV', sa.DECIMAL(precision=8), nullable=True),
+        sa.Column('STAYIMPCTRYLEVEL1_PV', sa.DECIMAL(precision=8), nullable=True),
+        sa.Column('STAYIMPCTRYLEVEL2_PV', sa.DECIMAL(precision=8), nullable=True),
+        sa.Column('STAYIMPCTRYLEVEL3_PV', sa.DECIMAL(precision=8), nullable=True),
+        sa.Column('STAYIMPCTRYLEVEL4_PV', sa.DECIMAL(precision=8), nullable=True),
+        sa.Column('TOWN_IMP_ELIGIBLE_PV', sa.DECIMAL(precision=1), nullable=True),
     )
 
     op.create_table(
@@ -903,7 +904,7 @@ def upgrade():
         sa.Column('APORTLONMIN', sa.DECIMAL(precision=2), nullable=True),
 
         sa.Column('APORTLONSEC', sa.DECIMAL(precision=2), nullable=True),
-        sa.Column('APORTLONEW', sa.VARCHAR(length=2), nullable=True),
+        sa.Column('APORTLONEW', sa.VARCHAR(length=1), nullable=True),
         sa.Column('ARRIVEDEPART', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('BABYFARE', sa.DECIMAL(precision=4, scale=2), nullable=True),
         sa.Column('BEFAF', sa.DECIMAL(precision=6), nullable=True),
@@ -918,8 +919,8 @@ def upgrade():
         sa.Column('CPORTLONDEG', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('CPORTLONMIN', sa.DECIMAL(precision=2), nullable=True),
         sa.Column('CPORTLONSEC', sa.DECIMAL(precision=2), nullable=True),
-        sa.Column('CPORTLONEW', sa.DECIMAL(precision=3), nullable=True),
-        sa.Column('INTDATE', sa.DECIMAL(precision=8), nullable=True),
+        sa.Column('CPORTLONEW', sa.VARCHAR(length=3), nullable=True),
+        sa.Column('INTDATE', sa.VARCHAR(length=8), nullable=True),
         sa.Column('DAYTYPE', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('DIRECTLEG', sa.DECIMAL(precision=6), nullable=True),
         sa.Column('DVEXPEND', sa.DECIMAL(precision=6), nullable=True),
@@ -931,18 +932,7 @@ def upgrade():
         sa.Column('DVPACKCOST', sa.DECIMAL(precision=6), nullable=True),
         sa.Column('DVPERSONS', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('DVPORTCODE', sa.DECIMAL(precision=6), nullable=True),
-        sa.Column('EXPENDCODE', sa.VARCHAR(precision=4), nullable=True),
-        sa.Column('EXPENDITURE', sa.DECIMAL(precision=6), nullable=True),
-        sa.Column('FARE', sa.DECIMAL(precision=6), nullable=True),
-
-        sa.Column('DVFARE', sa.DECIMAL(precision=6), nullable=True),
-        sa.Column('DVLINECODE', sa.DECIMAL(precision=6), nullable=True),
-        sa.Column('DVPACKAGE', sa.DECIMAL(precision=1), nullable=True),
-        sa.Column('PACKAGECOST', sa.FLOAT, nullable=True),
-        sa.Column('DVPACKCOST', sa.DECIMAL(precision=6), nullable=True),
-        sa.Column('DVPERSONS', sa.DECIMAL(precision=3), nullable=True),
-        sa.Column('DVPORTCODE', sa.DECIMAL(precision=6), nullable=True),
-        sa.Column('EXPENDCODE', sa.VARCHAR(precision=4), nullable=True),
+        sa.Column('EXPENDCODE', sa.VARCHAR(length=4), nullable=True),
         sa.Column('EXPENDITURE', sa.DECIMAL(precision=6), nullable=True),
         sa.Column('FARE', sa.DECIMAL(precision=6), nullable=True),
 
@@ -1041,7 +1031,7 @@ def upgrade():
         sa.Column('DUTY_FREE_PV', sa.DECIMAL(precision=4), nullable=True),
         sa.Column('FAGE_PV', sa.DECIMAL(precision=2), nullable=True),
         sa.Column('FARES_IMP_ELIGIBLE_PV', sa.DECIMAL(precision=1), nullable=True),
-        sa.Column('FARES_IMP_FLAG_PV', sa.VARCHAR(length=1), nullable=True),
+        sa.Column('FARES_IMP_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('FLOW_PV', sa.DECIMAL(precision=2), nullable=True),
         sa.Column('FOOT_OR_VEHICLE_PV', sa.DECIMAL(precision=2), nullable=True),
 
@@ -1052,20 +1042,20 @@ def upgrade():
         sa.Column('IMBAL_PORT_FACT_PV', sa.DECIMAL(precision=5, scale=3), nullable=True),
         sa.Column('IMBAL_PORT_GRP_PV', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('IMBAL_PORT_SUBGRP_PV', sa.DECIMAL(precision=3), nullable=True),
-        sa.Column('LOS_PV', sa.VARCHAR(length=3), nullable=True),
+        sa.Column('LOS_PV', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('LOSDAYS_PV', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('MIG_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
 
-        sa.Column('MINS_CTRY_GRP_PV', sa.VARCHAR(length=2), nullable=True),
-        sa.Column('MINS_CTRY_GRP_PV', sa.DECIMAL(precision=5, scale=3), nullable=True),
-        sa.Column('MINS_FLAG_PV', sa.DECIMAL(precision=3), nullable=True),
-        sa.Column('MINS_NAT_GRP_PV', sa.DECIMAL(precision=1), nullable=True),
-        sa.Column('MINS_PORT_GRP_PV', sa.DECIMAL(precision=5, scale=3), nullable=True),
-        sa.Column('MINS_QUALITY_PV', sa.DECIMAL(precision=3), nullable=True),
-        sa.Column('NR_FLAG_PV', sa.DECIMAL(precision=3), nullable=True),
+        sa.Column('MINS_CTRY_GRP_PV', sa.DECIMAL(precision=2), nullable=True),
+        sa.Column('MINS_CTRY_PORT_GRP_PV', sa.VARCHAR(length=10), nullable=True),
+        sa.Column('MINS_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
+        sa.Column('MINS_NAT_GRP_PV', sa.DECIMAL(precision=6), nullable=True),
+        sa.Column('MINS_PORT_GRP_PV', sa.DECIMAL(precision=3), nullable=True),
+        sa.Column('MINS_QUALITY_PV', sa.DECIMAL(precision=1), nullable=True),
+        sa.Column('NR_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('NR_PORT_GRP_PV', sa.VARCHAR(length=3), nullable=True),
-        sa.Column('OPERA_PV', sa.DECIMAL(precision=3), nullable=True),
-        sa.Column('OSPORT1_PV', sa.DECIMAL(precision=1), nullable=True),
+        sa.Column('OPERA_PV', sa.DECIMAL(precision=2), nullable=True),
+        sa.Column('OSPORT1_PV', sa.DECIMAL(precision=8), nullable=True),
 
         sa.Column('OSPORT2_PV', sa.DECIMAL(precision=8), nullable=True),
         sa.Column('OSPORT3_PV', sa.DECIMAL(precision=8), nullable=True),
@@ -1074,7 +1064,7 @@ def upgrade():
         sa.Column('PUR2_PV', sa.DECIMAL(precision=8), nullable=True),
         sa.Column('PUR3_PV', sa.DECIMAL(precision=8), nullable=True),
         sa.Column('PURPOSE_PV', sa.DECIMAL(precision=8), nullable=True),
-        sa.Column('QMFARE_PV', sa.VARCHAR(length=8), nullable=True),
+        sa.Column('QMFARE_PV', sa.DECIMAL(precision=8), nullable=True),
         sa.Column('RAIL_CNTRY_GRP_PV', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('RAIL_EXERCISE_PV', sa.DECIMAL(precision=6), nullable=True),
 
@@ -1085,7 +1075,7 @@ def upgrade():
         sa.Column('SHIFT_PORT_GRP_PV', sa.VARCHAR(length=10), nullable=True),
         sa.Column('SPEND_IMP_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('SPEND_IMP_ELIGIBLE_PV', sa.DECIMAL(precision=1), nullable=True),
-        sa.Column('STAY_IMP_ELIGIBLE_PV', sa.VARCHAR(length=1), nullable=True),
+        sa.Column('STAY_IMP_ELIGIBLE_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('STAY_IMP_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('STAY_PURPOSE_GRP_PV', sa.DECIMAL(precision=2), nullable=True),
 
@@ -1097,7 +1087,7 @@ def upgrade():
         sa.Column('UKPORT2_PV', sa.DECIMAL(precision=8), nullable=True),
         sa.Column('UKPORT3_PV', sa.DECIMAL(precision=8), nullable=True),
         sa.Column('UKPORT4_PV', sa.DECIMAL(precision=8), nullable=True),
-        sa.Column('UNSAMP_PORT_GRP_PV', sa.DECIMAL(precision=10), nullable=True),
+        sa.Column('UNSAMP_PORT_GRP_PV', sa.VARCHAR(length=10), nullable=True),
         sa.Column('UNSAMP_REGION_GRP_PV', sa.DECIMAL(precision=9, scale=3), nullable=True),
 
         sa.Column('WEEKDAY_END_PV', sa.DECIMAL(precision=1), nullable=True),
@@ -1115,7 +1105,7 @@ def upgrade():
         sa.Column('SPEND5', sa.DECIMAL(precision=7), nullable=True),
         sa.Column('SPEND6', sa.DECIMAL(precision=7), nullable=True),
         sa.Column('SPEND7', sa.DECIMAL(precision=7), nullable=True),
-        sa.Column('SPEND8', sa.sa.DECIMAL(precision=7), nullable=True),
+        sa.Column('SPEND8', sa.DECIMAL(precision=7), nullable=True),
         sa.Column('SPEND9', sa.DECIMAL(precision=7), nullable=True),
         sa.Column('SPENDIMPREASON', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('SPENDK', sa.DECIMAL(precision=2), nullable=True),
@@ -1581,6 +1571,7 @@ def downgrade():
     op.drop_table("SAS_STAY_SPV")
     op.drop_table("SAS_SURVEY_SUBSAMPLE")
     op.drop_table("SAS_TOWN_STAY_IMP")
+    op.drop_table("SAS_TOWN_STAY_SPV")
     op.drop_table("SAS_TRAFFIC_DATA")
     op.drop_table("SAS_TRAFFIC_PV")
     op.drop_table("SAS_TRAFFIC_SPV")
