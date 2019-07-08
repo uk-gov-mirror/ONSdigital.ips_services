@@ -10,9 +10,6 @@ import sqlalchemy as sa
 from sqlalchemy.dialects.mysql import YEAR, LONGTEXT, DOUBLE
 from sqlalchemy import UniqueConstraint
 
-
-
-
 # revision identifiers, used by Alembic.
 revision = '66b6474a5c45'
 down_revision = None
@@ -164,22 +161,6 @@ def upgrade():
     )
 
     op.create_table(
-        "RUN",
-        sa.Column('RUN', sa.VARCHAR(length=40), nullable=False, primary_key=True),
-        sa.Column('RUN_NAME', sa.VARCHAR(length=30), nullable=True),
-        sa.Column('RUN_DESC', sa.VARCHAR(length=250), nullable=True),
-        sa.Column('USER_ID', sa.VARCHAR(length=20), nullable=True),
-        sa.Column('YEAR', YEAR, nullable=True),
-        sa.Column('PERIOD', sa.VARCHAR(length=255), nullable=True),
-        sa.Column('RUN_STATUS', sa.DECIMAL(precision=2), nullable=True),
-        sa.Column('RUN_TYPE_ID', sa.DECIMAL(precision=2), nullable=True),
-        sa.Column('LAST_MODIFIED', sa.TIMESTAMP, server_default=sa.text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'), nullable=True),  # ?????????????????
-        sa.Column('STEP', sa.VARCHAR(length=255), nullable=True),
-        sa.Column('PERCENT', sa.INTEGER, nullable=True),
-        UniqueConstraint('RUN_ID', name='RUN_RUN_ID_uindex')
-    )
-
-    op.create_table(
         "RUN_STEPS",
         sa.Column('RUN', sa.VARCHAR(length=40), nullable=False),
         sa.Column('STEP_NUMBER', sa.DECIMAL(precision=2), nullable=False),
@@ -260,7 +241,7 @@ def upgrade():
         sa.Column('MINS_PORT_GRP_PV', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('MINS_CTRY_GRP_PV', sa.DECIMAL(precision=6), nullable=True),
         sa.Column('MINS_NAT_GRP_PV', sa.DECIMAL(precision=6), nullable=True),
-        sa.Column('MINS_CTRY_PORT_GRP_PV', sa.VARCHAR(lengrth=10), nullable=True),
+        sa.Column('MINS_CTRY_PORT_GRP_PV', sa.VARCHAR(length=10), nullable=True),
         sa.Column('MINS_QUALITY_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('MINS_FLAG_PV', sa.DECIMAL(precision=1), nullable=True),
     )
@@ -476,7 +457,7 @@ def upgrade():
 
     op.create_table(
         "SAS_SHIFT_SPV",
-        sa.Column('REC_ID', sa.DECIMAL(precision=15), nullable=False),
+        sa.Column('SERIAL', sa.DECIMAL(precision=15), nullable=False),
         sa.Column('SHIFT_PORT_GRP_PV', sa.VARCHAR(length=10), nullable=True),
         sa.Column('AM_PM_NIGHT_PV', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('WEEKDAY_END_PV', sa.DECIMAL(precision=1), nullable=True),
@@ -806,7 +787,7 @@ def upgrade():
 
     op.create_table(
         "SAS_TRAFFIC_DATA",
-        sa.Column('REC_ID', sa.DECIMAL(precision=15), nullable=False, primary_key=True, autoincrement=True),
+        sa.Column('REC_ID', sa.INTEGER, nullable=False, autoincrement=True, primary_key=True),
         sa.Column('PORTROUTE', sa.DECIMAL(precision=4), nullable=True),
         sa.Column('ARRIVEDEPART', sa.DECIMAL(precision=1), nullable=True),
         sa.Column('TRAFFICTOTAL', sa.DECIMAL, nullable=True),
@@ -1164,7 +1145,7 @@ def upgrade():
         sa.Column('PORTROUTE', sa.DECIMAL(precision=4), nullable=True),
         sa.Column('REGION', sa.DECIMAL(precision=3), nullable=True),
         sa.Column('ARRIVEDEPART', sa.DECIMAL(precision=1), nullable=True),
-        sa.Column('UNSAMP_TOTAL', sa.VARCHAR(length=12, scale=3), nullable=False),
+        sa.Column('UNSAMP_TOTAL', sa.DECIMAL(precision=12, scale=3), nullable=False),
     )
 
     op.create_table(
@@ -1251,7 +1232,7 @@ def upgrade():
     )
 
     op.create_table(
-        "POPROWVEC_TRAFFIC",
+        "POPROWVEC_UNSAMP",
         sa.Column('C_GROUP', sa.BIGINT, nullable=True),
         sa.Column('T_1', sa.FLOAT, nullable=True),
         sa.Column('T_2', sa.FLOAT, nullable=True),
@@ -1536,7 +1517,6 @@ def downgrade():
     op.drop_table("PS_TRAFFIC")
     op.drop_table("PS_UNSAMPLED_OOH")
     op.drop_table("RESPONSE")
-    op.drop_table("RUN")
     op.drop_table("RUN_STEPS")
     op.drop_table("SAS_AIR_MILES")
     op.drop_table("SAS_FARES_IMP")
@@ -1566,6 +1546,7 @@ def downgrade():
     op.drop_table("SAS_SHIFT_PV")
     op.drop_table("SAS_SHIFT_SPV")
     op.drop_table("SAS_SHIFT_WT")
+    op.drop_table("SAS_SPEND_IMP")
     op.drop_table("SAS_SPEND_SPV")
     op.drop_table("SAS_STAY_IMP")
     op.drop_table("SAS_STAY_SPV")

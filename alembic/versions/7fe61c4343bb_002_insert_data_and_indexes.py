@@ -8,6 +8,7 @@ Create Date: 2019-07-04 13:08:42.388831
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects.mysql import YEAR
+from sqlalchemy import *
 from db.data.PVs import *
 
 # revision identifiers, used by Alembic.
@@ -35,6 +36,36 @@ def upgrade():
         sa.Column('PERIOD', sa.VARCHAR(length=12), nullable=False),
         sa.Column('YEAR', YEAR(display_width=4), nullable=False),
     )
+
+    RUN = op.create_table(
+        "RUN",
+        sa.Column('RUN_ID', sa.VARCHAR(length=40), nullable=False, primary_key=True),
+        sa.Column('RUN_NAME', sa.VARCHAR(length=30), nullable=True),
+        sa.Column('RUN_DESC', sa.VARCHAR(length=250), nullable=True),
+        sa.Column('USER_ID', sa.VARCHAR(length=20), nullable=True),
+        sa.Column('YEAR', YEAR, nullable=True),
+        sa.Column('PERIOD', sa.VARCHAR(length=255), nullable=True),
+        sa.Column('RUN_STATUS', sa.DECIMAL(precision=2), nullable=True),
+        sa.Column('RUN_TYPE_ID', sa.DECIMAL(precision=2), nullable=True),
+        sa.Column('LAST_MODIFIED', sa.TIMESTAMP, server_default=sa.text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'), nullable=True),
+        sa.Column('STEP', sa.VARCHAR(length=255), nullable=True),
+        sa.Column('PERCENT', sa.INTEGER, nullable=True),
+        UniqueConstraint('RUN_ID', name='RUN_RUN_ID_uindex')
+    )
+
+    op.bulk_insert(RUN,
+                   [
+                       {"RUN_ID": "b63786be-25b1-4f30-bfd9-a240a10f0ede", "RUN_NAME": "TM_Create_and_Edit_Test", "RUN_DESC": "Test run to check run creation and editing are still working after changing the fieldwork selection options", "USER_ID": "smptester", "PERIOD": "01", "YEAR": 2019, "RUN_STATUS": 0, "RUN_TYPE_ID": "0", "LAST_MODIFIED": "2019-07-05"},
+                       {"RUN_ID": "0eada784-7caf-4f68-b26f-4699c9bf0032", "RUN_NAME": "TestRun1", "RUN_DESC": "Demo test run", "USER_ID": "smptester", "PERIOD": "02", "YEAR": 2018, "RUN_STATUS": 3, "RUN_TYPE_ID": 0, "LAST_MODIFIED": "2019-07-05"},
+                       {"RUN_ID": "09e5c1872-3f8e-4ae5-85dc-c67a602d011e", "RUN_NAME": "IPS_Test_Run_December_2017", "RUN_DESC": "IPS run that contains data for the December period of 2017. This is our demo run, skip the dataimport step.", "USER_ID": "smptester", "PERIOD": "12", "YEAR": 2017, "RUN_STATUS": 2, "RUN_TYPE_ID": 1, "LAST_MODIFIED": "2019-07-05"},
+                       {"RUN_ID": "6aee5893-79bd-4e6b-923e-c41a9d3b56d9", "RUN_NAME": "IPS_Run December 2017", "RUN_DESC": "Demo Run", "USER_ID": "smptester", "PERIOD": "11", "YEAR": 2017, "RUN_STATUS": 3, "RUN_TYPE_ID": "0", "LAST_MODIFIED": "2019-07-05"},
+                       {"RUN_ID": "b33e6aa9-415a-408f-a871-04701fadbd70", "RUN_NAME": "HandoverRun", "RUN_DESC": "Test run for handover demo.", "USER_ID": "mahont1", "PERIOD": "01", "YEAR": 2019, "RUN_STATUS": 0, "RUN_TYPE_ID": 0, "LAST_MODIFIED": "2019-07-05"},
+                   ])
+
+    op.bulk_insert(PROCESS_VARIABLE_SET,
+                   [
+                       {"RUN_ID": "TEMPLATE", "NAME": "TEMPLATE", "USER": "Template", "PERIOD": "2017", "YEAR": 2017}
+                   ])
 
     op.bulk_insert(PROCESS_VARIABLE_PY,
                    [
@@ -100,6 +131,8 @@ def upgrade():
 
 
 def downgrade():
+    op.drop_table("RUN")
     op.drop_table("PROCESS_VARIABLE_PY")
+    op.drop_table("PROCESS_VARIABLE_SET")
 
 
