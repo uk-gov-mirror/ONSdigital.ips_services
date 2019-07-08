@@ -37,7 +37,7 @@ Install freetds
 
 1. Run the commmand `export PYTHONPATH=<path_to_project>`
 
-2. Add `MYSQL_HOST=<hostname>` to the .env file, this will either be `localhost` or you will need to type `hostname` into the terminal and copy the output.
+2. Add `MYSQL_HOST=<hostname>` to the .env file, hostname will either be `localhost` or you will need to type `hostname` into the terminal and copy the output.
 
 3. Run all scripts `alembic upgrade head`
 
