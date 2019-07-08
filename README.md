@@ -22,6 +22,38 @@ Install freetds
 
 3. Install the dependencies with `pip install -r requirements.txt`
 
-4. Call the *main* function or
+4. Create a .env file.
 
-4a. run all the tests using pytest (see for configuring pytest in pycharm and running tests)
+5. Run `docker-compose up`
+
+6. Create tables (see alembic quick start below).
+
+7. Run the ui.
+
+
+# Alembic
+
+### Quick Start
+
+1. Run the commmand `export PYTHONPATH=<path_to_project>`
+
+2. Add `MYSQL_HOST=<hostname>` to the .env file, this will either be `localhost` or you will need to type `hostname` into the terminal and copy the output.
+
+3. Run all scripts `alembic upgrade head`
+
+### Ammending the migration
+
+1. Run the commmand `alembic revision -m "<migration number> <desctiption of migration>"`, this will create and nam your migration script.
+
+2. Create/alter/update tables under upgrade and remove all changes in the file in the downgrade.
+
+### Migration commands
+
+-  Run the next script `alembic upgrade +1`
+
+-  Peel back one script `alembic downgrade -1`
+
+-  Remove all tables `alembic downgrade base`
+
+
+
