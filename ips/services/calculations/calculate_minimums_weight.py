@@ -3,7 +3,7 @@ import pandas as pd
 
 from ips.util.services_logging import log
 
-from ips.services.calculations import log_warnings
+from ips.services.calculations import log_warnings, log_errors
 
 OUTPUT_TABLE_NAME = 'SAS_MINIMUMS_WT'
 SUMMARY_TABLE_NAME = 'SAS_PS_MINIMUMS'
@@ -88,7 +88,8 @@ def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_wei
                             + df_check_prior_gross_fulls.columns[0] + " : " + str(record[0])
 
     if not df_check_prior_gross_fulls.empty and not df_summig.empty:
-        log.error('Error: No complete or partial responses' + threshold_string)
+        log_errors('Error: No complete or partial responses' + threshold_string)(pd.DataFrame(), run_id, 2)
+        raise ValueError('PV Failed!')
     else:
         df_summary[min_weight] = np.where(df_summary[PRIOR_WEIGHT_FULL_COLUMN] > 0,
                                           (df_summary[PRIOR_WEIGHT_MINIMUM_COLUMN] +
