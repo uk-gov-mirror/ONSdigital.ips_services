@@ -7,7 +7,7 @@ from pkg_resources import resource_filename
 
 from ips.util.services_logging import log
 import ips.persistence.persistence as db
-from ips.services.calculations import log_warnings
+from ips.services.calculations import log_warnings, log_errors
 
 OOH_STRATA = [
     'UNSAMP_PORT_GRP_PV',
@@ -24,7 +24,7 @@ PREVIOUS_TOTAL_COLUMN = 'PREVTOTAL'
 POST_WEIGHT_COLUMN = 'POSTWEIGHT'
 
 
-def error_check(df_survey_in, df_reference_in):
+def error_check(df_survey_in, df_reference_in, run_id):
     sort1 = ['UNSAMP_PORT_GRP_PV', 'UNSAMP_REGION_GRP_PV', 'ARRIVEDEPART']
 
     # Check data for errors before passed into R for processing
@@ -46,33 +46,31 @@ def error_check(df_survey_in, df_reference_in):
 
     # Error check 1
     df_sum_check_1 = df_merge_totals[df_merge_totals['OOHDESIGNWEIGHT'] > 0 & df_merge_totals['OOHDESIGNWEIGHT'].notnull()]
-    df_sum_check_2 = df_sum_check_1[df_sum_check_1['UNSAMP_TOTAL'] < 0 | df_sum_check_1['UNSAMP_TOTAL'].isnull()]
+    df_sum_check_2 = pd.concat([df_sum_check_1[df_sum_check_1['UNSAMP_TOTAL'].isna()],
+                                df_sum_check_1[df_sum_check_1['UNSAMP_TOTAL'] < 0]])
 
     if len(df_sum_check_2):
-        threshold_string_cap = 4000
         error_str = "No traffic total but sampled records present for"
-        threshold_string = ""
         for index, record in df_sum_check_2.iterrows():
-            threshold_string += \
+            threshold_string = \
                 error_str + " " + 'UNSAMP_PORT_GRP_PV' + " = " + str(record[0]) \
                 + " " + 'ARRIVEDEPART' + " = " + str(record[1]) + "\n"
-        threshold_string_capped = threshold_string[:threshold_string_cap]
-        log.error(threshold_string_capped)
+            log_errors(threshold_string)(pd.DataFrame(), run_id, 5)
+        raise ValueError('SAMP_PORT_GRP_PV Failed!')
 
     # Error check 2
     df_sum_check_1 = df_merge_totals[df_merge_totals['UNSAMP_TOTAL'] > 0 & df_merge_totals['UNSAMP_TOTAL'].notnull()]
-    df_sum_check_2 = df_sum_check_1[df_sum_check_1['OOHDESIGNWEIGHT'] < 0 | df_sum_check_1['OOHDESIGNWEIGHT'].isnull()]
+    df_sum_check_2 = pd.concat([df_sum_check_1[df_sum_check_1['OOHDESIGNWEIGHT'].isna()],
+                                df_sum_check_1[df_sum_check_1['OOHDESIGNWEIGHT'] < 0]])
 
     if len(df_sum_check_2):
-        threshold_string_cap = 4000
         error_str = "No records to match traffic against for"
-        threshold_string = ""
         for index, record in df_sum_check_2.iterrows():
-            threshold_string += \
+            threshold_string = \
                 error_str + " " + 'UNSAMP_PORT_GRP_PV' + " = " + str(record[0]) \
                 + " " + 'ARRIVEDEPART' + " = " + str(record[1]) + "\n"
-        threshold_string_capped = threshold_string[:threshold_string_cap]
-        log.error(threshold_string_capped)
+        log_errors(threshold_string)(pd.DataFrame(), run_id, 5)
+        raise ValueError('SAMP_PORT_GRP_PV Failed!')
 
 
 # Prepare survey data
@@ -146,7 +144,7 @@ def r_survey_input(survey_input: pd.DataFrame) -> None:
 
 
 # Prepare population totals to create AUX lookup variables
-def r_population_input(survey_input: pd.DataFrame, ustotals: pd.DataFrame) -> None:
+def r_population_input(survey_input: pd.DataFrame, ustotals: pd.DataFrame, run_id) -> None:
     """
     Author       : David Powell
     Date         : 07/06/2018
@@ -174,7 +172,7 @@ def r_population_input(survey_input: pd.DataFrame, ustotals: pd.DataFrame) -> No
     df_survey_input_lookup = df_survey_input_lookup[~df_survey_input_lookup['ARRIVEDEPART'].isnull()]
 
     df_check_survey = df_survey_input_lookup.copy()
-    error_check(df_check_survey, ustotals)
+    error_check(df_check_survey, ustotals, run_id)
 
     # Create lookup. Group by and aggregate. Allocates T_1 - T_n.
     lookup_dataframe = df_survey_input_lookup
@@ -284,7 +282,7 @@ def run_r_ges_script() -> None:
     log.info("R process finished.")
 
 
-def do_ips_ges_weighting(df_surveydata: pd.DataFrame, df_ustotals: pd.DataFrame):
+def do_ips_ges_weighting(df_surveydata: pd.DataFrame, df_ustotals: pd.DataFrame, run_id):
     # Deletes from poprowvec and survey_unsamp_aux tables
     db.truncate_table('SURVEY_UNSAMP_AUX')()
 
@@ -296,7 +294,7 @@ def do_ips_ges_weighting(df_surveydata: pd.DataFrame, df_ustotals: pd.DataFrame)
 
     r_survey_input(df_surveydata)
 
-    r_population_input(df_surveydata, df_ustotals)
+    r_population_input(df_surveydata, df_ustotals, run_id)
 
     run_r_ges_script()
 
@@ -391,7 +389,7 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     # Remove any records where var_totals value is not greater than zero
     lifted_totals = lifted_totals[lifted_totals[TOTALS_COLUMN] > 0]
 
-    ges_dataframes = do_ips_ges_weighting(df_surveydata, df_ustotals)
+    ges_dataframes = do_ips_ges_weighting(df_surveydata, df_ustotals, run_id)
 
     df_survey = ges_dataframes[0]
     df_output = ges_dataframes[1]

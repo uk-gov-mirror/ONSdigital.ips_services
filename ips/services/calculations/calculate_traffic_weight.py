@@ -144,7 +144,8 @@ def r_population_input(df_survey_input, df_tr_totals, run_id):
     # Error check 1
     df_sum_check_1 = df_merge_totals[
         df_merge_totals['TRAFDESIGNWEIGHT'] > 0 & df_merge_totals['TRAFDESIGNWEIGHT'].notna()]
-    df_sum_check_2 = df_sum_check_1[df_sum_check_1['TRAFFICTOTAL'] < 0 | np.isnan(df_sum_check_1['TRAFFICTOTAL'])]
+    df_sum_check_2 = pd.concat([df_sum_check_1[df_sum_check_1['TRAFFICTOTAL'].isna()],
+                                df_sum_check_1[df_sum_check_1['TRAFFICTOTAL'] < 0]])
 
     if len(df_sum_check_2):
         error_str = "No traffic total but sampled records present for"
