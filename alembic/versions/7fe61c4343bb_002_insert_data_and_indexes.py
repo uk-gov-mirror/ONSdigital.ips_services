@@ -53,6 +53,21 @@ def upgrade():
         UniqueConstraint('RUN_ID', name='RUN_RUN_ID_uindex')
     )
 
+    USER = op.create_table(
+        "USER",
+        sa.Column('ID', sa.INTEGER, autoincrement=True, primary_key=True, nullable=False),
+        sa.Column('USER_NAME', sa.VARCHAR(length=80), nullable=True),
+        sa.Column('PASSWORD', sa.VARCHAR(length=255), nullable=True),
+        sa.Column('FIRST_NAME', sa.VARCHAR(length=255), nullable=True),
+        sa.Column('SURNAME', sa.VARCHAR(length=255), nullable=True),
+        sa.Column('ROLE', sa.VARCHAR(length=50), nullable=True)
+    )
+
+    op.bulk_insert(USER,
+                   [
+                       {"ID": 1, "USER_NAME": "Admin", "PASSWORD": "pbkdf2:sha256:50000$jYlAjFyT$a3990f67a04492fdffae29256cc168caf7becbe33ca6fefb2f89c04b00ef9d27", "FIRST_NAME": None, "SURNAME": None, "ROLE": "admin"}
+                   ])
+
     op.bulk_insert(RUN,
                    [
                        {"RUN_ID": "b63786be-25b1-4f30-bfd9-a240a10f0ede", "RUN_NAME": "TM_Create_and_Edit_Test", "RUN_DESC": "Test run to check run creation and editing are still working after changing the fieldwork selection options", "USER_ID": "smptester", "PERIOD": "01", "YEAR": 2019, "RUN_STATUS": 0, "RUN_TYPE_ID": "0", "LAST_MODIFIED": "2019-07-05"},
