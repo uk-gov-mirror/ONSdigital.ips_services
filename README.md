@@ -19,7 +19,7 @@ All data resides in the database and code connecting to the database can be foun
 
 3. Create a .env file and populate with environment variables (see below)
 
-4. Run `docke-compose build`
+4. Run `docker-compose build`
 
 5. Run `docker-compose up`
 
