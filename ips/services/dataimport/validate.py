@@ -26,6 +26,10 @@ def validate_reference_data(reference_type: str, data: pd.DataFrame, user_month:
     data.columns = data.columns.str.upper()
     data.columns = data.columns.str.replace(' ', '')
 
+    if data.isnull().values.any() and reference_type.upper() in ["SHIFT", "NON_RESPONSE"]:
+        errors.add(f"{reference_type} has blank values")
+        return False
+
     if 'DATASOURCE' not in data.columns:
         errors.add(f"Invalid data uploaded.")
 
@@ -40,6 +44,8 @@ def validate_reference_data(reference_type: str, data: pd.DataFrame, user_month:
 
     if user_month is None or user_year is None:
         return True
+
+
 
     return _validate_date(data, user_month, user_year, errors)
 

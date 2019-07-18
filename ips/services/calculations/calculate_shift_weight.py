@@ -246,14 +246,14 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     df_shift_flag = df_surveydata_merge[df_surveydata_merge[FLAG_COLUMN] == 1]
     df_shift_flag = df_shift_flag[df_shift_flag[FACTOR_COLUMN].isnull()]
 
+
     # Collect data outside of specified threshold
-    threshold_string = ""
     for index, record in df_shift_flag.iterrows():
-        threshold_string += "___||___" \
+        threshold_string = "___||___" \
                             + df_shift_flag.columns[0] + " : " + str(record[0])
+        log_errors('Case(s) contain no shift factor(s):' + threshold_string)(pd.DataFrame(), run_id, 1)
 
     if len(df_shift_flag) > 0:
-        log_errors('Case(s) contain no shift factor(s):' + threshold_string)(pd.DataFrame(), run_id, 2)
         raise ValueError('PV Failed!')
     else:
         df_surveydata_merge.loc[df_surveydata_merge[FACTOR_COLUMN].isnull() &
@@ -269,11 +269,10 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     # Collect data outside of specified threshold
 
     if len(df_crossings_flag) > 0:
-        threshold_string = ""
         for index, record in df_crossings_flag.iterrows():
-            threshold_string += "___||___" \
+            threshold_string = "___||___" \
                                 + df_crossings_flag.columns[0] + " : " + str(record[0])
-        log_errors('Case(s) contain no crossings factor(s):' + threshold_string)(pd.DataFrame(), run_id, 2)
+            log_errors('Case(s) contain no crossings factor(s):' + threshold_string)(pd.DataFrame(), run_id, 1)
         raise ValueError('PV Failed!')
     else:
         df_surveydata_merge.loc[df_surveydata_merge[CROSSING_FACTOR_COLUMN].isnull() &
@@ -283,33 +282,31 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     # --------------------------------------------------------------------
     # Check for invalid shift data by extracting incorrect values
     # --------------------------------------------------------------------
+
+    df_shift_flag = df_surveydata_merge[df_surveydata_merge[FLAG_COLUMN] == 1]
     df_invalid_shifts = df_surveydata_merge[df_surveydata_merge[FACTOR_COLUMN] < 0]
-
-    df_possible_shifts = pd.merge(df_shift_flag, df_invalid_shifts, on=['SERIAL'], how='left')
-
-    # Collect data outside of specified threshold
+    df_possible_shifts = pd.merge(df_shift_flag, df_invalid_shifts, on=['SERIAL'])
 
     if len(df_possible_shifts) > 0:
-        threshold_string = ""
         for index, record in df_possible_shifts.iterrows():
-            threshold_string += "___||___" \
+            threshold_string = "___||___" \
                                 + df_possible_shifts.columns[0] + " : " + str(record[0])
-        log_errors('Case(s) has an invalid number of possible shifts' + threshold_string)(pd.DataFrame(), run_id, 2)
+            log_errors('Case(s) has an invalid number of possible shifts' + threshold_string)(pd.DataFrame(), run_id, 1)
         raise ValueError('PV Failed!')
 
     # Check for invalid crossings data by extracting incorrect values.
-    df_invalid_crossings = df_surveydata_merge[df_surveydata_merge[CROSSING_FACTOR_COLUMN] < 0]
 
-    df_possible_crossings = pd.merge(df_crossings_flag, df_invalid_crossings, on=['SERIAL'], how='left')
+    df_crossings_flag = df_surveydata_merge[df_surveydata_merge[CROSSING_FLAG_COLUMN] == 1]
+    df_invalid_crossings = df_surveydata_merge[df_surveydata_merge[CROSSING_FACTOR_COLUMN] < 0]
+    df_possible_crossings = pd.merge(df_crossings_flag, df_invalid_crossings, on=['SERIAL'])
 
     # Collect data outside of specified threshold
 
     if len(df_possible_crossings) > 0:
-        threshold_string = ""
         for index, record in df_possible_crossings.iterrows():
-            threshold_string += "___||___" \
+            threshold_string = "___||___" \
                                 + df_possible_crossings.columns[0] + " : " + str(record[0])
-        log_errors('Case(s) has an invalid number of total crossings' + threshold_string)(pd.DataFrame(), run_id, 2)
+            log_errors('Case(s) has an invalid number of total crossings' + threshold_string)(pd.DataFrame(), run_id, 1)
         raise ValueError('PV Failed!')
 
     # Check for missing migration sampling intervals by extracting incorrect values.
@@ -318,11 +315,10 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     # Collect data outside of specified threshold
 
     if len(df_missing_migsi) > 0:
-        threshold_string = ""
         for index, record in df_missing_migsi.iterrows():
-            threshold_string += "___||___" \
+            threshold_string = "___||___" \
                                 + df_missing_migsi.columns[0] + " : " + str(record[0])
-        log_errors('Case(s) missing migration sampling interval' + threshold_string)(pd.DataFrame(), run_id, 2)
+            log_errors('Case(s) missing migration sampling interval' + threshold_string)(pd.DataFrame(), run_id, 1)
         raise ValueError('PV Failed!')
 
     # --------------------------------------------------------------------
