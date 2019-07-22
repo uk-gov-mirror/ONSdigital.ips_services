@@ -15,7 +15,7 @@ FAILED: int = 6
 
 def clear_existing_status():
     log.debug("Clearing IN_PROGRESS runs to FAILED")
-    db.clear_existing_status()
+    # db.clear_existing_status()
 
 
 def process_variables_exist(run_id: str) -> bool:

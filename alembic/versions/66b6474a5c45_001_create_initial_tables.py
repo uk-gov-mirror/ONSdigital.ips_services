@@ -162,7 +162,7 @@ def upgrade():
 
     op.create_table(
         "RUN_STEPS",
-        sa.Column('RUN', sa.VARCHAR(length=40), nullable=False),
+        sa.Column('RUN_ID', sa.VARCHAR(length=40), nullable=False),
         sa.Column('STEP_NUMBER', sa.DECIMAL(precision=2), nullable=False),
         sa.Column('STEP_NAME', sa.VARCHAR(length=50), nullable=False),
         sa.Column('STEP_STATUS', sa.DECIMAL(precision=2), nullable=False),

@@ -28,7 +28,9 @@ All data resides in the database and code connecting to the database can be foun
 7. Run the ui.
 
 
-##Alembic
+## Alembic
+
+#### [Confluence Documentation](https://collaborate2.ons.gov.uk/confluence/display/QSS/Alembic+Database+Migration)
 
 #### Quick Start
 From the project root folder:
@@ -37,21 +39,27 @@ From the project root folder:
 
 2. Add `MYSQL_HOST=<hostname>` to the .env file, hostname will either be `localhost` or you will need to type `hostname` into the terminal and copy the output.
 
-3. Run all scripts `alembic upgrade head`
+3. Run build scripts `alembic upgrade 7fe61c4343bb`
 
-#### Ammending the migration
+#### Adding Tables/Columns/Data
 
-1. Run the commmand `alembic revision -m "<migration number> <desctiption of migration>"`, this will create and nam your migration script.
+There us an 'update tables' script already created, it contains an example of adding a column to the user table.
 
-2. Create/alter/update tables under upgrade and remove all changes in the file in the downgrade.
+Commands can be added to this file to update the tables.
+
+Make sure to reflect the upgrades in the downgrade function.
 
 #### Migration commands
 
--  Run the next script `alembic upgrade +1`
+-  Run all upgrade scripts `alembic upgrade head`
 
--  Peel back one script `alembic downgrade -1`
+-  Run the next script upgrade `alembic upgrade +1`
+
+-  Run the downgrade script `alembic downgrade -1`
 
 -  Remove all tables `alembic downgrade base`
+
+There is documentation for creating and editing tables in the confluence page linked above
 
 #### Environment Variables
 
