@@ -43,11 +43,15 @@ def error_check(df_survey_in, df_reference_in, run_id):
     df_pop_totals = df_us_totals_check.groupby(['UNSAMP_PORT_GRP_PV', 'UNSAMP_REGION_GRP_PV', 'ARRIVEDEPART']).agg(
                     {'UNSAMP_TOTAL': 'sum'}).reset_index()
     df_merge_totals = df_rsumsamp.merge(df_pop_totals, on=sort1, how='outer')
+    df_merge_totals['UNSAMP_TOTAL'] = df_merge_totals['UNSAMP_TOTAL'].fillna(0)
+    values = df_merge_totals.OOHDESIGNWEIGHT + df_merge_totals.UNSAMP_TOTAL
+    df_merge_totals['UNSAMP_LIFTED'] = values
 
     # Error check 1
-    df_sum_check_1 = df_merge_totals[df_merge_totals['OOHDESIGNWEIGHT'] > 0 & df_merge_totals['OOHDESIGNWEIGHT'].notnull()]
-    df_sum_check_2 = pd.concat([df_sum_check_1[df_sum_check_1['UNSAMP_TOTAL'].isna()],
-                                df_sum_check_1[df_sum_check_1['UNSAMP_TOTAL'] < 0]])
+    df_sum_check_1 = df_merge_totals[
+        df_merge_totals['OOHDESIGNWEIGHT'] > 0 & df_merge_totals['OOHDESIGNWEIGHT'].notnull()]
+    df_sum_check_2 = pd.concat([df_sum_check_1[df_sum_check_1['UNSAMP_LIFTED'].isna()],
+                                df_sum_check_1[df_sum_check_1['UNSAMP_LIFTED'] < 0]])
 
     if len(df_sum_check_2):
         error_str = "No traffic total but sampled records present for"
@@ -56,10 +60,10 @@ def error_check(df_survey_in, df_reference_in, run_id):
                 error_str + " " + 'UNSAMP_PORT_GRP_PV' + " = " + str(record[0]) \
                 + " " + 'ARRIVEDEPART' + " = " + str(record[1]) + "\n"
             log_errors(threshold_string)(pd.DataFrame(), run_id, 5)
-        raise ValueError('SAMP_PORT_GRP_PV Failed!')
+        raise ValueError('UNSAMP_PORT_GRP_PV Failed!')
 
     # Error check 2
-    df_sum_check_1 = df_merge_totals[df_merge_totals['UNSAMP_TOTAL'] > 0 & df_merge_totals['UNSAMP_TOTAL'].notnull()]
+    df_sum_check_1 = df_merge_totals[df_merge_totals['UNSAMP_LIFTED'] > 0 & df_merge_totals['UNSAMP_LIFTED'].notnull()]
     df_sum_check_2 = pd.concat([df_sum_check_1[df_sum_check_1['OOHDESIGNWEIGHT'].isna()],
                                 df_sum_check_1[df_sum_check_1['OOHDESIGNWEIGHT'] < 0]])
 
@@ -70,7 +74,7 @@ def error_check(df_survey_in, df_reference_in, run_id):
                 error_str + " " + 'UNSAMP_PORT_GRP_PV' + " = " + str(record[0]) \
                 + " " + 'ARRIVEDEPART' + " = " + str(record[1]) + "\n"
         log_errors(threshold_string)(pd.DataFrame(), run_id, 5)
-        raise ValueError('SAMP_PORT_GRP_PV Failed!')
+        raise ValueError('UNSAMP_PORT_GRP_PV Failed!')
 
 
 # Prepare survey data
