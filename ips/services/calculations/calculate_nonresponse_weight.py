@@ -80,9 +80,9 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
     # Validate that non-response totals can be grossed
     df_migtotal_not_zero = df_grossmignonresp[df_grossmignonresp[NR_TOTALS_COLUMN] != 0]
 
+    # TODO: Return error
     if len(df_migtotal_not_zero[df_migtotal_not_zero['grossmignonresp'].isnull()]) > 0:
-        log_errors("Unable to gross up non-response total.")(pd.DataFrame(), run_id, 2)
-        raise ValueError('PV Failed!')
+        log_errors("Unable to gross up non-response total.")(df_migtotal_not_zero, run_id, 2)
 
     # Summarise over non-response strata
     df_grossmignonresp = df_grossmignonresp.sort_values(NON_RESPONSE_STRATA)
@@ -145,8 +145,7 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
 
     # Collect data outside of specified threshold
     if len(df_gross_resp_is_zero) > 0:
-        log_errors("Gross response is 0")(pd.DataFrame(), run_id, 2)
-        raise ValueError('PV Failed!')
+        log_errors("Gross response is 0")(df_gross_resp_is_zero, run_id, 2)
 
     # Sort df_gnr and df_surveydata ready for producing summary
     df_gnr = df_gnr.sort_values(NON_RESPONSE_STRATA)
