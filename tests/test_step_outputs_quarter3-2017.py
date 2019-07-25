@@ -22,8 +22,6 @@ from ips.util.services_configuration import ServicesConfiguration
 from ips.persistence.persistence import execute_sql as exec_sql
 execute_sql = exec_sql()
 
-
-
 input_survey_data = 'data/import_data/quarter3/surveydata.csv'
 input_shift_data = 'data/import_data/quarter3/Possible shifts Q3 2017.csv'
 input_nr_data = 'data/import_data/quarter3/Non Response Q3 2017.csv'
@@ -318,248 +316,248 @@ def test_shift_weight():
     )
 
 
-def test_non_response_weight():
-    log.info("Testing Calculation  2 --> non_response_weight")
-    non_response_weight.non_response_weight_step(run_id)
-
-    survey_output(
-        "NON_RESPONSE",
-        "data/calculations/Q3_2017/non_response_weight/surveysubsample_nonresponse_q3.csv",
-        [
-            'SERIAL', 'NON_RESPONSE_WT'
-        ]
-    )
-
-    summary_output(
-        "NON_RESPONSE",
-        "data/calculations/Q3_2017/non_response_weight/nr_summary_q32017.csv",
-        "PS_NON_RESPONSE",
-        [
-            'NR_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'MEAN_RESPS_SH_WT', 'COUNT_RESPS', 'PRIOR_SUM',
-            'GROSS_RESP', 'GNR', 'MEAN_NR_WT'
-        ]
-    )
-
-
-def test_minimums_weight():
-    log.info("Testing Calculation  3 --> minimums_weight")
-    minimums_weight.minimums_weight_step(run_id)
-
-    survey_output(
-        "MINIMUMS",
-        "data/calculations/Q3_2017/min_weight/surveysubsample_mins_q3.csv",
-        [
-            'SERIAL', 'MINS_WT'
-        ]
-    )
-
-    summary_output(
-        "MINIMUMS",
-        "data/calculations/Q3_2017/min_weight/mins_summary_q32017.csv",
-        "PS_MINIMUMS",
-        [
-            'MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV',
-            'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS',
-            'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD'
-        ]
-    )
-
-
-def test_traffic_weight():
-    log.info("Testing Calculation  4 --> traffic_weight")
-    traffic_weight.traffic_weight_step(run_id)
-    survey_output(
-        "TRAFFIC",
-        "data/calculations/Q3_2017/traffic_weight/traffic_surveysubsample_2017.csv",
-        [
-            'SERIAL', 'TRAFFIC_WT'
-        ]
-    )
-
-    summary_output(
-        "TRAFFIC",
-        "data/calculations/Q3_2017/traffic_weight/traffic_summary_q32017.csv",
-        "PS_TRAFFIC",
-        [
-            'SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT'
-        ]
-    )
-
-
-def test_unsampled_weight():
-    log.info("Testing Calculation  5 --> unsampled_weight")
-    unsampled_weight.unsampled_weight_step(run_id)
-    survey_output(
-        "UNSAMPLED",
-        "data/calculations/Q3_2017/unsampled_weight/unsamp_surveysubsample_2017.csv",
-        [
-            'SERIAL', 'UNSAMP_TRAFFIC_WT'
-        ]
-    )
-
-    summary_output(
-        "UNSAMPLED",
-        "data/calculations/Q3_2017/unsampled_weight/unsamp_summary_q32017.csv",
-        "PS_UNSAMPLED_OOH",
-        [
-            'UNSAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'UNSAMP_REGION_GRP_PV', 'CASES', 'SUM_PRIOR_WT',
-            'SUM_UNSAMP_TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT'
-        ]
-    )
-
-
-def test_imbalance_weight():
-    log.info("Testing Calculation  6 --> imbalance_weight")
-    imbalance_weight.imbalance_weight_step(run_id)
-    survey_output(
-        "IMBALANCE",
-        "data/calculations/Q3_2017/imbalance_weight/imbalance_surveysubsample_2017.csv",
-        [
-            'SERIAL', 'IMBAL_WT'
-        ]
-    )
-
-    summary_output(
-        "IMBALANCE",
-        "data/calculations/Q3_2017/imbalance_weight/imbalance_summary_q32017.csv",
-        "PS_IMBALANCE",
-        [
-            'FLOW', 'SUM_PRIOR_WT', 'SUM_IMBAL_WT'
-        ]
-    )
-
-
-def test_final_weight():
-    log.info("Testing Calculation  7 --> final_weight")
-    final_weight.final_weight_step(run_id)
-    survey_output(
-        "FINAL",
-        "data/calculations/Q3_2017/final_weight/final_surveysubsample_2017.csv",
-        [
-            'SERIAL', 'FINAL_WT'
-        ]
-    )
-
-    summary_output(
-        "FINAL",
-        "data/calculations/Q3_2017/final_weight/final_summary_q32017.csv",
-        "PS_IMBALANCE",
-        [
-            'SERIAL', 'SHIFT_WT', 'NON_RESPONSE_WT', 'MINS_WT', 'TRAFFIC_WT',
-            'UNSAMP_TRAFFIC_WT', 'IMBAL_WT', 'FINAL_WT'
-        ]
-    )
-
-
-def test_stay_imputation():
-    log.info("Testing Calculation  8 --> stay_imputation")
-    stay_imputation.stay_imputation_step(run_id)
-    survey_output(
-        "STAY",
-        "data/calculations/Q3_2017/fares/stay_surveysubsample_2017.csv",
-        [
-            'SERIAL', 'STAY', 'STAYK'
-        ]
-    )
-
-
-def test_fares_imputation():
-    log.info("Testing Calculation  9 --> fares_imputation")
-    fares_imputation.fares_imputation_step(run_id)
-    survey_output(
-        "FARES",
-        "data/calculations/Q3_2017/fares/fares_surveysubsample_2017.csv",
-        [
-             'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
-        ]
-    )
-
-
-def test_spend_imputation():
-    log.info("Testing Calculation 10 --> spend_imputation")
-    spend_imputation.spend_imputation_step(run_id)
-
-    # Assert 'PUR2_PV', 'SPEND' and 'SPENDK' columns are not equal. For further information see
-    # https://collaborate2.ons.gov.uk/confluence/display/QSS/Spend+Imputation+Testing+Configuration
-    status = ServicesConfiguration().sas_pur2_pv()
-
-    survey_output(
-        "SPEND",
-        "data/calculations/Q3_2017/spend/spend_surveysubsample_2017.csv",
-        [
-            'SERIAL', 'SPEND_IMP_FLAG_PV', 'SPEND_IMP_ELIGIBLE_PV', 'UK_OS_PV', 'PUR1_PV', 'PUR2_PV',
-            'PUR3_PV', 'DUR1_PV', 'DUR2_PV', 'SPENDK', 'SPEND'
-        ],
-        status=status,
-        false_cols=['PUR2_PV', 'SPEND', 'SPENDK']
-    )
-
-
-# @pytest.mark.xfail()
-def test_rail_imputation():
-    # Expected failure on SPEND column.  For further information see:
-    # https://collaborate2.ons.gov.uk/confluence/display/QSS/Differing+values+between+SAS+and+Python+outputs
-    log.info("Testing Calculation 11 --> rail_imputation")
-    rail_imputation.rail_imputation_step(run_id)
-
-    survey_output(
-        "RAIL",
-        "data/calculations/Q3_2017/rail/rail_surveysubsample_2017.csvv",
-        [
-            'SERIAL', 'RAIL_CNTRY_GRP_PV', 'RAIL_EXERCISE_PV', 'RAIL_IMP_ELIGIBLE_PV', 'SPEND'
-        ],
-    )
-
-
-# @pytest.mark.xfail()
-def test_regional_weight():
-    # Expected failure on VISIT_WT and EXPENDITURE_WT columns.  For further information see:
-    # https://collaborate2.ons.gov.uk/confluence/display/QSS/Differing+values+between+SAS+and+Python+outputs
-
-    log.info("Testing Calculation 14 --> regional_weight")
-    regional_weights.regional_weights_step(run_id)
-
-    survey_output(
-        "REGIONAL",
-        'data/calculations/Q3_2017/regional_weights/regional_surveysubsample_2017.csv',
-        [
-            'SERIAL', 'VISIT_WT', 'VISIT_WTK', 'STAY_WT', 'STAY_WTK', 'EXPENDITURE_WT', 'EXPENDITURE_WTK', 'NIGHTS1',
-            'NIGHTS2', 'NIGHTS3', 'NIGHTS4', 'NIGHTS5', 'NIGHTS6', 'NIGHTS7', 'NIGHTS8', 'STAY1K', 'STAY2K', 'STAY3K',
-            'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K', 'PURPOSE_PV', 'STAYIMPCTRYLEVEL1_PV',
-            'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV', 'REG_IMP_ELIGIBLE_PV'
-        ],
-    )
-
-
-# @pytest.mark.xfail()
-def test_town_stay_expenditure_imputation():
-    # Expected failure on VISIT_WT and EXPENDITURE_WT columns.  For further information see:
-    # https://collaborate2.ons.gov.uk/confluence/display/QSS/Differing+values+between+SAS+and+Python+outputs
-
-    log.info("Testing Calculation 13 --> town_stay_expenditure_imputation")
-    town_stay_expenditure.town_stay_expenditure_imputation_step(run_id)
-
-    survey_output(
-        "TOWN_AND_STAY",
-        "data/calculations/Q3_2017/town_and_stay/town_surveysubsample_2017.csv",
-        [
-            'SERIAL', 'SPEND1', 'SPEND2', 'SPEND3', 'SPEND4', 'SPEND5', 'SPEND6', 'SPEND7', 'SPEND8', 'PURPOSE_PV',
-            'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV',
-            'TOWN_IMP_ELIGIBLE_PV'
-        ],
-    )
-
-
-def test_airmiles():
-    log.info("Testing Calculation 14 --> airiles")
-    air_miles.airmiles_step(run_id)
-    survey_output(
-        "AIRMILES",
-        "data/calculations/Q3_2017/stay/air_surveysubsample_2017.csv",
-        [
-            'SERIAL', 'UKLEG', 'OVLEG', 'DIRECTLEG'
-        ]
-    )
+# def test_non_response_weight():
+#     log.info("Testing Calculation  2 --> non_response_weight")
+#     non_response_weight.non_response_weight_step(run_id)
+#
+#     survey_output(
+#         "NON_RESPONSE",
+#         "data/calculations/Q3_2017/non_response_weight/surveysubsample_nonresponse_q3.csv",
+#         [
+#             'SERIAL', 'NON_RESPONSE_WT'
+#         ]
+#     )
+#
+#     summary_output(
+#         "NON_RESPONSE",
+#         "data/calculations/Q3_2017/non_response_weight/nr_summary_q32017.csv",
+#         "PS_NON_RESPONSE",
+#         [
+#             'NR_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'MEAN_RESPS_SH_WT', 'COUNT_RESPS', 'PRIOR_SUM',
+#             'GROSS_RESP', 'GNR', 'MEAN_NR_WT'
+#         ]
+#     )
+#
+#
+# def test_minimums_weight():
+#     log.info("Testing Calculation  3 --> minimums_weight")
+#     minimums_weight.minimums_weight_step(run_id)
+#
+#     survey_output(
+#         "MINIMUMS",
+#         "data/calculations/Q3_2017/min_weight/surveysubsample_mins_q3.csv",
+#         [
+#             'SERIAL', 'MINS_WT'
+#         ]
+#     )
+#
+#     summary_output(
+#         "MINIMUMS",
+#         "data/calculations/Q3_2017/min_weight/mins_summary_q32017.csv",
+#         "PS_MINIMUMS",
+#         [
+#             'MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV',
+#             'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS',
+#             'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD'
+#         ]
+#     )
+#
+#
+# def test_traffic_weight():
+#     log.info("Testing Calculation  4 --> traffic_weight")
+#     traffic_weight.traffic_weight_step(run_id)
+#     survey_output(
+#         "TRAFFIC",
+#         "data/calculations/Q3_2017/traffic_weight/traffic_surveysubsample_2017.csv",
+#         [
+#             'SERIAL', 'TRAFFIC_WT'
+#         ]
+#     )
+#
+#     summary_output(
+#         "TRAFFIC",
+#         "data/calculations/Q3_2017/traffic_weight/traffic_summary_q32017.csv",
+#         "PS_TRAFFIC",
+#         [
+#             'SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT'
+#         ]
+#     )
+#
+#
+# def test_unsampled_weight():
+#     log.info("Testing Calculation  5 --> unsampled_weight")
+#     unsampled_weight.unsampled_weight_step(run_id)
+#     survey_output(
+#         "UNSAMPLED",
+#         "data/calculations/Q3_2017/unsampled_weight/unsamp_surveysubsample_2017.csv",
+#         [
+#             'SERIAL', 'UNSAMP_TRAFFIC_WT'
+#         ]
+#     )
+#
+#     summary_output(
+#         "UNSAMPLED",
+#         "data/calculations/Q3_2017/unsampled_weight/unsamp_summary_q32017.csv",
+#         "PS_UNSAMPLED_OOH",
+#         [
+#             'UNSAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'UNSAMP_REGION_GRP_PV', 'CASES', 'SUM_PRIOR_WT',
+#             'SUM_UNSAMP_TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT'
+#         ]
+#     )
+#
+#
+# def test_imbalance_weight():
+#     log.info("Testing Calculation  6 --> imbalance_weight")
+#     imbalance_weight.imbalance_weight_step(run_id)
+#     survey_output(
+#         "IMBALANCE",
+#         "data/calculations/Q3_2017/imbalance_weight/imbalance_surveysubsample_2017.csv",
+#         [
+#             'SERIAL', 'IMBAL_WT'
+#         ]
+#     )
+#
+#     summary_output(
+#         "IMBALANCE",
+#         "data/calculations/Q3_2017/imbalance_weight/imbalance_summary_q32017.csv",
+#         "PS_IMBALANCE",
+#         [
+#             'FLOW', 'SUM_PRIOR_WT', 'SUM_IMBAL_WT'
+#         ]
+#     )
+#
+#
+# def test_final_weight():
+#     log.info("Testing Calculation  7 --> final_weight")
+#     final_weight.final_weight_step(run_id)
+#     survey_output(
+#         "FINAL",
+#         "data/calculations/Q3_2017/final_weight/final_surveysubsample_2017.csv",
+#         [
+#             'SERIAL', 'FINAL_WT'
+#         ]
+#     )
+#
+#     summary_output(
+#         "FINAL",
+#         "data/calculations/Q3_2017/final_weight/final_summary_q32017.csv",
+#         "PS_IMBALANCE",
+#         [
+#             'SERIAL', 'SHIFT_WT', 'NON_RESPONSE_WT', 'MINS_WT', 'TRAFFIC_WT',
+#             'UNSAMP_TRAFFIC_WT', 'IMBAL_WT', 'FINAL_WT'
+#         ]
+#     )
+#
+#
+# def test_stay_imputation():
+#     log.info("Testing Calculation  8 --> stay_imputation")
+#     stay_imputation.stay_imputation_step(run_id)
+#     survey_output(
+#         "STAY",
+#         "data/calculations/Q3_2017/fares/stay_surveysubsample_2017.csv",
+#         [
+#             'SERIAL', 'STAY', 'STAYK'
+#         ]
+#     )
+#
+#
+# def test_fares_imputation():
+#     log.info("Testing Calculation  9 --> fares_imputation")
+#     fares_imputation.fares_imputation_step(run_id)
+#     survey_output(
+#         "FARES",
+#         "data/calculations/Q3_2017/fares/fares_surveysubsample_2017.csv",
+#         [
+#              'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
+#         ]
+#     )
+#
+#
+# def test_spend_imputation():
+#     log.info("Testing Calculation 10 --> spend_imputation")
+#     spend_imputation.spend_imputation_step(run_id)
+#
+#     # Assert 'PUR2_PV', 'SPEND' and 'SPENDK' columns are not equal. For further information see
+#     # https://collaborate2.ons.gov.uk/confluence/display/QSS/Spend+Imputation+Testing+Configuration
+#     status = ServicesConfiguration().sas_pur2_pv()
+#
+#     survey_output(
+#         "SPEND",
+#         "data/calculations/Q3_2017/spend/spend_surveysubsample_2017.csv",
+#         [
+#             'SERIAL', 'SPEND_IMP_FLAG_PV', 'SPEND_IMP_ELIGIBLE_PV', 'UK_OS_PV', 'PUR1_PV', 'PUR2_PV',
+#             'PUR3_PV', 'DUR1_PV', 'DUR2_PV', 'SPENDK', 'SPEND'
+#         ],
+#         status=status,
+#         false_cols=['PUR2_PV', 'SPEND', 'SPENDK']
+#     )
+#
+#
+# # @pytest.mark.xfail()
+# def test_rail_imputation():
+#     # Expected failure on SPEND column.  For further information see:
+#     # https://collaborate2.ons.gov.uk/confluence/display/QSS/Differing+values+between+SAS+and+Python+outputs
+#     log.info("Testing Calculation 11 --> rail_imputation")
+#     rail_imputation.rail_imputation_step(run_id)
+#
+#     survey_output(
+#         "RAIL",
+#         "data/calculations/Q3_2017/rail/rail_surveysubsample_2017.csvv",
+#         [
+#             'SERIAL', 'RAIL_CNTRY_GRP_PV', 'RAIL_EXERCISE_PV', 'RAIL_IMP_ELIGIBLE_PV', 'SPEND'
+#         ],
+#     )
+#
+#
+# # @pytest.mark.xfail()
+# def test_regional_weight():
+#     # Expected failure on VISIT_WT and EXPENDITURE_WT columns.  For further information see:
+#     # https://collaborate2.ons.gov.uk/confluence/display/QSS/Differing+values+between+SAS+and+Python+outputs
+#
+#     log.info("Testing Calculation 14 --> regional_weight")
+#     regional_weights.regional_weights_step(run_id)
+#
+#     survey_output(
+#         "REGIONAL",
+#         'data/calculations/Q3_2017/regional_weights/regional_surveysubsample_2017.csv',
+#         [
+#             'SERIAL', 'VISIT_WT', 'VISIT_WTK', 'STAY_WT', 'STAY_WTK', 'EXPENDITURE_WT', 'EXPENDITURE_WTK', 'NIGHTS1',
+#             'NIGHTS2', 'NIGHTS3', 'NIGHTS4', 'NIGHTS5', 'NIGHTS6', 'NIGHTS7', 'NIGHTS8', 'STAY1K', 'STAY2K', 'STAY3K',
+#             'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K', 'PURPOSE_PV', 'STAYIMPCTRYLEVEL1_PV',
+#             'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV', 'REG_IMP_ELIGIBLE_PV'
+#         ],
+#     )
+#
+#
+# # @pytest.mark.xfail()
+# def test_town_stay_expenditure_imputation():
+#     # Expected failure on VISIT_WT and EXPENDITURE_WT columns.  For further information see:
+#     # https://collaborate2.ons.gov.uk/confluence/display/QSS/Differing+values+between+SAS+and+Python+outputs
+#
+#     log.info("Testing Calculation 13 --> town_stay_expenditure_imputation")
+#     town_stay_expenditure.town_stay_expenditure_imputation_step(run_id)
+#
+#     survey_output(
+#         "TOWN_AND_STAY",
+#         "data/calculations/Q3_2017/town_and_stay/town_surveysubsample_2017.csv",
+#         [
+#             'SERIAL', 'SPEND1', 'SPEND2', 'SPEND3', 'SPEND4', 'SPEND5', 'SPEND6', 'SPEND7', 'SPEND8', 'PURPOSE_PV',
+#             'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV',
+#             'TOWN_IMP_ELIGIBLE_PV'
+#         ],
+#     )
+#
+#
+# def test_airmiles():
+#     log.info("Testing Calculation 14 --> airiles")
+#     air_miles.airmiles_step(run_id)
+#     survey_output(
+#         "AIRMILES",
+#         "data/calculations/Q3_2017/stay/air_surveysubsample_2017.csv",
+#         [
+#             'SERIAL', 'UKLEG', 'OVLEG', 'DIRECTLEG'
+#         ]
+#     )
 
 
 def survey_output(test_name, expected_survey_output, survey_output_columns, status=True, false_cols=None):
