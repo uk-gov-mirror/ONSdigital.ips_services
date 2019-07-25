@@ -637,3 +637,7 @@ def assert_frame_not_equal(results, expected, columns, test_name):
         else:
             # frames are equal
             log.warning(f"{col} matches SAS output: Unexpected behaviour.")
+
+
+if __name__ == '__main__':
+    setup_pv()
