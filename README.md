@@ -23,9 +23,7 @@ All data resides in the database and code connecting to the database can be foun
 
 5. Run `docker-compose up`
 
-6. Create tables (see alembic quick start below).
-
-7. Run the ui.
+6. Run the ui.
 
 
 ## Alembic
@@ -33,6 +31,10 @@ All data resides in the database and code connecting to the database can be foun
 #### [Confluence Documentation](https://collaborate2.ons.gov.uk/confluence/display/QSS/Alembic+Database+Migration)
 
 #### Quick Start
+The database is currently being created and populated in ips_services/db/data/ips_mysql_schema.sql 
+
+To create in alembic the sql file needs to be commented out after line 5, then run `docker-compose down -v` and repeat steps 4 and 5 above followed by the three steps directly below.
+
 From the project root folder:
 
 1. Run the commmand `export PYTHONPATH=<path_to_project>`
