@@ -4,6 +4,7 @@ import pandas as pd
 from ips.util.services_logging import log
 # dataimport survey_support
 from ips.services.calculations import log_warnings
+from ips.services.calculations.sas_rounding import ips_rounding
 
 OUTPUT_TABLE_NAME = 'SAS_RAIL_IMP'
 ELIGIBLE_VARIABLE = 'FLOW'  # direction of travel (use 5 out uk , 8 in )
@@ -22,8 +23,8 @@ def do_ips_railex_imp(df_input, var_serial, var_final_weight, minimum_count_thre
     Author       : Thomas Mahoney
     Date         : 28 / 02 / 2018
     Purpose      : Calculates the imputed values for rail expenditure for the IPS system.
-    Parameters   : df_input - the IPS survey dataset         
-                   output - the output dataset                                         
+    Parameters   : df_input - the IPS survey dataset
+                   output - the output dataset
                    var_serial - the serial number field name
                    var_final_weight - previously estimated final weight
                    minimum_count_threshold - threshold for respondent count warning msg
@@ -43,10 +44,10 @@ def do_ips_railex_imp(df_input, var_serial, var_final_weight, minimum_count_thre
 
     input2 = input2.sort_values(STRATA)
 
-    # Replace blank values with zero as python drops blanks during the aggregation process.  
+    # Replace blank values with zero as python drops blanks during the aggregation process.
     input2[STRATA] = input2[STRATA].fillna(0)
 
-    # Generate the aggregated data 
+    # Generate the aggregated data
     gp_summin = input2.groupby(STRATA)[PRESPEND_VARIABLE].agg(['sum', 'count'])
     gp_summin.rename(columns={'sum': GROSS_PRESPEND_VARIABLE, 'count': COUNT_VARIABLE}, inplace=True)
 
@@ -95,7 +96,7 @@ def do_ips_railex_imp(df_input, var_serial, var_final_weight, minimum_count_thre
     def calculate_spend(row):
         if not math.isnan(row[RAIL_FACTOR_VARIABLE]):
             if not math.isnan(row[SPEND_VARIABLE]):
-                row[SPEND_VARIABLE] = round(row[SPEND_VARIABLE] * row[RAIL_FACTOR_VARIABLE])
+                row[SPEND_VARIABLE] = ips_rounding(row[SPEND_VARIABLE] * row[RAIL_FACTOR_VARIABLE], 0)
         return row
 
     df_output = df_output.apply(calculate_spend, axis=1)
