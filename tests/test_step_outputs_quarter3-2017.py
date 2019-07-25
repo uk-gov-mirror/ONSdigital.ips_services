@@ -339,30 +339,30 @@ def test_non_response_weight():
     )
 
 
-# def test_minimums_weight():
-#     log.info("Testing Calculation  3 --> minimums_weight")
-#     minimums_weight.minimums_weight_step(run_id)
-#
-#     survey_output(
-#         "MINIMUMS",
-#         "data/calculations/Q3_2017/min_weight/surveysubsample_mins_q3.csv",
-#         [
-#             'SERIAL', 'MINS_WT'
-#         ]
-#     )
-#
-#     summary_output(
-#         "MINIMUMS",
-#         "data/calculations/Q3_2017/min_weight/mins_summary_q32017.csv",
-#         "PS_MINIMUMS",
-#         [
-#             'MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV',
-#             'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS',
-#             'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD'
-#         ]
-#     )
-#
-#
+def test_minimums_weight():
+    log.info("Testing Calculation  3 --> minimums_weight")
+    minimums_weight.minimums_weight_step(run_id)
+
+    survey_output(
+        "MINIMUMS",
+        "data/calculations/Q3_2017/min_weight/surveysubsample_mins_q3.csv",
+        [
+            'SERIAL', 'MINS_WT'
+        ]
+    )
+
+    summary_output(
+        "MINIMUMS",
+        "data/calculations/Q3_2017/min_weight/mins_summary_q32017.csv",
+        "PS_MINIMUMS",
+        [
+            'MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV',
+            'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS',
+            'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD'
+        ]
+    )
+
+             
 # def test_traffic_weight():
 #     log.info("Testing Calculation  4 --> traffic_weight")
 #     traffic_weight.traffic_weight_step(run_id)
