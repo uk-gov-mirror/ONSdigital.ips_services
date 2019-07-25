@@ -54,6 +54,9 @@ def traffic_weight_step(run_id):
     survey_data = get_survey_data()
     traffic_data = read_table_values(config["data_table"])()
 
+    survey_data.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/traffic_scratch/traffic_survey_in.csv')
+    traffic_data.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/traffic_scratch/traffic_reference_in.csv')
+
     # Calculate Traffic Weight
     output_data, summary_data = do_ips_trafweight_calculation_with_r(survey_data, traffic_data, run_id)
 

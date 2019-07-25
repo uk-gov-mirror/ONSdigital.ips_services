@@ -92,8 +92,7 @@ def setup_pv():
 
 def update_traffic_weight_pv():
     samp_port_grp_pv = """
-    '
-    if row[''PORTROUTE''] in (111, 113, 119, 161, 171):
+    'if row[''PORTROUTE''] in (111, 113, 119, 161, 171):
         row[''SAMP_PORT_GRP_PV''] = ''A111''
     elif row[''PORTROUTE''] in (121, 123, 162, 172):
         row[''SAMP_PORT_GRP_PV''] = ''A121''
@@ -316,74 +315,74 @@ def test_shift_weight():
     )
 
 
-# def test_non_response_weight():
-#     log.info("Testing Calculation  2 --> non_response_weight")
-#     non_response_weight.non_response_weight_step(run_id)
-#
-#     survey_output(
-#         "NON_RESPONSE",
-#         "data/calculations/Q3_2017/non_response_weight/surveysubsample_nonresponse_q3.csv",
-#         [
-#             'SERIAL', 'NON_RESPONSE_WT'
-#         ]
-#     )
-#
-#     summary_output(
-#         "NON_RESPONSE",
-#         "data/calculations/Q3_2017/non_response_weight/nr_summary_q32017.csv",
-#         "PS_NON_RESPONSE",
-#         [
-#             'NR_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'MEAN_RESPS_SH_WT', 'COUNT_RESPS', 'PRIOR_SUM',
-#             'GROSS_RESP', 'GNR', 'MEAN_NR_WT'
-#         ]
-#     )
-#
-#
-# def test_minimums_weight():
-#     log.info("Testing Calculation  3 --> minimums_weight")
-#     minimums_weight.minimums_weight_step(run_id)
-#
-#     survey_output(
-#         "MINIMUMS",
-#         "data/calculations/Q3_2017/min_weight/surveysubsample_mins_q3.csv",
-#         [
-#             'SERIAL', 'MINS_WT'
-#         ]
-#     )
-#
-#     summary_output(
-#         "MINIMUMS",
-#         "data/calculations/Q3_2017/min_weight/mins_summary_q32017.csv",
-#         "PS_MINIMUMS",
-#         [
-#             'MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV',
-#             'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS',
-#             'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD'
-#         ]
-#     )
-#
-#
-# def test_traffic_weight():
-#     log.info("Testing Calculation  4 --> traffic_weight")
-#     traffic_weight.traffic_weight_step(run_id)
-#     survey_output(
-#         "TRAFFIC",
-#         "data/calculations/Q3_2017/traffic_weight/traffic_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'TRAFFIC_WT'
-#         ]
-#     )
-#
-#     summary_output(
-#         "TRAFFIC",
-#         "data/calculations/Q3_2017/traffic_weight/traffic_summary_q32017.csv",
-#         "PS_TRAFFIC",
-#         [
-#             'SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT'
-#         ]
-#     )
-#
-#
+def test_non_response_weight():
+    log.info("Testing Calculation  2 --> non_response_weight")
+    non_response_weight.non_response_weight_step(run_id)
+
+    survey_output(
+        "NON_RESPONSE",
+        "data/calculations/Q3_2017/non_response_weight/surveysubsample_nonresponse_q3.csv",
+        [
+            'SERIAL', 'NON_RESPONSE_WT'
+        ]
+    )
+
+    summary_output(
+        "NON_RESPONSE",
+        "data/calculations/Q3_2017/non_response_weight/nr_summary_q32017.csv",
+        "PS_NON_RESPONSE",
+        [
+            'NR_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'MEAN_RESPS_SH_WT', 'COUNT_RESPS', 'PRIOR_SUM',
+            'GROSS_RESP', 'GNR', 'MEAN_NR_WT'
+        ]
+    )
+
+
+def test_minimums_weight():
+    log.info("Testing Calculation  3 --> minimums_weight")
+    minimums_weight.minimums_weight_step(run_id)
+
+    survey_output(
+        "MINIMUMS",
+        "data/calculations/Q3_2017/min_weight/surveysubsample_mins_q3.csv",
+        [
+            'SERIAL', 'MINS_WT'
+        ]
+    )
+
+    summary_output(
+        "MINIMUMS",
+        "data/calculations/Q3_2017/min_weight/mins_summary_q32017.csv",
+        "PS_MINIMUMS",
+        [
+            'MINS_PORT_GRP_PV', 'ARRIVEDEPART', 'MINS_CTRY_GRP_PV', 'MINS_NAT_GRP_PV',
+            'MINS_CTRY_PORT_GRP_PV', 'MINS_CASES', 'FULLS_CASES', 'PRIOR_GROSS_MINS',
+            'PRIOR_GROSS_FULLS', 'PRIOR_GROSS_ALL', 'MINS_WT', 'POST_SUM', 'CASES_CARRIED_FWD'
+        ]
+    )
+
+
+def test_traffic_weight():
+    log.info("Testing Calculation  4 --> traffic_weight")
+    traffic_weight.traffic_weight_step(run_id)
+    survey_output(
+        "TRAFFIC",
+        "data/calculations/Q3_2017/traffic_weight/traffic_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'TRAFFIC_WT'
+        ]
+    )
+
+    summary_output(
+        "TRAFFIC",
+        "data/calculations/Q3_2017/traffic_weight/traffic_summary_q32017.csv",
+        "PS_TRAFFIC",
+        [
+            'SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'CASES', 'TRAFFICTOTAL', 'SUM_TRAFFIC_WT', 'TRAFFIC_WT'
+        ]
+    )
+
+
 # def test_unsampled_weight():
 #     log.info("Testing Calculation  5 --> unsampled_weight")
 #     unsampled_weight.unsampled_weight_step(run_id)
