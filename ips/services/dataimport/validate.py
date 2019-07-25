@@ -26,10 +26,6 @@ def validate_reference_data(reference_type: str, data: pd.DataFrame, user_month:
     data.columns = data.columns.str.upper()
     data.columns = data.columns.str.replace(' ', '')
 
-    if data.isnull().values.any() and reference_type.upper() in ["SHIFT", "NON_RESPONSE"]:
-        errors.add(f"{reference_type} has blank values")
-        return False
-
     if 'DATASOURCE' not in data.columns:
         errors.add(f"Invalid data uploaded.")
 
@@ -44,8 +40,6 @@ def validate_reference_data(reference_type: str, data: pd.DataFrame, user_month:
 
     if user_month is None or user_year is None:
         return True
-
-
 
     return _validate_date(data, user_month, user_year, errors)
 
@@ -96,9 +90,11 @@ def _validate_date(data, user_month, user_year, errors):
         for index, row in date_column.iteritems():
             year = row[-4:]
             month = row[-6:][:2]
+            if month[0] == '0':
+                month = month[1:]
 
-        if not valid_year() or not valid_month():
-            return False
+            if not valid_year() or not valid_month():
+                return False
     else:
         for index, row in data.iterrows():
             year = str(row['YEAR'])
@@ -108,9 +104,10 @@ def _validate_date(data, user_month, user_year, errors):
                 return False
 
     if user_month in valid_quarters:
-        qf = list(quarters_found).sort()
-        if qf != valid_quarters[user_month]:
-            errors.add(f"Data for the quarter, [{user_month}], does not contain all valid months")
-            return False
+        qf = list(quarters_found)
+        for x in qf:
+            if x not in valid_quarters[user_month]:
+                errors.add(f"Data for the quarter, [{user_month}], does not contain all valid months")
+                return False
 
     return True

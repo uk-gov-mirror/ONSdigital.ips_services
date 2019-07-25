@@ -3,7 +3,6 @@ import math
 import decimal
 import numpy as np
 import pandas as pd
-from ips.util.services_logging import log
 
 OUTPUT_TABLE_NAME = "SAS_TOWN_STAY_IMP"
 FLOW_COLUMN = "FLOW"
