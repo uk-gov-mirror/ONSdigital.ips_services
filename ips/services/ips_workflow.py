@@ -46,7 +46,7 @@ class IPSWorkflow:
 
     def __init__(self):
         log.info("IPSWorkflow starting")
-        # runs.clear_existing_status()
+        runs.clear_existing_status()
 
     def is_in_progress(self) -> bool:
         if self.in_progress is True:
