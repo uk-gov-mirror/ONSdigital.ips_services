@@ -257,13 +257,10 @@ if row[''UKPORT1_PV''] == 641:
 else:
     if not math.isnan(row[''OSPORT1_PV'']):
         row[''OSPORT2_PV''] = int(float(row[''OSPORT1_PV'']) / 1000.0)
-
 if row[''UKFOREIGN''] == 1 and math.isnan(row[''OSPORT1_PV'']):
     row[''OSPORT2_PV''] = row[''COUNTRYVISIT'']
-
 if row[''UKFOREIGN''] == 2 and math.isnan(row[''OSPORT1_PV'']):
     row[''OSPORT2_PV''] = row[''RESIDENCE'']
-
 if row[''OSPORT2_PV''] == 300:
     row[''OSPORT2_PV''] = 2500
 elif row[''OSPORT2_PV''] == 310:
@@ -279,12 +276,10 @@ elif row[''OSPORT2_PV''] == 160:
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 47, 'rail_cntry_grp_pv', 'rail_cntry_grp_pv', '
 railcountry = 0
-
 if row[''FLOW''] == 5:
     railcountry = row[''RESIDENCE'']
 elif row[''FLOW''] == 8:
     railcountry = row[''COUNTRYVISIT'']
-
 if (railcountry == 250):
     row[''RAIL_CNTRY_GRP_PV''] = 1
 elif railcountry in (208,578,752):
@@ -312,7 +307,6 @@ elif railcountry in (112,100,191,203,246,300,348,973,428,440,807,504,616,642,643
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 34, 'osport3_pv', 'osport3_pv', '
-
 if row[''OSPORT2_PV''] in (40,56,250,276,372,438,442,492,528,756,830,831,832,833,921,922,923,924,926,931):
     row[''OSPORT3_PV''] = 1
 elif row[''OSPORT2_PV''] in (208,233,234,246,248,352,428,440,578,744,752):
@@ -365,7 +359,6 @@ elif row[''OSPORT2_PV''] in (3000,3010):
     APDBAND = 1
 else:
     APDBAND = 2
-
 if row[''FLOW''] > 4:
     row[''APD_PV''] = 0
 elif APDBAND == 1:
@@ -401,7 +394,6 @@ INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DE
 VALUES ('TEMPLATE', 40, 'uk_os_pv', 'uk_os_pv', '
 if row[''FLOW''] in (1,5):
     row[''UK_OS_PV''] = 2
-
 if row[''FLOW''] in (4,8):
     row[''UK_OS_PV''] = 1');
 
@@ -409,10 +401,8 @@ INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DE
 VALUES ('TEMPLATE', 41, 'pur1_pv', 'pur1_pv', '
 if row[''DVPACKAGE''] in (1,2):
     row[''IND''] = 1
-
 if row[''DVPACKAGE''] == 9 or math.isnan(row[''DVPACKAGE'']):
     row[''IND''] = 0
-
 if row[''PURPOSE''] in (10,14,17,18):
     row[''PUR1_PV''] = 2
 elif row[''PURPOSE''] in (20,21,22):
@@ -425,7 +415,6 @@ elif row[''PURPOSE''] == 71:
     row[''PUR1_PV''] = 6
 else:
     row[''PUR1_PV''] = 7
-
 if row[''IND''] == 1 and row[''PUR1_PV''] == 2:
     row[''PUR1_PV''] = 1
 ');
@@ -442,7 +431,6 @@ elif math.isnan(row[''PURPOSE'']):
     row[''PUR2_PV''] = None
 else:
     row[''PUR2_PV''] = 5
-
 if row[''IND''] == 1 and row[''PUR2_PV''] == 2:
     row[''PUR2_PV''] = 1');
 
@@ -712,10 +700,8 @@ else:
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('TEMPLATE', 32, 'osport1_pv', 'osport1_pv', '
 row[''OSPORT1_PV''] = row[''DVPORTCODE'']
-
 if not math.isnan(row[''CHANGECODE'']):
     row[''OSPORT1_PV''] = row[''CHANGECODE'']
-
 if row[''OSPORT1_PV''] in (999998,999999):
     row[''OSPORT1_PV''] = float(''NaN'')
 ');
@@ -772,7 +758,6 @@ elif row[''FLOW''] == 5:
         row[''RAIL_EXERCISE_PV''] = 0
     elif row[''RAIL_CNTRY_GRP_PV''] == 12:
         row[''RAIL_EXERCISE_PV''] = 23
-
 row[''RAIL_EXERCISE_PV''] = row[''RAIL_EXERCISE_PV''] * 1000');
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
@@ -914,16 +899,13 @@ elif row[''PORTROUTE''] == 921:
     row[''SAMP_PORT_GRP_PV''] = ''E921''
 elif row[''PORTROUTE''] == 951:
     row[''SAMP_PORT_GRP_PV''] = ''E951''
-
 Irish = 0
 IoM = 0
 ChannelI = 0
 dvpc = 0
-
 if dataset == ''survey'':
     if not math.isnan(row[''DVPORTCODE'']):
         dvpc = int(row[''DVPORTCODE''] / 1000)
-
     if dvpc == 372:
         Irish = 1
     elif row[''DVPORTCODE''] == 999999 or math.isnan(row[''DVPORTCODE'']):
@@ -931,7 +913,6 @@ if dataset == ''survey'':
             Irish = 1
         elif ((row[''FLOW''] in (2,4)) and (row[''COUNTRYVISIT''] == 372)):
             Irish = 1
-
     if dvpc == 833:
         IoM = 1
     elif row[''DVPORTCODE''] == 999999 or math.isnan(row[''DVPORTCODE'']):
@@ -939,7 +920,6 @@ if dataset == ''survey'':
             IoM = 1
         elif ((row[''FLOW''] in (2,4)) and (row[''COUNTRYVISIT''] == 833)):
             IoM = 1
-
     if dvpc in (831, 832, 931):
         ChannelI = 1
     elif row[''DVPORTCODE''] == 999999 or math.isnan(row[''DVPORTCODE'']):
@@ -954,7 +934,6 @@ elif dataset == ''traffic'':
         ChannelI = 1
     elif ( row[''PORTROUTE''] == 260) or (row[''PORTROUTE''] == 360):
         IoM = 1
-
 if (Irish) and row[''PORTROUTE''] in (111, 121, 131, 141, 132, 142, 119, 161, 162, 163, 164, 165, 151, 152, 171, 173, 174, 175):
     row[''SAMP_PORT_GRP_PV''] = ''AHE''
 elif (Irish) and row[''PORTROUTE''] in (181, 191, 192, 189, 199):
@@ -975,34 +954,26 @@ elif (IoM) and (row[''PORTROUTE''] >= 100) and (row[''PORTROUTE''] < 300):
     row[''SAMP_PORT_GRP_PV''] = ''MAM''
 elif (IoM) and (row[''PORTROUTE''] >= 300) and (row[''PORTROUTE''] < 600):
     row[''SAMP_PORT_GRP_PV''] = ''RAM''
-
 if row[''SAMP_PORT_GRP_PV''] == ''HGS'':
     row[''SAMP_PORT_GRP_PV''] = ''HBN''
-
 if row[''SAMP_PORT_GRP_PV''] == ''EGS'':
     row[''SAMP_PORT_GRP_PV''] = ''HBN''
-
 if row[''SAMP_PORT_GRP_PV''] == ''MAM'':
     row[''SAMP_PORT_GRP_PV''] = ''MAC''
-
 if row[''SAMP_PORT_GRP_PV''] == ''RAM'':
     row[''SAMP_PORT_GRP_PV''] = ''RAC''
-
 if row[''SAMP_PORT_GRP_PV''] == ''A331'' and (row[''ARRIVEDEPART''] == 1):
     row[''SAMP_PORT_GRP_PV''] = ''A391''
 if row[''SAMP_PORT_GRP_PV''] == ''A331'' and (row[''ARRIVEDEPART''] == 2):
     row[''SAMP_PORT_GRP_PV''] = ''A391''
-
 if row[''SAMP_PORT_GRP_PV''] == ''A401'' and (row[''ARRIVEDEPART''] == 1):
     row[''SAMP_PORT_GRP_PV''] = ''A441''
 if row[''SAMP_PORT_GRP_PV''] == ''A401'' and (row[''ARRIVEDEPART''] == 2):
     row[''SAMP_PORT_GRP_PV''] = ''A441''
-
 if row[''SAMP_PORT_GRP_PV''] == ''SLR'' and (row[''ARRIVEDEPART''] == 1):
     row[''SAMP_PORT_GRP_PV''] = ''SCF''
 if row[''SAMP_PORT_GRP_PV''] == ''SLR'' and (row[''ARRIVEDEPART''] == 2):
     row[''SAMP_PORT_GRP_PV''] = ''SCF''
-
 if row[''SAMP_PORT_GRP_PV''] == ''SSE'' and (row[''ARRIVEDEPART''] == 1):
     row[''SAMP_PORT_GRP_PV''] = ''SNE''
 ');
@@ -1081,16 +1052,13 @@ elif row[''PORTROUTE''] == 921:
     row[''UNSAMP_PORT_GRP_PV''] = ''E921''
 elif row[''PORTROUTE''] == 951:
     row[''UNSAMP_PORT_GRP_PV''] = ''E951''
-
 Irish = 0
 IoM = 0
 ChannelI = 0
 dvpc = 0
-
 if dataset == ''survey'':
     if not math.isnan(row[''DVPORTCODE'']):
         dvpc = int(row[''DVPORTCODE''] / 1000)
-
     if dvpc == 372:
         Irish = 1
     elif (row[''DVPORTCODE''] == 999999) or math.isnan(row[''DVPORTCODE'']):
@@ -1098,7 +1066,6 @@ if dataset == ''survey'':
             Irish = 1
         elif ((row[''FLOW''] in (2,4)) and (row[''COUNTRYVISIT''] == 372)):
             Irish = 1
-
     if dvpc == 833:
         IoM = 1
     elif (row[''DVPORTCODE''] == 999999) or math.isnan(row[''DVPORTCODE'']):
@@ -1106,16 +1073,13 @@ if dataset == ''survey'':
             IoM = 1
         elif ((row[''FLOW''] in (2,4)) and (row[''COUNTRYVISIT''] == 833)):
             IoM = 1
-
     if dvpc in (831, 832, 931):
         ChannelI = 1
-
     elif (row[''DVPORTCODE''] == 999999) or math.isnan(row[''DVPORTCODE'']):
         if ((row[''FLOW''] in (1,3)) and (row[''RESIDENCE''] in (831, 832, 931))):
             ChannelI = 1
         elif ((row[''FLOW''] in (2,4)) and (row[''COUNTRYVISIT''] in (831, 832, 931))):
             ChannelI = 1
-
     if (Irish) and row[''PORTROUTE''] in (111, 121, 131, 141, 132, 142, 119, 161, 162, 163, 164, 165, 151, 152):
         row[''UNSAMP_PORT_GRP_PV''] = ''AHE''
     elif (Irish) and row[''PORTROUTE''] in (181, 191, 192, 189, 199):
@@ -1278,7 +1242,6 @@ elif dataset == ''unsampled'':
     if not math.isnan(row[''REGION'']):
         row[''REGION''] = int(row[''REGION''])
         row[''UNSAMP_REGION_GRP_PV''] = row[''REGION'']
-
 if row[''UNSAMP_PORT_GRP_PV''] == ''A201'' and row[''UNSAMP_REGION_GRP_PV''] == 7.0 and row[''ARRIVEDEPART''] == 2:
     row[''UNSAMP_PORT_GRP_PV''] = ''A191''
 if row[''UNSAMP_PORT_GRP_PV''] == ''HGS'':
@@ -1287,14 +1250,12 @@ if row[''UNSAMP_PORT_GRP_PV''] == ''E921'':
     row[''UNSAMP_PORT_GRP_PV''] = ''E911''
 if row[''UNSAMP_PORT_GRP_PV''] == ''E951'':
     row[''UNSAMP_PORT_GRP_PV''] = ''E911''
-
 if row[''UNSAMP_PORT_GRP_PV''] == ''A181'' and row[''UNSAMP_REGION_GRP_PV''] == 6.0 and row[''ARRIVEDEPART''] == 1:
     row[''UNSAMP_PORT_GRP_PV''] = ''A151''
 if row[''UNSAMP_PORT_GRP_PV''] == ''A211'' and row[''UNSAMP_REGION_GRP_PV''] == 4.0 and row[''ARRIVEDEPART''] == 1:
     row[''UNSAMP_PORT_GRP_PV''] = ''A221''
 if row[''UNSAMP_PORT_GRP_PV''] == ''A241'' and row[''UNSAMP_REGION_GRP_PV''] == 8.0 and row[''ARRIVEDEPART''] == 1:
     row[''UNSAMP_PORT_GRP_PV''] = ''A201''
-
 if row[''UNSAMP_PORT_GRP_PV''] == ''RSS'' and row[''ARRIVEDEPART''] == 1:
     row[''UNSAMP_PORT_GRP_PV''] = ''HBN''
 if row[''UNSAMP_PORT_GRP_PV''] == ''RSS'' and row[''ARRIVEDEPART''] == 2:
@@ -1306,15 +1267,11 @@ VALUES ('TEMPLATE', 1, 'weekday_end_pv', 'weekday_end_pv', '
 if dataset == ''survey'':
     weekday = float(''nan'')
     from datetime import datetime
-
     day = int(row[''INTDATE''][:2])
     month = int(row[''INTDATE''][2:4])
     year = int(row[''INTDATE''][4:8])
-
     d = datetime(year,month,day)
-
     dayweek = (d.isoweekday() + 1) % 7
-
     if (row[''PORTROUTE''] == 811):
         if (dayweek >= 2 and dayweek <= 5):
             weekday = 1
@@ -1325,7 +1282,6 @@ if dataset == ''survey'':
             weekday = 1
         else:
             weekday = 2
-
     if (row[''PORTROUTE''] == 811):
         row[''WEEKDAY_END_PV''] = weekday
     elif (row[''PORTROUTE''] >= 600):
@@ -1454,7 +1410,6 @@ elif (row[''KIDAGE''] >= 2) and (row[''KIDAGE''] <= 15):
     row[''FAGE_PV''] = 2
 else:
     row[''FAGE_PV''] = 6
-
 if (row[''AGE''] > 1) or math.isnan(row[''AGE'']):
     row[''FAGE_PV''] = 6
 elif (row[''AGE''] < 2) and math.isnan(row[''KIDAGE'']):
