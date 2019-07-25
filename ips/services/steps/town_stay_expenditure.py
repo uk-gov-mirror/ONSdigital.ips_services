@@ -4,7 +4,6 @@ from ips.persistence.persistence import insert_from_dataframe
 from ips.services.calculations import calculate_town_and_stay_expenditure
 from ips.util import process_variables
 from ips.util.services_configuration import ServicesConfiguration
-from ips.util.services_logging import log
 
 
 def town_stay_expenditure_imputation_step(run_id):

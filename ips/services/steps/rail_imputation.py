@@ -44,7 +44,6 @@ def rail_imputation_step(run_id):
                                                                   var_final_weight='FINAL_WT',
                                                                   minimum_count_threshold=30,
                                                                   run_id=run_id)
-
     # Insert data to SQL
     insert_from_dataframe(config["temp_table"])(survey_data_out)
 

@@ -13,7 +13,7 @@ logging:
     console_level: ${LOG_CONSOLE_LEVEL}
 
 rounding:
-  sas_rounding: True
+  sas_rounding: False
 
 spend_work_around:
   change_pur2_pv: False

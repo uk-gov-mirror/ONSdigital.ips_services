@@ -317,25 +317,24 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     Date         : Apr 2018
     Purpose      : Performs calculations to determine the unsampled weight values
                    of the imported dataset.
-    Parameters   : df_surveydata - the IPS df_surveydata records for the period                                
+    Parameters   : df_surveydata - the IPS df_surveydata records for the period
                    var_serialNum - variable holding the record serial number (UID)
-                   var_shiftWeight - variable holding the shift weight field name                
-                   var_NRWeight - variable holding the non-response weight field name        
-                   var_minWeight - variable holding the minimum weight field name            
-                   var_trafficWeight - variable holding the traffic weight field name        
+                   var_shiftWeight - variable holding the shift weight field name
+                   var_NRWeight - variable holding the non-response weight field name
+                   var_minWeight - variable holding the minimum weight field name
+                   var_trafficWeight - variable holding the traffic weight field name
                    df_ustotals - Population totals file
                    minCountThresh - The minimum cell count threshold
     Returns      : df_summary(dataframe containing random sample of rows)
                    df_output(dataframe containing serial number and calculated unsampled weight)
     Requirements : do_ips_ges_weighting()
     Dependencies : NA
-
     NOTES        : Currently GES weighing has not been written. Therefore the current solution
                    does not generate the output data frame. Once the function is written and we
                    are aware of what is being returned from the GES weighting function as well
-                   as what is actually needed to be *sent* passed to the function we will rewrite the 
-                   function call and implement its return functionality 
-                   be rewriting the 
+                   as what is actually needed to be *sent* passed to the function we will rewrite the
+                   function call and implement its return functionality
+                   be rewriting the
     """
 
     ooh_design_weight_column = 'OOHDESIGNWEIGHT'
@@ -353,14 +352,14 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     # Re-index the data frame
     df_ustotals.index = range(df_ustotals.shape[0])
 
-    # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.  
+    # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.
     pop_totals = df_ustotals.fillna('NOTHING')
 
     # Summarise the uplift totals over the strata
     pop_totals = pop_totals.groupby(OOH_STRATA)[TOTALS_COLUMN].agg([(UPLIFT_COLUMN, 'sum')])
     pop_totals.reset_index(inplace=True)
 
-    # Replace the previously added 'NOTHING' values with their original blank values  
+    # Replace the previously added 'NOTHING' values with their original blank values
     pop_totals = pop_totals.replace('NOTHING', np.NaN)
 
     # Summarise the previous totals over the strata
@@ -369,12 +368,12 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
 
     prev_totals = df_surveydata.loc[df_surveydata[ooh_design_weight_column] > 0]
 
-    # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.  
+    # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.
     prev_totals = prev_totals.fillna('NOTHING')
     prev_totals = prev_totals.groupby(OOH_STRATA)[ooh_design_weight_column].agg([(PREVIOUS_TOTAL_COLUMN, 'sum')])
     prev_totals.reset_index(inplace=True)
 
-    # Replace the previously added 'NOTHING' values with their original blank values  
+    # Replace the previously added 'NOTHING' values with their original blank values
     prev_totals = prev_totals.replace('NOTHING', np.NaN)
 
     pop_totals = pop_totals.sort_values(OOH_STRATA)
@@ -413,13 +412,13 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     # Generate POSTWEIGHT values from the UNSAMP_TRAFFIC_WT and ooh_design_weight_column values
     df_survey[POST_WEIGHT_COLUMN] = df_survey[out_of_hours_weight] * df_survey[ooh_design_weight_column]
 
-    # Sort the data ready for summarising    
+    # Sort the data ready for summarising
     df_survey = df_survey.sort_values(OOH_STRATA)
 
     # Create the summary data frame from the sample with ooh_design_weight_column not equal to zero
     df_summary = df_survey[df_survey[ooh_design_weight_column] != 0]
 
-    # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.  
+    # Replace blank values with 'NOTHING' as python drops blanks during the aggregation process.
     df_summary = df_summary.fillna('NOTHING')
 
     # Generate a dataframe containing the count of each evaluated group
@@ -476,5 +475,3 @@ def do_ips_unsampled_weight_calculation(df_surveydata: pd.DataFrame, serial_num:
     df_output['UNSAMP_TRAFFIC_WT'] = df_output['UNSAMP_TRAFFIC_WT'].round(3)
 
     return df_output, df_summary
-
-

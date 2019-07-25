@@ -7,7 +7,7 @@ from pkg_resources import resource_filename
 
 from ips.util.services_logging import log
 import ips.persistence.traffic_weight as db
-from ips.services.calculations import log_errors,log_warnings, THRESHOLD_CAP
+from ips.services.calculations import log_warnings, THRESHOLD_CAP
 
 SERIAL = 'SERIAL'
 TRAFFIC_WT = 'TRAFFIC_WT'
@@ -97,7 +97,7 @@ def r_survey_input(df_survey_input):
 
 
 # Prepare population totals to create AUX lookup variables
-def r_population_input(df_survey_input, df_tr_totals, run_id):
+def r_population_input(df_survey_input, df_tr_totals):
     """
     Author       : David Powell / edits by Nassir Mohammad
     Date         : 07/06/2018
@@ -143,34 +143,39 @@ def r_population_input(df_survey_input, df_tr_totals, run_id):
 
     # Error check 1
     df_sum_check_1 = df_merge_totals[
-        df_merge_totals['TRAFDESIGNWEIGHT'] > 0 & df_merge_totals['TRAFDESIGNWEIGHT'].notna()]
-    df_sum_check_2 = pd.concat([df_sum_check_1[df_sum_check_1['TRAFFICTOTAL'].isna()],
-                                df_sum_check_1[df_sum_check_1['TRAFFICTOTAL'] < 0]])
+        df_merge_totals['TRAFDESIGNWEIGHT'] > 0 & df_merge_totals['TRAFDESIGNWEIGHT'].notnull()]
+    df_sum_check_2 = df_sum_check_1[df_sum_check_1['TRAFFICTOTAL'] < 0 | df_sum_check_1['TRAFFICTOTAL'].isnull()]
 
     if len(df_sum_check_2):
+        threshold_string_cap = 4000
         error_str = "No traffic total but sampled records present for"
+
+        threshold_string = ""
         for index, record in df_sum_check_2.iterrows():
-            threshold_string = \
+            threshold_string += \
                 error_str + " " + 'SAMP_PORT_GRP_PV' + " = " + str(record[0]) \
                 + " " + 'ARRIVEDEPART' + " = " + str(record[1]) + "\n"
-            log_errors(threshold_string)(pd.DataFrame(), run_id, 4)
-        raise ValueError('SAMP_PORT_GRP_PV Failed!')
 
+        threshold_string_capped = threshold_string[:threshold_string_cap]
+        log.error(threshold_string_capped)
 
     # Error check 2
-    df_sum_check_1 = df_merge_totals[df_merge_totals['TRAFFICTOTAL'] > 0 & df_merge_totals['TRAFFICTOTAL'].notna()]
-    df_sum_check_2 = pd.concat([df_sum_check_1[df_sum_check_1['TRAFDESIGNWEIGHT'].isna()],
-                               df_sum_check_1[df_sum_check_1['TRAFDESIGNWEIGHT'] < 0]])
-    print(df_sum_check_2)
+    df_sum_check_1 = df_merge_totals[df_merge_totals['TRAFFICTOTAL'] > 0 & df_merge_totals['TRAFFICTOTAL'].notnull()]
+    df_sum_check_2 = df_sum_check_1[
+        df_sum_check_1['TRAFDESIGNWEIGHT'] < 0 | df_sum_check_1['TRAFDESIGNWEIGHT'].isnull()]
+
     if len(df_sum_check_2):
+        threshold_string_cap = 4000
         error_str = "No records to match traffic against for"
 
+        threshold_string = ""
         for index, record in df_sum_check_2.iterrows():
-            threshold_string = \
+            threshold_string += \
                 error_str + " " + 'SAMP_PORT_GRP_PV' + " = " + str(record[0]) \
                 + " " + 'ARRIVEDEPART' + " = " + str(record[1]) + "\n"
-            log_errors(threshold_string)(pd.DataFrame(), run_id, 4)
-        raise ValueError('SAMP_PORT_GRP_PV Failed!')
+
+        threshold_string_capped = threshold_string[:threshold_string_cap]
+        log.error(threshold_string_capped)
 
     # Sort input values
     df_pop_totals = df_tr_totals.sort_values(sort1)
@@ -369,7 +374,6 @@ def generate_ips_tw_summary(df_survey, df_output_merge_final,
         df_sum_check = df_sum_check.head(THRESHOLD_CAP)
         log_warnings("Respondent count below minimum threshold for")(df_sum_check, 2, run_id, 4)
 
-
     return df_summary_merge_sum_traftot
 
 
@@ -385,7 +389,7 @@ def do_ips_trafweight_calculation_with_r(survey_data, trtotals, run_id):
     # inserts into survey_traffic_aux a.k.a. SURVEY_TRAFFIC_AUX_TABLE
     r_survey_input(survey_data)
     # inserts into POP_PROWVEC_TABLE
-    r_population_input(survey_data, trtotals, run_id)
+    r_population_input(survey_data, trtotals)
 
     run_r_ges_script()
 

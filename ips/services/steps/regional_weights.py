@@ -4,7 +4,7 @@ from ips.persistence.persistence import insert_from_dataframe
 from ips.services.calculations import calculate_regional_weights
 from ips.util import process_variables
 from ips.util.services_configuration import ServicesConfiguration
-from ips.util.services_logging import log
+import ips.services.dataimport.schemas.sas_regional_imp as schema
 
 
 def regional_weights_step(run_id):
@@ -48,7 +48,6 @@ def regional_weights_step(run_id):
     )
 
     # Insert data to SQL
-    import ips.services.dataimport.schemas.sas_regional_imp as schema
     insert_from_dataframe(config["temp_table"], dtype=schema.get_schema())(survey_data_out)
 
     # Update Survey Data With Regional Weights Results
