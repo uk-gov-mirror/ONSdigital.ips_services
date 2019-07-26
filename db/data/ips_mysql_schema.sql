@@ -1029,14 +1029,12 @@ elif row[''PORTROUTE''] in (211, 213, 219):
     row[''SAMP_PORT_GRP_PV''] = ''A211''
 elif row[''PORTROUTE''] in (221, 223):
     row[''SAMP_PORT_GRP_PV''] = ''A221''
-elif row[''PORTROUTE''] in (231, 232, 234):
+elif row[''PORTROUTE''] in (231, 233, 234):
     row[''SAMP_PORT_GRP_PV''] = ''A231''
 elif row[''PORTROUTE''] in (241, 243, 249):
     row[''SAMP_PORT_GRP_PV''] = ''A241''
-elif row[''PORTROUTE''] in (311, 313, 319):
+elif row[''PORTROUTE''] in (311, 321, 313, 319):
     row[''SAMP_PORT_GRP_PV''] = ''A311''
-elif row[''PORTROUTE''] == 321:
-    row[''SAMP_PORT_GRP_PV''] = ''A321''
 elif row[''PORTROUTE''] == 331:
     row[''SAMP_PORT_GRP_PV''] = ''A331''
 elif row[''PORTROUTE''] == 351:
@@ -1168,24 +1166,6 @@ if row[''SAMP_PORT_GRP_PV''] == ''MAM'':
 
 if row[''SAMP_PORT_GRP_PV''] == ''RAM'':
     row[''SAMP_PORT_GRP_PV''] = ''RAC''
-
-if row[''SAMP_PORT_GRP_PV''] == ''A331'' and (row[''ARRIVEDEPART''] == 1):
-    row[''SAMP_PORT_GRP_PV''] = ''A391''
-if row[''SAMP_PORT_GRP_PV''] == ''A331'' and (row[''ARRIVEDEPART''] == 2):
-    row[''SAMP_PORT_GRP_PV''] = ''A391''
-
-if row[''SAMP_PORT_GRP_PV''] == ''A401'' and (row[''ARRIVEDEPART''] == 1):
-    row[''SAMP_PORT_GRP_PV''] = ''A441''
-if row[''SAMP_PORT_GRP_PV''] == ''A401'' and (row[''ARRIVEDEPART''] == 2):
-    row[''SAMP_PORT_GRP_PV''] = ''A441''
-
-if row[''SAMP_PORT_GRP_PV''] == ''SLR'' and (row[''ARRIVEDEPART''] == 1):
-    row[''SAMP_PORT_GRP_PV''] = ''SCF''
-if row[''SAMP_PORT_GRP_PV''] == ''SLR'' and (row[''ARRIVEDEPART''] == 2):
-    row[''SAMP_PORT_GRP_PV''] = ''SCF''
-
-if row[''SAMP_PORT_GRP_PV''] == ''SSE'' and (row[''ARRIVEDEPART''] == 1):
-    row[''SAMP_PORT_GRP_PV''] = ''SNE''
 
 if row[''SAMP_PORT_GRP_PV''] == ''LHS'':
     row[''SAMP_PORT_GRP_PV''] = ''HBN''
