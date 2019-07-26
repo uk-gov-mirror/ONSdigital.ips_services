@@ -15,35 +15,20 @@ ARRIVEDEPART = 'ARRIVEDEPART'
 T1 = "T1"
 
 STRATA = ['SAMP_PORT_GRP_PV', 'ARRIVEDEPART']
-MAX_RULE_LENGTH = '512'
 MODEL_GROUP = 'C_GROUP'
-GES_BOUND_TYPE = 'G'
-GES_UPPER_BOUND = ''
-GES_LOWER_BOUND = '1.0'
-GES_MAX_DIFFERENCE = '1E-8'
-GES_MAX_ITERATIONS = '50'
-GES_MAX_DISTANCE = '1E-8'
 COUNT_COLUMN = 'CASES'
 TRAFFIC_TOTAL_COLUMN = 'TRAFFICTOTAL'
-POST_SUM_COLUMN = 'SUM_TRAFFIC_WT'.upper()
+POST_SUM_COLUMN = 'SUM_TRAFFIC_WT'
 
 TRAFFIC_DESIGN_WEIGHT_COLUMN = 'TRAFDESIGNWEIGHT'
 TRAFDESIGNWEIGHT = 'TRAF_DESIGN_WEIGHT'
 
 POST_WEIGHT_COLUMN = 'POSTWEIGHT'
 
-POP_TOTALS = "SAS_TRAFFIC_DATA"
-OUTPUT_TABLE_NAME = 'SAS_TRAFFIC_WT'
-SUMMARY_TABLE_NAME = 'SAS_PS_TRAFFIC'
-SURVEY_TRAFFIC_AUX_TABLE = "SURVEY_TRAFFIC_AUX"
-POP_ROWVEC_TABLE = 'POPROWVEC_TRAFFIC'
-R_TRAFFIC_TABLE = "R_TRAFFIC"
-
-var_serialNum = 'serial'.upper()
-var_shiftWeight = 'shift_wt'.upper()
-var_NRWeight = 'non_response_wt'.upper()
-var_minWeight = 'mins_wt'.upper()
-GWeightVar = 'traffic_wt'.upper()
+var_shiftWeight = 'SHIFT_WT'
+var_NRWeight = 'NON_RESPONSE_WT'
+var_minWeight = 'MINS_WT'
+GWeightVar = 'TRAFFIC_WT'
 minCountThresh = 30
 
 SAMP_PORT_GRP_PV = 'SAMP_PORT_GRP_PV'
@@ -280,25 +265,10 @@ def generate_ips_tw_summary(df_survey, df_output_merge_final,
     Author       : Nassir Mohammad
     Date         : 08 Mar 2018
     Purpose      : Calculates IPS Traffic Weight summary
-    Parameters   : Survey = survey data set
-                   var_serialNum = Variable holding the name of the serial number field
-                   var_trafficWeight = Variable holding the name of the traffic wght field
-                   var_priorWeight = Variable holding the name of the prior (design) weight
-                   TrafficTotals = Traffic (population) totals dataset
-                   minCountThresh = The minimum cell count threshold
-    Returns      : dataframe - df_summary_merge_sum_traftot
-    Requirements : TODO
-    Dependencies : TODO
     """
 
-    # #####################################################
-    #
-    # calculate the post weight
-    # add the traffic weight to the survey data
-    #
-    # #####################################################
-
-    cols_to_keep = ['serial'.upper(), 'SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'TRAFFIC_WT', 'SHIFT_WT', 'NON_RESPONSE_WT',
+    # calculate the post weight add the traffic weight to the survey data
+    cols_to_keep = ['SERIAL', 'SAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'TRAFFIC_WT', 'SHIFT_WT', 'NON_RESPONSE_WT',
                     'MINS_WT', 'TRAFDESIGNWEIGHT']
     df_survey = df_survey[cols_to_keep]
 
@@ -431,15 +401,11 @@ def do_ips_trafweight_calculation_with_r(survey_data, trtotals, run_id):
     df_summary_merge_sum_traftot = generate_ips_tw_summary(
         survey_data,
         df_ret_out_final_not_rounded,
-        var_serialNum,
+        SERIAL,
         GWeightVar,
         df_pop_totals,
         minCountThresh,
         run_id=run_id
     )
-
-    # update the output SQL tables
-    # db.save_sas_traffic_wt(ret_out_final)
-    # db.save_summary(df_summary_merge_sum_traftot)
 
     return ret_out_final, df_summary_merge_sum_traftot
