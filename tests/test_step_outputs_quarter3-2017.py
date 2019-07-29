@@ -93,7 +93,7 @@ def setup_pv():
 def update_q3_pvs():
     sql = f"""
     DELETE FROM PROCESS_VARIABLE_PY
-    WHERE PV_NAME in ('samp_port_grp_pv', 'unsamp_port_grp_pv')
+    WHERE PV_NAME in ('samp_port_grp_pv', 'unsamp_port_grp_pv', 'unsamp_region_grp_pv')
     AND RUN_ID = '{run_id}'
     """
 
@@ -214,8 +214,6 @@ def test_unsampled_weight():
         [
             'SERIAL', 'UNSAMP_TRAFFIC_WT'
         ],
-        expected_failure=True,
-        cols_to_fail=['UNSAMP_TRAFFIC_WT']
     )
 
     summary_output(
@@ -454,7 +452,7 @@ def assert_frame_not_equal(results, expected, columns, test_name):
         except AssertionError:
             # frames are not equal
             log.info(f"{col} does not match SAS output:  Expected behaviour")
-            return True
+            # return True
         else:
             # frames are equal
             log.warning(f"{col} matches SAS output: Unexpected behaviour.")
