@@ -93,7 +93,7 @@ def setup_pv():
 def update_q3_pvs():
     sql = f"""
     DELETE FROM PROCESS_VARIABLE_PY
-    WHERE PV_NAME = 'samp_port_grp_pv'
+    WHERE PV_NAME in ('samp_port_grp_pv', 'unsamp_port_grp_pv')
     AND RUN_ID = '{run_id}'
     """
 
@@ -201,28 +201,28 @@ def test_traffic_weight():
     )
 
 
-# def test_unsampled_weight():
-#     log.info("Testing Calculation  5 --> unsampled_weight")
-#     unsampled_weight.unsampled_weight_step(run_id)
-#     survey_output(
-#         "UNSAMPLED",
-#         "data/calculations/Q3_2017/unsampled_weight/unsamp_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'UNSAMP_TRAFFIC_WT'
-#         ]
-#     )
-#
-#     summary_output(
-#         "UNSAMPLED",
-#         "data/calculations/Q3_2017/unsampled_weight/unsamp_summary_q32017.csv",
-#         "PS_UNSAMPLED_OOH",
-#         [
-#             'UNSAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'UNSAMP_REGION_GRP_PV', 'CASES', 'SUM_PRIOR_WT',
-#             'SUM_UNSAMP_TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT'
-#         ]
-#     )
-#
-#
+def test_unsampled_weight():
+    log.info("Testing Calculation  5 --> unsampled_weight")
+    unsampled_weight.unsampled_weight_step(run_id)
+    survey_output(
+        "UNSAMPLED",
+        "data/calculations/Q3_2017/unsampled_weight/unsamp_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'UNSAMP_TRAFFIC_WT'
+        ]
+    )
+
+    summary_output(
+        "UNSAMPLED",
+        "data/calculations/Q3_2017/unsampled_weight/unsamp_summary_q32017.csv",
+        "PS_UNSAMPLED_OOH",
+        [
+            'UNSAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'UNSAMP_REGION_GRP_PV', 'CASES', 'SUM_PRIOR_WT',
+            'SUM_UNSAMP_TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT'
+        ]
+    )
+
+
 # def test_imbalance_weight():
 #     log.info("Testing Calculation  6 --> imbalance_weight")
 #     imbalance_weight.imbalance_weight_step(run_id)
@@ -455,7 +455,3 @@ def assert_frame_not_equal(results, expected, columns, test_name):
         else:
             # frames are equal
             log.warning(f"{col} matches SAS output: Unexpected behaviour.")
-
-
-if __name__ == '__main__':
-    setup_pv()
