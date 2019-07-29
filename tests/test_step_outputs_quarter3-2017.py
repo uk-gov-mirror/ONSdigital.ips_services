@@ -245,34 +245,34 @@ def test_imbalance_weight():
     )
 
 
-# def test_final_weight():
-#     log.info("Testing Calculation  7 --> final_weight")
-#     final_weight.final_weight_step(run_id)
-#     survey_output(
-#         "FINAL",
-#         "data/calculations/Q3_2017/final_weight/final_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'FINAL_WT'
-#         ]
-#     )
-#
-#     summary_output(
-#         "FINAL",
-#         "data/calculations/Q3_2017/final_weight/final_summary_q32017.csv",
-#         "PS_IMBALANCE",
-#         [
-#             'SERIAL', 'SHIFT_WT', 'NON_RESPONSE_WT', 'MINS_WT', 'TRAFFIC_WT',
-#             'UNSAMP_TRAFFIC_WT', 'IMBAL_WT', 'FINAL_WT'
-#         ]
-#     )
-#
-#
+def test_final_weight():
+    log.info("Testing Calculation  7 --> final_weight")
+    final_weight.final_weight_step(run_id)
+    survey_output(
+        "FINAL",
+        "data/calculations/Q3_2017/final_weight/final_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'FINAL_WT'
+        ]
+    )
+
+    summary_output(
+        "FINAL",
+        "data/calculations/Q3_2017/final_weight/final_summary_q32017.csv",
+        "PS_IMBALANCE",
+        [
+            'SERIAL', 'SHIFT_WT', 'NON_RESPONSE_WT', 'MINS_WT', 'TRAFFIC_WT',
+            'UNSAMP_TRAFFIC_WT', 'IMBAL_WT', 'FINAL_WT'
+        ]
+    )
+
+
 # def test_stay_imputation():
 #     log.info("Testing Calculation  8 --> stay_imputation")
 #     stay_imputation.stay_imputation_step(run_id)
 #     survey_output(
 #         "STAY",
-#         "data/calculations/Q3_2017/fares/stay_surveysubsample_2017.csv",
+#         "data/calculations/Q3_2017/stay/stay_surveysubsample_2017.csv",
 #         [
 #             'SERIAL', 'STAY', 'STAYK'
 #         ]
@@ -282,22 +282,38 @@ def test_imbalance_weight():
 # def test_fares_imputation():
 #     log.info("Testing Calculation  9 --> fares_imputation")
 #     fares_imputation.fares_imputation_step(run_id)
+#     expected_failure = False
+#
+#     # Assert failure when using Python's default bankers rounding. For further information see
+#     # https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+#     conventional_rounding = ServicesConfiguration().sas_rounding()
+#     if not conventional_rounding:
+#         expected_failure = True
+#
 #     survey_output(
 #         "FARES",
 #         "data/calculations/Q3_2017/fares/fares_surveysubsample_2017.csv",
 #         [
 #              'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
-#         ]
+#         ],
+#         expected_failure=expected_failure,
+#         cols_to_fail=['FARE', 'SPEND']
 #     )
 #
 #
 # def test_spend_imputation():
 #     log.info("Testing Calculation 10 --> spend_imputation")
 #     spend_imputation.spend_imputation_step(run_id)
+#     expected_failure = False
 #
-#     # Assert 'PUR2_PV', 'SPEND' and 'SPENDK' columns are not equal. For further information see
-#     # https://collaborate2.ons.gov.uk/confluence/display/QSS/Spend+Imputation+Testing+Configuration
-#     status = ServicesConfiguration().sas_pur2_pv()
+#     # Assert failure when using the refactored PUR2_PV or Python's default bankers rounding. For further information see
+#     # https://collaborate2.ons.gov.uk/confluence/display/QSS/Spend+Imputation+Testing+Configuration and
+#     # https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+#     refactor_pur2_pv = ServicesConfiguration().sas_pur2_pv()
+#     conventional_rounding = ServicesConfiguration().sas_rounding()
+#
+#     if not refactor_pur2_pv or not conventional_rounding:
+#         expected_failure = True
 #
 #     survey_output(
 #         "SPEND",
@@ -306,32 +322,30 @@ def test_imbalance_weight():
 #             'SERIAL', 'SPEND_IMP_FLAG_PV', 'SPEND_IMP_ELIGIBLE_PV', 'UK_OS_PV', 'PUR1_PV', 'PUR2_PV',
 #             'PUR3_PV', 'DUR1_PV', 'DUR2_PV', 'SPENDK', 'SPEND'
 #         ],
-#         status=status,
-#         false_cols=['PUR2_PV', 'SPEND', 'SPENDK']
+#         expected_failure=expected_failure,
+#         cols_to_fail=['PUR2_PV', 'PUR3_PV', 'SPEND', 'SPENDK']
 #     )
 #
 #
-# # @pytest.mark.xfail()
 # def test_rail_imputation():
-#     # Expected failure on SPEND column.  For further information see:
-#     # https://collaborate2.ons.gov.uk/confluence/display/QSS/Differing+values+between+SAS+and+Python+outputs
+#     # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
 #     log.info("Testing Calculation 11 --> rail_imputation")
 #     rail_imputation.rail_imputation_step(run_id)
 #
+#
 #     survey_output(
 #         "RAIL",
-#         "data/calculations/Q3_2017/rail/rail_surveysubsample_2017.csvv",
+#         "data/calculations/Q3_2017/rail/rail_surveysubsample_2017.csv",
 #         [
 #             'SERIAL', 'RAIL_CNTRY_GRP_PV', 'RAIL_EXERCISE_PV', 'RAIL_IMP_ELIGIBLE_PV', 'SPEND'
 #         ],
+#         expected_failure=True,
+#         cols_to_fail=['SPEND']
 #     )
 #
 #
-# # @pytest.mark.xfail()
 # def test_regional_weight():
-#     # Expected failure on VISIT_WT and EXPENDITURE_WT columns.  For further information see:
-#     # https://collaborate2.ons.gov.uk/confluence/display/QSS/Differing+values+between+SAS+and+Python+outputs
-#
+#     # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
 #     log.info("Testing Calculation 14 --> regional_weight")
 #     regional_weights.regional_weights_step(run_id)
 #
@@ -344,14 +358,16 @@ def test_imbalance_weight():
 #             'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K', 'PURPOSE_PV', 'STAYIMPCTRYLEVEL1_PV',
 #             'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV', 'REG_IMP_ELIGIBLE_PV'
 #         ],
+#         expected_failure=True,
+#         cols_to_fail=['EXPENDITURE_WT', 'STAY1K', 'STAY2K', 'STAY3K', 'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K', 'PURPOSE_PV',
+#                         'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV',
+#                         'STAYIMPCTRYLEVEL4_PV', 'REG_IMP_ELIGIBLE_PV'
+#                       ]
 #     )
 #
 #
-# # @pytest.mark.xfail()
 # def test_town_stay_expenditure_imputation():
-#     # Expected failure on VISIT_WT and EXPENDITURE_WT columns.  For further information see:
-#     # https://collaborate2.ons.gov.uk/confluence/display/QSS/Differing+values+between+SAS+and+Python+outputs
-#
+#     # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
 #     log.info("Testing Calculation 13 --> town_stay_expenditure_imputation")
 #     town_stay_expenditure.town_stay_expenditure_imputation_step(run_id)
 #
@@ -363,6 +379,11 @@ def test_imbalance_weight():
 #             'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV',
 #             'TOWN_IMP_ELIGIBLE_PV'
 #         ],
+#         expected_failure=True,
+#         cols_to_fail=['SPEND1', 'SPEND2', 'SPEND3', 'SPEND4', 'SPEND5', 'SPEND6', 'SPEND7', 'SPEND8', 'PURPOSE_PV',
+#                         'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV',
+#                         'STAYIMPCTRYLEVEL4_PV', 'TOWN_IMP_ELIGIBLE_PV'
+#                       ]
 #     )
 #
 #
@@ -371,12 +392,12 @@ def test_imbalance_weight():
 #     air_miles.airmiles_step(run_id)
 #     survey_output(
 #         "AIRMILES",
-#         "data/calculations/Q3_2017/stay/air_surveysubsample_2017.csv",
+#         "data/calculations/Q3_2017/air_miles/air_surveysubsample_2017.csv",
 #         [
 #             'SERIAL', 'UKLEG', 'OVLEG', 'DIRECTLEG'
 #         ]
 #     )
-
+#
 
 def survey_output(test_name, expected_survey_output, survey_output_columns, expected_failure=None, cols_to_fail=None):
     # Get survey results
@@ -413,9 +434,6 @@ def summary_output(test_name, expected_summary_output, summary_output_table, sum
     # Create comparison summary dataframes
     summary_expected = pd.read_csv(expected_summary_output, engine='python')
 
-    if 'RUN_ID' in summary_expected:
-        summary_expected.drop('RUN_ID', axis=1, inplace=True)
-
     if test_name != 'FINAL':
         # Summary data is exported from table
         summary_data = select_data("*", summary_output_table, "RUN_ID", run_id)
@@ -449,7 +467,7 @@ def assert_frame_not_equal(results, expected, columns, test_name):
         except AssertionError:
             # frames are not equal
             log.info(f"{col} does not match SAS output:  Expected behaviour")
-            # return True
+            return True
         else:
             # frames are equal
             log.warning(f"{col} matches SAS output: Unexpected behaviour.")
