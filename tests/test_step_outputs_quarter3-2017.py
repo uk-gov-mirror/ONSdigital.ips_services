@@ -202,9 +202,6 @@ def test_traffic_weight():
 
 
 def test_unsampled_weight():
-    # Assert failure due to rounding. For further information see
-    # https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
-
     log.info("Testing Calculation  5 --> unsampled_weight")
     unsampled_weight.unsampled_weight_step(run_id)
 
@@ -213,7 +210,7 @@ def test_unsampled_weight():
         "data/calculations/Q3_2017/unsampled_weight/unsamp_surveysubsample_2017.csv",
         [
             'SERIAL', 'UNSAMP_TRAFFIC_WT'
-        ],
+        ]
     )
 
     summary_output(
@@ -227,27 +224,27 @@ def test_unsampled_weight():
     )
 
 
-# def test_imbalance_weight():
-#     log.info("Testing Calculation  6 --> imbalance_weight")
-#     imbalance_weight.imbalance_weight_step(run_id)
-#     survey_output(
-#         "IMBALANCE",
-#         "data/calculations/Q3_2017/imbalance_weight/imbalance_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'IMBAL_WT'
-#         ]
-#     )
-#
-#     summary_output(
-#         "IMBALANCE",
-#         "data/calculations/Q3_2017/imbalance_weight/imbalance_summary_q32017.csv",
-#         "PS_IMBALANCE",
-#         [
-#             'FLOW', 'SUM_PRIOR_WT', 'SUM_IMBAL_WT'
-#         ]
-#     )
-#
-#
+def test_imbalance_weight():
+    log.info("Testing Calculation  6 --> imbalance_weight")
+    imbalance_weight.imbalance_weight_step(run_id)
+    survey_output(
+        "IMBALANCE",
+        "data/calculations/Q3_2017/imbalance_weight/imbalance_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'IMBAL_WT'
+        ]
+    )
+
+    summary_output(
+        "IMBALANCE",
+        "data/calculations/Q3_2017/imbalance_weight/imbalance_summary_q32017.csv",
+        "PS_IMBALANCE",
+        [
+            'FLOW', 'SUM_PRIOR_WT', 'SUM_IMBAL_WT'
+        ]
+    )
+
+
 # def test_final_weight():
 #     log.info("Testing Calculation  7 --> final_weight")
 #     final_weight.final_weight_step(run_id)
