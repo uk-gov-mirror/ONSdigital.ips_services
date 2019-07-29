@@ -267,137 +267,137 @@ def test_final_weight():
     )
 
 
-# def test_stay_imputation():
-#     log.info("Testing Calculation  8 --> stay_imputation")
-#     stay_imputation.stay_imputation_step(run_id)
-#     survey_output(
-#         "STAY",
-#         "data/calculations/Q3_2017/stay/stay_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'STAY', 'STAYK'
-#         ]
-#     )
-#
-#
-# def test_fares_imputation():
-#     log.info("Testing Calculation  9 --> fares_imputation")
-#     fares_imputation.fares_imputation_step(run_id)
-#     expected_failure = False
-#
-#     # Assert failure when using Python's default bankers rounding. For further information see
-#     # https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
-#     conventional_rounding = ServicesConfiguration().sas_rounding()
-#     if not conventional_rounding:
-#         expected_failure = True
-#
-#     survey_output(
-#         "FARES",
-#         "data/calculations/Q3_2017/fares/fares_surveysubsample_2017.csv",
-#         [
-#              'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
-#         ],
-#         expected_failure=expected_failure,
-#         cols_to_fail=['FARE', 'SPEND']
-#     )
-#
-#
-# def test_spend_imputation():
-#     log.info("Testing Calculation 10 --> spend_imputation")
-#     spend_imputation.spend_imputation_step(run_id)
-#     expected_failure = False
-#
-#     # Assert failure when using the refactored PUR2_PV or Python's default bankers rounding. For further information see
-#     # https://collaborate2.ons.gov.uk/confluence/display/QSS/Spend+Imputation+Testing+Configuration and
-#     # https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
-#     refactor_pur2_pv = ServicesConfiguration().sas_pur2_pv()
-#     conventional_rounding = ServicesConfiguration().sas_rounding()
-#
-#     if not refactor_pur2_pv or not conventional_rounding:
-#         expected_failure = True
-#
-#     survey_output(
-#         "SPEND",
-#         "data/calculations/Q3_2017/spend/spend_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'SPEND_IMP_FLAG_PV', 'SPEND_IMP_ELIGIBLE_PV', 'UK_OS_PV', 'PUR1_PV', 'PUR2_PV',
-#             'PUR3_PV', 'DUR1_PV', 'DUR2_PV', 'SPENDK', 'SPEND'
-#         ],
-#         expected_failure=expected_failure,
-#         cols_to_fail=['PUR2_PV', 'PUR3_PV', 'SPEND', 'SPENDK']
-#     )
-#
-#
-# def test_rail_imputation():
-#     # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
-#     log.info("Testing Calculation 11 --> rail_imputation")
-#     rail_imputation.rail_imputation_step(run_id)
-#
-#
-#     survey_output(
-#         "RAIL",
-#         "data/calculations/Q3_2017/rail/rail_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'RAIL_CNTRY_GRP_PV', 'RAIL_EXERCISE_PV', 'RAIL_IMP_ELIGIBLE_PV', 'SPEND'
-#         ],
-#         expected_failure=True,
-#         cols_to_fail=['SPEND']
-#     )
-#
-#
-# def test_regional_weight():
-#     # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
-#     log.info("Testing Calculation 14 --> regional_weight")
-#     regional_weights.regional_weights_step(run_id)
-#
-#     survey_output(
-#         "REGIONAL",
-#         'data/calculations/Q3_2017/regional_weights/regional_surveysubsample_2017.csv',
-#         [
-#             'SERIAL', 'VISIT_WT', 'VISIT_WTK', 'STAY_WT', 'STAY_WTK', 'EXPENDITURE_WT', 'EXPENDITURE_WTK', 'NIGHTS1',
-#             'NIGHTS2', 'NIGHTS3', 'NIGHTS4', 'NIGHTS5', 'NIGHTS6', 'NIGHTS7', 'NIGHTS8', 'STAY1K', 'STAY2K', 'STAY3K',
-#             'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K', 'PURPOSE_PV', 'STAYIMPCTRYLEVEL1_PV',
-#             'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV', 'REG_IMP_ELIGIBLE_PV'
-#         ],
-#         expected_failure=True,
-#         cols_to_fail=['EXPENDITURE_WT', 'STAY1K', 'STAY2K', 'STAY3K', 'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K', 'PURPOSE_PV',
-#                         'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV',
-#                         'STAYIMPCTRYLEVEL4_PV', 'REG_IMP_ELIGIBLE_PV'
-#                       ]
-#     )
-#
-#
-# def test_town_stay_expenditure_imputation():
-#     # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
-#     log.info("Testing Calculation 13 --> town_stay_expenditure_imputation")
-#     town_stay_expenditure.town_stay_expenditure_imputation_step(run_id)
-#
-#     survey_output(
-#         "TOWN_AND_STAY",
-#         "data/calculations/Q3_2017/town_and_stay/town_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'SPEND1', 'SPEND2', 'SPEND3', 'SPEND4', 'SPEND5', 'SPEND6', 'SPEND7', 'SPEND8', 'PURPOSE_PV',
-#             'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV',
-#             'TOWN_IMP_ELIGIBLE_PV'
-#         ],
-#         expected_failure=True,
-#         cols_to_fail=['SPEND1', 'SPEND2', 'SPEND3', 'SPEND4', 'SPEND5', 'SPEND6', 'SPEND7', 'SPEND8', 'PURPOSE_PV',
-#                         'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV',
-#                         'STAYIMPCTRYLEVEL4_PV', 'TOWN_IMP_ELIGIBLE_PV'
-#                       ]
-#     )
-#
-#
-# def test_airmiles():
-#     log.info("Testing Calculation 14 --> airiles")
-#     air_miles.airmiles_step(run_id)
-#     survey_output(
-#         "AIRMILES",
-#         "data/calculations/Q3_2017/air_miles/air_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'UKLEG', 'OVLEG', 'DIRECTLEG'
-#         ]
-#     )
-#
+def test_stay_imputation():
+    log.info("Testing Calculation  8 --> stay_imputation")
+    stay_imputation.stay_imputation_step(run_id)
+    survey_output(
+        "STAY",
+        "data/calculations/Q3_2017/stay/stay_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'STAY', 'STAYK'
+        ]
+    )
+
+
+def test_fares_imputation():
+    log.info("Testing Calculation  9 --> fares_imputation")
+    fares_imputation.fares_imputation_step(run_id)
+    expected_failure = False
+
+    # Assert failure when using Python's default bankers rounding. For further information see
+    # https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+    conventional_rounding = ServicesConfiguration().sas_rounding()
+    if not conventional_rounding:
+        expected_failure = True
+
+    survey_output(
+        "FARES",
+        "data/calculations/Q3_2017/fares/fares_surveysubsample_2017.csv",
+        [
+             'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
+        ],
+        expected_failure=expected_failure,
+        cols_to_fail=['FARE', 'SPEND']
+    )
+
+
+def test_spend_imputation():
+    log.info("Testing Calculation 10 --> spend_imputation")
+    spend_imputation.spend_imputation_step(run_id)
+    expected_failure = False
+
+    # Assert failure when using the refactored PUR2_PV or Python's default bankers rounding. For further information see
+    # https://collaborate2.ons.gov.uk/confluence/display/QSS/Spend+Imputation+Testing+Configuration and
+    # https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+    refactor_pur2_pv = ServicesConfiguration().sas_pur2_pv()
+    conventional_rounding = ServicesConfiguration().sas_rounding()
+
+    if not refactor_pur2_pv or not conventional_rounding:
+        expected_failure = True
+
+    survey_output(
+        "SPEND",
+        "data/calculations/Q3_2017/spend/spend_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'SPEND_IMP_FLAG_PV', 'SPEND_IMP_ELIGIBLE_PV', 'UK_OS_PV', 'PUR1_PV', 'PUR2_PV',
+            'PUR3_PV', 'DUR1_PV', 'DUR2_PV', 'SPENDK', 'SPEND'
+        ],
+        expected_failure=expected_failure,
+        cols_to_fail=['PUR2_PV', 'PUR3_PV', 'SPEND', 'SPENDK']
+    )
+
+
+def test_rail_imputation():
+    # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+    log.info("Testing Calculation 11 --> rail_imputation")
+    rail_imputation.rail_imputation_step(run_id)
+
+
+    survey_output(
+        "RAIL",
+        "data/calculations/Q3_2017/rail/rail_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'RAIL_CNTRY_GRP_PV', 'RAIL_EXERCISE_PV', 'RAIL_IMP_ELIGIBLE_PV', 'SPEND'
+        ],
+        expected_failure=True,
+        cols_to_fail=['SPEND']
+    )
+
+
+def test_regional_weight():
+    # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+    log.info("Testing Calculation 14 --> regional_weight")
+    regional_weights.regional_weights_step(run_id)
+
+    survey_output(
+        "REGIONAL",
+        'data/calculations/Q3_2017/regional_weights/regional_surveysubsample_2017.csv',
+        [
+            'SERIAL', 'VISIT_WT', 'VISIT_WTK', 'STAY_WT', 'STAY_WTK', 'EXPENDITURE_WT', 'EXPENDITURE_WTK', 'NIGHTS1',
+            'NIGHTS2', 'NIGHTS3', 'NIGHTS4', 'NIGHTS5', 'NIGHTS6', 'NIGHTS7', 'NIGHTS8', 'STAY1K', 'STAY2K', 'STAY3K',
+            'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K', 'PURPOSE_PV', 'STAYIMPCTRYLEVEL1_PV',
+            'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV', 'REG_IMP_ELIGIBLE_PV'
+        ],
+        expected_failure=True,
+        cols_to_fail=['EXPENDITURE_WT', 'STAY1K', 'STAY2K', 'STAY3K', 'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K', 'PURPOSE_PV',
+                        'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV',
+                        'STAYIMPCTRYLEVEL4_PV', 'REG_IMP_ELIGIBLE_PV'
+                      ]
+    )
+
+
+def test_town_stay_expenditure_imputation():
+    # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+    log.info("Testing Calculation 13 --> town_stay_expenditure_imputation")
+    town_stay_expenditure.town_stay_expenditure_imputation_step(run_id)
+
+    survey_output(
+        "TOWN_AND_STAY",
+        "data/calculations/Q3_2017/town_and_stay/town_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'SPEND1', 'SPEND2', 'SPEND3', 'SPEND4', 'SPEND5', 'SPEND6', 'SPEND7', 'SPEND8', 'PURPOSE_PV',
+            'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV',
+            'TOWN_IMP_ELIGIBLE_PV'
+        ],
+        expected_failure=True,
+        cols_to_fail=['SPEND1', 'SPEND2', 'SPEND3', 'SPEND4', 'SPEND5', 'SPEND6', 'SPEND7', 'SPEND8', 'PURPOSE_PV',
+                        'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV',
+                        'STAYIMPCTRYLEVEL4_PV', 'TOWN_IMP_ELIGIBLE_PV'
+                      ]
+    )
+
+
+def test_airmiles():
+    log.info("Testing Calculation 14 --> airiles")
+    air_miles.airmiles_step(run_id)
+    survey_output(
+        "AIRMILES",
+        "data/calculations/Q3_2017/air_miles/air_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'UKLEG', 'OVLEG', 'DIRECTLEG'
+        ]
+    )
+
 
 def survey_output(test_name, expected_survey_output, survey_output_columns, expected_failure=None, cols_to_fail=None):
     # Get survey results
