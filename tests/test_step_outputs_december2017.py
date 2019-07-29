@@ -419,6 +419,9 @@ def summary_output(test_name, expected_summary_output, summary_output_table, sum
     summary_results.index = range(0, len(summary_results))
     summary_expected.index = range(0, len(summary_expected))
 
+    summary_results.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/summary_results.csv')
+    summary_expected.to_csv('/Users/ThornE1/PycharmProjects/ips_services/tests/summary_expected.csv')
+
     # Test summary outputs
     assert_frame_equal(summary_results, summary_expected, check_dtype=False, check_less_precise=True)
 

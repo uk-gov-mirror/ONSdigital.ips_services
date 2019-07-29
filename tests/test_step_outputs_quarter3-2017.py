@@ -202,14 +202,20 @@ def test_traffic_weight():
 
 
 def test_unsampled_weight():
+    # Assert failure due to rounding. For further information see
+    # https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+
     log.info("Testing Calculation  5 --> unsampled_weight")
     unsampled_weight.unsampled_weight_step(run_id)
+
     survey_output(
         "UNSAMPLED",
         "data/calculations/Q3_2017/unsampled_weight/unsamp_surveysubsample_2017.csv",
         [
             'SERIAL', 'UNSAMP_TRAFFIC_WT'
-        ]
+        ],
+        expected_failure=True,
+        cols_to_fail=['UNSAMP_TRAFFIC_WT']
     )
 
     summary_output(
@@ -377,7 +383,7 @@ def test_unsampled_weight():
 #     )
 
 
-def survey_output(test_name, expected_survey_output, survey_output_columns, status=True, false_cols=None):
+def survey_output(test_name, expected_survey_output, survey_output_columns, expected_failure=None, cols_to_fail=None):
     # Get survey results
     survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
 
@@ -393,15 +399,12 @@ def survey_output(test_name, expected_survey_output, survey_output_columns, stat
     survey_expected.sort_values(by='SERIAL', axis=0, inplace=True)
     survey_expected.index = range(0, len(survey_expected))
 
-    if not status:
-        columns = false_cols
+    if expected_failure:
+        assert_frame_not_equal(survey_results, survey_expected, cols_to_fail, test_name)
 
-        # Assert columns do not match
-        assert_frame_not_equal(survey_results, survey_expected, columns, test_name)
-
-        # Assert remaining dataframe for Spend Imputation matches for accuracy
-        survey_results.drop(columns, axis=1, inplace=True)
-        survey_expected.drop(columns, axis=1, inplace=True)
+        # Drop failing columns and test remaining dataframe
+        survey_results.drop(cols_to_fail, axis=1, inplace=True)
+        survey_expected.drop(cols_to_fail, axis=1, inplace=True)
 
     # Test survey outputs
     log.info(f"Testing survey results for {test_name}")
