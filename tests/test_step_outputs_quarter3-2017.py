@@ -93,7 +93,7 @@ def setup_pv():
 def update_q3_pvs():
     sql = f"""
     DELETE FROM PROCESS_VARIABLE_PY
-    WHERE PV_NAME = 'samp_port_grp_pv'
+    WHERE PV_NAME in ('samp_port_grp_pv', 'unsamp_port_grp_pv', 'unsamp_region_grp_pv')
     AND RUN_ID = '{run_id}'
     """
 
@@ -201,49 +201,50 @@ def test_traffic_weight():
     )
 
 
-# def test_unsampled_weight():
-#     log.info("Testing Calculation  5 --> unsampled_weight")
-#     unsampled_weight.unsampled_weight_step(run_id)
-#     survey_output(
-#         "UNSAMPLED",
-#         "data/calculations/Q3_2017/unsampled_weight/unsamp_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'UNSAMP_TRAFFIC_WT'
-#         ]
-#     )
-#
-#     summary_output(
-#         "UNSAMPLED",
-#         "data/calculations/Q3_2017/unsampled_weight/unsamp_summary_q32017.csv",
-#         "PS_UNSAMPLED_OOH",
-#         [
-#             'UNSAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'UNSAMP_REGION_GRP_PV', 'CASES', 'SUM_PRIOR_WT',
-#             'SUM_UNSAMP_TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT'
-#         ]
-#     )
-#
-#
-# def test_imbalance_weight():
-#     log.info("Testing Calculation  6 --> imbalance_weight")
-#     imbalance_weight.imbalance_weight_step(run_id)
-#     survey_output(
-#         "IMBALANCE",
-#         "data/calculations/Q3_2017/imbalance_weight/imbalance_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'IMBAL_WT'
-#         ]
-#     )
-#
-#     summary_output(
-#         "IMBALANCE",
-#         "data/calculations/Q3_2017/imbalance_weight/imbalance_summary_q32017.csv",
-#         "PS_IMBALANCE",
-#         [
-#             'FLOW', 'SUM_PRIOR_WT', 'SUM_IMBAL_WT'
-#         ]
-#     )
-#
-#
+def test_unsampled_weight():
+    log.info("Testing Calculation  5 --> unsampled_weight")
+    unsampled_weight.unsampled_weight_step(run_id)
+
+    survey_output(
+        "UNSAMPLED",
+        "data/calculations/Q3_2017/unsampled_weight/unsamp_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'UNSAMP_TRAFFIC_WT'
+        ]
+    )
+
+    summary_output(
+        "UNSAMPLED",
+        "data/calculations/Q3_2017/unsampled_weight/unsamp_summary_q32017.csv",
+        "PS_UNSAMPLED_OOH",
+        [
+            'UNSAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'UNSAMP_REGION_GRP_PV', 'CASES', 'SUM_PRIOR_WT',
+            'SUM_UNSAMP_TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT'
+        ]
+    )
+
+
+def test_imbalance_weight():
+    log.info("Testing Calculation  6 --> imbalance_weight")
+    imbalance_weight.imbalance_weight_step(run_id)
+    survey_output(
+        "IMBALANCE",
+        "data/calculations/Q3_2017/imbalance_weight/imbalance_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'IMBAL_WT'
+        ]
+    )
+
+    summary_output(
+        "IMBALANCE",
+        "data/calculations/Q3_2017/imbalance_weight/imbalance_summary_q32017.csv",
+        "PS_IMBALANCE",
+        [
+            'FLOW', 'SUM_PRIOR_WT', 'SUM_IMBAL_WT'
+        ]
+    )
+
+
 # def test_final_weight():
 #     log.info("Testing Calculation  7 --> final_weight")
 #     final_weight.final_weight_step(run_id)
@@ -377,7 +378,7 @@ def test_traffic_weight():
 #     )
 
 
-def survey_output(test_name, expected_survey_output, survey_output_columns, status=True, false_cols=None):
+def survey_output(test_name, expected_survey_output, survey_output_columns, expected_failure=None, cols_to_fail=None):
     # Get survey results
     survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
 
@@ -393,15 +394,12 @@ def survey_output(test_name, expected_survey_output, survey_output_columns, stat
     survey_expected.sort_values(by='SERIAL', axis=0, inplace=True)
     survey_expected.index = range(0, len(survey_expected))
 
-    if not status:
-        columns = false_cols
+    if expected_failure:
+        assert_frame_not_equal(survey_results, survey_expected, cols_to_fail, test_name)
 
-        # Assert columns do not match
-        assert_frame_not_equal(survey_results, survey_expected, columns, test_name)
-
-        # Assert remaining dataframe for Spend Imputation matches for accuracy
-        survey_results.drop(columns, axis=1, inplace=True)
-        survey_expected.drop(columns, axis=1, inplace=True)
+        # Drop failing columns and test remaining dataframe
+        survey_results.drop(cols_to_fail, axis=1, inplace=True)
+        survey_expected.drop(cols_to_fail, axis=1, inplace=True)
 
     # Test survey outputs
     log.info(f"Testing survey results for {test_name}")
@@ -451,11 +449,7 @@ def assert_frame_not_equal(results, expected, columns, test_name):
         except AssertionError:
             # frames are not equal
             log.info(f"{col} does not match SAS output:  Expected behaviour")
-            return True
+            # return True
         else:
             # frames are equal
             log.warning(f"{col} matches SAS output: Unexpected behaviour.")
-
-
-if __name__ == '__main__':
-    setup_pv()
