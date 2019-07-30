@@ -434,11 +434,13 @@ def summary_output(test_name, expected_summary_output, summary_output_table, sum
     # Create comparison summary dataframes
     summary_expected = pd.read_csv(expected_summary_output, engine='python')
 
+    if 'RUN_ID' in summary_expected:
+        summary_expected.drop('RUN_ID', axis=1, inplace=True)
+
     if test_name != 'FINAL':
         # Summary data is exported from table
         summary_data = select_data("*", summary_output_table, "RUN_ID", run_id)
         summary_results = summary_data.copy()
-        summary_results.drop('RUN_ID', axis=1, inplace=True)
     else:
         # Final Weight Summary data is a subsample of records from the Survey output
         survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
