@@ -13,7 +13,9 @@ All data resides in the database and code connecting to the database can be foun
 # How to use this package?
 ## Quick Start
 
-1. Clone and navigate to the root directory of this repository.
+1. Clone UI project: https://github.com/ONSdigital/ips_user_interface
+
+2. Clone services repository and navigate to the root directory of this repository.
 
 2. Ensure python 3 and pip are installed.
 
@@ -21,9 +23,9 @@ All data resides in the database and code connecting to the database can be foun
 
 4. Run `docker-compose build`
 
-5. Run `docker-compose up`
+5. Run `docker-compose up` (This will set up UI, Services & DB)
 
-6. Run the ui.
+6. Navigate to localhost:5001, this will show the UI
 
 
 ## Alembic
