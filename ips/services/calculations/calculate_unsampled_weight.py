@@ -29,6 +29,9 @@ import numpy as np
 
 
 def error_check(df_survey_in, df_reference_in, run_id):
+    df_survey_in.to_csv('/Users/Rushtg/survey_in.csv')
+    df_reference_in.to_csv('/Users/Rushtg/reference_in.csv')
+
     sort1 = ['UNSAMP_PORT_GRP_PV', 'UNSAMP_REGION_GRP_PV', 'ARRIVEDEPART']
 
     # Check data for errors before passed into R for processing
@@ -89,7 +92,7 @@ def error_check(df_survey_in, df_reference_in, run_id):
             threshold_string = \
                 error_str + " " + 'UNSAMP_PORT_GRP_PV' + " = " + str(record[0]) \
                 + " " + 'ARRIVEDEPART' + " = " + str(record[1]) + "\n"
-        log_errors(threshold_string)(pd.DataFrame(), run_id, 5)
+            log_errors(threshold_string)(pd.DataFrame(), run_id, 5)
         raise ValueError('UNSAMP_PORT_GRP_PV Failed!')
 
 
