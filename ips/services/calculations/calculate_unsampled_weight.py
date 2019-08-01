@@ -24,14 +24,7 @@ PREVIOUS_TOTAL_COLUMN = 'PREVTOTAL'
 POST_WEIGHT_COLUMN = 'POSTWEIGHT'
 
 
-import pandas as pd
-import numpy as np
-
-
 def error_check(df_survey_in, df_reference_in, run_id):
-    df_survey_in.to_csv('/Users/Rushtg/survey_in.csv')
-    df_reference_in.to_csv('/Users/Rushtg/reference_in.csv')
-
     sort1 = ['UNSAMP_PORT_GRP_PV', 'UNSAMP_REGION_GRP_PV', 'ARRIVEDEPART']
 
     # Check data for errors before passed into R for processing
