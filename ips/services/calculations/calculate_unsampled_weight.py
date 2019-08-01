@@ -24,6 +24,10 @@ PREVIOUS_TOTAL_COLUMN = 'PREVTOTAL'
 POST_WEIGHT_COLUMN = 'POSTWEIGHT'
 
 
+import pandas as pd
+import numpy as np
+
+
 def error_check(df_survey_in, df_reference_in, run_id):
     sort1 = ['UNSAMP_PORT_GRP_PV', 'UNSAMP_REGION_GRP_PV', 'ARRIVEDEPART']
 
@@ -31,6 +35,9 @@ def error_check(df_survey_in, df_reference_in, run_id):
     df_survey_input_sorted = df_survey_in
     values = df_survey_input_sorted.SHIFT_WT * df_survey_input_sorted.NON_RESPONSE_WT * df_survey_input_sorted.MINS_WT * df_survey_input_sorted.TRAFFIC_WT
     df_survey_input_sorted['OOHDESIGNWEIGHT'] = values
+
+    df_survey_input_sorted = df_survey_input_sorted[df_survey_input_sorted.OOHDESIGNWEIGHT > 0]
+
     df_survey_input_sorted['C_GROUP'] = np.where(df_survey_input_sorted['OOHDESIGNWEIGHT'] > 0, 1, 0)
     df_ges_input = df_survey_input_sorted[['UNSAMP_PORT_GRP_PV', 'UNSAMP_REGION_GRP_PV', 'ARRIVEDEPART', 'OOHDESIGNWEIGHT', 'C_GROUP', 'SERIAL']]
     df_ges_input = df_ges_input.sort_values(sort1)
@@ -40,12 +47,21 @@ def error_check(df_survey_in, df_reference_in, run_id):
 
     df_us_totals_check = df_reference_in
     df_us_totals_check.UNSAMP_REGION_GRP_PV.fillna(value=0, inplace=True)
-    df_pop_totals = df_us_totals_check.groupby(['UNSAMP_PORT_GRP_PV', 'UNSAMP_REGION_GRP_PV', 'ARRIVEDEPART']).agg(
-                    {'UNSAMP_TOTAL': 'sum'}).reset_index()
-    df_merge_totals = df_rsumsamp.merge(df_pop_totals, on=sort1, how='outer')
-    df_merge_totals['UNSAMP_TOTAL'] = df_merge_totals['UNSAMP_TOTAL'].fillna(0)
-    values = df_merge_totals.OOHDESIGNWEIGHT + df_merge_totals.UNSAMP_TOTAL
-    df_merge_totals['UNSAMP_LIFTED'] = values
+    df_pop_totals = df_us_totals_check.groupby(['UNSAMP_PORT_GRP_PV', 'UNSAMP_REGION_GRP_PV', 'ARRIVEDEPART'])['UNSAMP_TOTAL'].agg(
+                    {'UPLIFT': 'sum'}).reset_index()
+
+    df_prevtotals = df_survey_input_sorted.groupby(['UNSAMP_PORT_GRP_PV', 'UNSAMP_REGION_GRP_PV', 'ARRIVEDEPART'])['OOHDESIGNWEIGHT'].agg(
+        {'PREVTOTAL': 'sum'}).reset_index()
+
+    df_lifted = df_prevtotals.merge(df_pop_totals, on=sort1, how='outer')
+    df_lifted['PREVTOTAL'] = df_lifted['PREVTOTAL'].fillna(0)
+    df_lifted['UPLIFT'] = df_lifted['UPLIFT'].fillna(0)
+    uplifted = df_lifted.PREVTOTAL + df_lifted.UPLIFT
+    df_lifted['UNSAMP_LIFTED'] = uplifted
+
+    df_lifted = df_lifted[df_lifted.UNSAMP_LIFTED > 0]
+
+    df_merge_totals = df_rsumsamp.merge(df_lifted, on=sort1, how='outer')
 
     # Error check 1
     df_sum_check_1 = df_merge_totals[
