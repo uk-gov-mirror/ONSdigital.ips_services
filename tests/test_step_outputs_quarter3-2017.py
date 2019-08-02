@@ -377,7 +377,7 @@ def test_town_stay_expenditure_imputation():
     log.info("Testing Calculation 13 --> town_stay_expenditure_imputation")
     town_stay_expenditure.town_stay_expenditure_imputation_step(run_id)
     expected_failure = True
-    cols_to_fail = ['STAY2K', 'STAY3K', 'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K']
+    cols_to_fail = ['SPEND1', 'SPEND2', 'SPEND3', 'SPEND4', 'SPEND5', 'SPEND6', 'SPEND7', 'SPEND8']
 
     survey_output(
         "TOWN_AND_STAY",
