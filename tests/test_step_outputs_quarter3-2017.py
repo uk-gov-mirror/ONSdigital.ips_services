@@ -280,7 +280,7 @@ def test_fares_imputation():
     log.info("Testing Calculation  9 --> fares_imputation")
     fares_imputation.fares_imputation_step(run_id)
     expected_failure = True
-    cols_to_fail = ['FARE']     # TODO: Why is Fare failing regardless of config? (please be Bankers rounding!)
+    cols_to_fail = ['FARE']     # TODO: Why is Fare failing regardless of config?
 
     # Assert failure when using Python's default bankers rounding. For further information see Confluence.
     conventional_rounding = ServicesConfiguration().sas_rounding()
@@ -349,16 +349,10 @@ def test_regional_weight():
     expected_failure = True
     cols_to_fail = ['STAY2K', 'STAY3K', 'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K']
 
+    # Assert failure if PUR2_PV isn't modified to match SAS. For further information see Confluence.
     refactor_pur2_pv = ServicesConfiguration().sas_pur2_pv()
-    # conventional_rounding = ServicesConfiguration().sas_rounding()
-
-    # Additional expected failures when not modifying PUR2_PV.
     if not refactor_pur2_pv:
         cols_to_fail.append('EXPENDITURE_WT')
-
-    # Additional expected failures when using Python's bankers rounding.
-    # if not conventional_rounding:
-    #     cols_to_fail.extend(['EXPENDITURE_WT', 'VISIT_WT', 'STAY_WT'])
 
     survey_output(
         "REGIONAL",
