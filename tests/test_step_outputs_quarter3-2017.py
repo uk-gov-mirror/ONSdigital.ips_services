@@ -3,7 +3,6 @@ import pandas as pd
 import ips.persistence.sql as db
 import zipfile
 import shutil
-import pytest
 from pandas.testing import assert_frame_equal
 from ips.util.services_logging import log
 from ips.persistence.persistence import select_data
@@ -36,8 +35,6 @@ month = 'Q3'
 year = '2017'
 
 start_time = time.time()
-
-rail_fixed = False
 
 
 def setup_module(module):
@@ -284,8 +281,7 @@ def test_fares_imputation():
     fares_imputation.fares_imputation_step(run_id)
     expected_failure = False
 
-    # Assert failure when using Python's default bankers rounding. For further information see
-    # https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+    # Assert failure when using Python's default bankers rounding. For further information see Confluence.
     conventional_rounding = ServicesConfiguration().sas_rounding()
     if not conventional_rounding:
         expected_failure = True
@@ -294,7 +290,7 @@ def test_fares_imputation():
         "FARES",
         "data/calculations/Q3_2017/fares/fares_surveysubsample_2017.csv",
         [
-             'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
+            'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
         ],
         expected_failure=expected_failure,
         cols_to_fail=['FARE', 'SPEND']
@@ -304,16 +300,13 @@ def test_fares_imputation():
 def test_spend_imputation():
     log.info("Testing Calculation 10 --> spend_imputation")
     spend_imputation.spend_imputation_step(run_id)
-    expected_failure = False
+    expected_failure = True
+    cols_to_fail = ['SPEND']    # Because Python's internal rounding
 
-    # Assert failure when using the refactored PUR2_PV or Python's default bankers rounding. For further information see
-    # https://collaborate2.ons.gov.uk/confluence/display/QSS/Spend+Imputation+Testing+Configuration and
-    # https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
-    refactor_pur2_pv = ServicesConfiguration().sas_pur2_pv()
-    conventional_rounding = ServicesConfiguration().sas_rounding()
-
-    if not refactor_pur2_pv or not conventional_rounding:
-        expected_failure = True
+    # Assert failure if PUR2_PV isn't modified to match SAS. For further information see Confluence.
+    change_pur2_pv = ServicesConfiguration().sas_pur2_pv()
+    if not change_pur2_pv:
+        cols_to_fail = ['PUR2_PV', 'SPENDK', 'SPEND']
 
     survey_output(
         "SPEND",
@@ -323,15 +316,17 @@ def test_spend_imputation():
             'PUR3_PV', 'DUR1_PV', 'DUR2_PV', 'SPENDK', 'SPEND'
         ],
         expected_failure=expected_failure,
-        cols_to_fail=['PUR2_PV', 'PUR3_PV', 'SPEND', 'SPENDK']
+        cols_to_fail=cols_to_fail
     )
 
 
 def test_rail_imputation():
-    # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+    # Expected failure regardless of the configuration.  Either SPEND does not match due to PUR2_PV
+    # or Python's internal bankers rounding.  See Confluence for further information.
     log.info("Testing Calculation 11 --> rail_imputation")
     rail_imputation.rail_imputation_step(run_id)
-
+    expected_failure = True
+    cols_to_fail = ['SPEND']
 
     survey_output(
         "RAIL",
@@ -339,15 +334,29 @@ def test_rail_imputation():
         [
             'SERIAL', 'RAIL_CNTRY_GRP_PV', 'RAIL_EXERCISE_PV', 'RAIL_IMP_ELIGIBLE_PV', 'SPEND'
         ],
-        expected_failure=True,
-        cols_to_fail=['SPEND']
+        expected_failure=expected_failure,
+        cols_to_fail=cols_to_fail
     )
 
 
 def test_regional_weight():
-    # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+    # TODO: --->
+    # Expected failure due to inferred data types in CSV. See Confluence for further information.
     log.info("Testing Calculation 14 --> regional_weight")
     regional_weights.regional_weights_step(run_id)
+    expected_failure = True
+    cols_to_fail = ['STAY2K', 'STAY3K', 'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K']
+
+    # refactor_pur2_pv = ServicesConfiguration().sas_pur2_pv()
+    # conventional_rounding = ServicesConfiguration().sas_rounding()
+
+    # Additional expected failures when not modifying PUR2_PV.
+    # if not refactor_pur2_pv:
+    #     cols_to_fail.extend(['VISIT_WT', 'STAY_WT'])
+
+    # Additional expected failures when using Python's bankers rounding.
+    # if not conventional_rounding:
+    #     cols_to_fail.extend(['EXPENDITURE_WT', 'VISIT_WT', 'STAY_WT'])
 
     survey_output(
         "REGIONAL",
@@ -358,18 +367,17 @@ def test_regional_weight():
             'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K', 'PURPOSE_PV', 'STAYIMPCTRYLEVEL1_PV',
             'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV', 'REG_IMP_ELIGIBLE_PV'
         ],
-        expected_failure=True,
-        cols_to_fail=['EXPENDITURE_WT', 'STAY1K', 'STAY2K', 'STAY3K', 'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K', 'PURPOSE_PV',
-                        'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV',
-                        'STAYIMPCTRYLEVEL4_PV', 'REG_IMP_ELIGIBLE_PV'
-                      ]
+        expected_failure=expected_failure,
+        cols_to_fail=cols_to_fail
     )
 
 
 def test_town_stay_expenditure_imputation():
-    # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+    # Expected failure due to inferred data types in CSV. See Confluence for further information.
     log.info("Testing Calculation 13 --> town_stay_expenditure_imputation")
     town_stay_expenditure.town_stay_expenditure_imputation_step(run_id)
+    expected_failure = True
+    cols_to_fail = ['STAY2K', 'STAY3K', 'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K']
 
     survey_output(
         "TOWN_AND_STAY",
@@ -379,11 +387,8 @@ def test_town_stay_expenditure_imputation():
             'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV',
             'TOWN_IMP_ELIGIBLE_PV'
         ],
-        expected_failure=True,
-        cols_to_fail=['SPEND1', 'SPEND2', 'SPEND3', 'SPEND4', 'SPEND5', 'SPEND6', 'SPEND7', 'SPEND8', 'PURPOSE_PV',
-                        'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV',
-                        'STAYIMPCTRYLEVEL4_PV', 'TOWN_IMP_ELIGIBLE_PV'
-                      ]
+        expected_failure=expected_failure,
+        cols_to_fail=cols_to_fail
     )
 
 
@@ -423,8 +428,18 @@ def survey_output(test_name, expected_survey_output, survey_output_columns, expe
         survey_expected.drop(cols_to_fail, axis=1, inplace=True)
 
     # Test survey outputs
+    # TODO: --->
     log.info(f"Testing survey results for {test_name}")
-    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
+    # assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
+
+    try:
+        assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
+    except Exception:
+        log.info(f"Columns: {list(survey_expected.columns.values)}")
+        survey_results.to_csv(f'/Users/ThornE1/PycharmProjects/ips_services/tests/{test_name}_py_failed.csv')
+        survey_expected.to_csv(f'/Users/ThornE1/PycharmProjects/ips_services/tests/{test_name}_sas_failed.csv')
+        raise
+#     TODO: <---
 
 
 def summary_output(test_name, expected_summary_output, summary_output_table, summary_output_columns):
@@ -441,6 +456,7 @@ def summary_output(test_name, expected_summary_output, summary_output_table, sum
         # Summary data is exported from table
         summary_data = select_data("*", summary_output_table, "RUN_ID", run_id)
         summary_results = summary_data.copy()
+        summary_results.drop('RUN_ID', axis=1, inplace=True)
     else:
         # Final Weight Summary data is a subsample of records from the Survey output
         survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
@@ -459,6 +475,8 @@ def summary_output(test_name, expected_summary_output, summary_output_table, sum
 
 def assert_frame_not_equal(results, expected, columns, test_name):
     # Mismatching dataframes will result in a positive result
+    outcome = []
+
     for col in columns:
         python_df = results[['SERIAL', col]]
         sas_df = expected[['SERIAL', col]]
@@ -466,10 +484,17 @@ def assert_frame_not_equal(results, expected, columns, test_name):
         try:
             log.info(f"Asserting {col} not equal for {test_name}")
             assert_frame_equal(python_df, sas_df)
-        except AssertionError:
+        except AssertionError as err:
             # frames are not equal
             log.info(f"{col} does not match SAS output:  Expected behaviour")
-            return True
+            outcome.append(True)
         else:
             # frames are equal
             log.warning(f"{col} matches SAS output: Unexpected behaviour.")
+            outcome.append(False)
+
+    result = set(outcome)
+    if False in result:
+        assert False
+
+    assert True
