@@ -252,8 +252,7 @@ def test_fares_imputation():
     fares_imputation.fares_imputation_step(run_id)
     expected_failure = False
 
-    # Assert failure when using Python's default bankers rounding. For further information see
-    # https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+    # Assert failure when using Python's default bankers rounding. For further information see Confluence
     conventional_rounding = ServicesConfiguration().sas_rounding()
     if not conventional_rounding:
         expected_failure = True
@@ -300,10 +299,9 @@ def test_spend_imputation():
 
 
 def test_rail_imputation():
-    # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+    # Expected failure.  For further information see Confluence
     log.info("Testing Calculation 11 --> rail_imputation")
     rail_imputation.rail_imputation_step(run_id)
-
 
     survey_output(
         "RAIL",
@@ -317,18 +315,11 @@ def test_rail_imputation():
 
 
 def test_regional_weight():
-    # TODO: --->
     # Expected failure due to inferred data types in CSV. See Confluence for further information.
     log.info("Testing Calculation 14 --> regional_weight")
     regional_weights.regional_weights_step(run_id)
     expected_failure = True
     cols_to_fail = ['EXPENDITURE_WT', 'STAY2K', 'STAY3K', 'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K']
-
-    # Assert failure if PUR2_PV isn't modified to match SAS. For further information see Confluence.
-    # refactor_pur2_pv = ServicesConfiguration().sas_pur2_pv()
-    # conventional_rounding = ServicesConfiguration().sas_rounding()
-    # if not refactor_pur2_pv or not conventional_rounding:
-    #     cols_to_fail.append('EXPENDITURE_WT')
 
     survey_output(
         "REGIONAL",
@@ -400,20 +391,8 @@ def survey_output(test_name, expected_survey_output, survey_output_columns, expe
         survey_expected.drop(cols_to_fail, axis=1, inplace=True)
 
     # Test survey outputs
-    # TODO: --->
     log.info(f"Testing survey results for {test_name}")
-    # assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
-
-    try:
-        assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
-    except Exception:
-        log.info(f"Columns: {list(survey_expected.columns.values)}")
-        survey_results.to_csv(f'/Users/ThornE1/PycharmProjects/ips_services/tests/{test_name}_py_failed_dec.csv')
-        survey_expected.to_csv(f'/Users/ThornE1/PycharmProjects/ips_services/tests/{test_name}_sas_failed_dec.csv')
-        raise
-
-
-#     TODO: <---
+    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
 
 
 def summary_output(test_name, expected_summary_output, summary_output_table, summary_output_columns):
@@ -456,11 +435,9 @@ def assert_frame_not_equal(results, expected, columns, test_name):
             log.info(f"Asserting {col} not equal for {test_name}")
             assert_frame_equal(python_df, sas_df)
         except AssertionError as err:
-            # frames are not equal
             log.info(f"{col} does not match SAS output:  Expected behaviour")
             outcome.append(True)
         else:
-            # frames are equal
             log.warning(f"{col} matches SAS output: Unexpected behaviour.")
             outcome.append(False)
 
