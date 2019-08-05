@@ -351,6 +351,7 @@ def test_regional_weight():
 
     # Assert failure if PUR2_PV isn't modified to match SAS. For further information see Confluence.
     refactor_pur2_pv = ServicesConfiguration().sas_pur2_pv()
+    # conventional_rouding = ServicesConfiguration().sas_rounding()
     if not refactor_pur2_pv:
         cols_to_fail.append('EXPENDITURE_WT')
 
@@ -424,18 +425,8 @@ def survey_output(test_name, expected_survey_output, survey_output_columns, expe
         survey_expected.drop(cols_to_fail, axis=1, inplace=True)
 
     # Test survey outputs
-    # TODO: --->
     log.info(f"Testing survey results for {test_name}")
-    # assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
-
-    try:
-        assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
-    except Exception:
-        log.info(f"Columns: {list(survey_expected.columns.values)}")
-        survey_results.to_csv(f'/Users/ThornE1/PycharmProjects/ips_services/tests/{test_name}_py_failed.csv')
-        survey_expected.to_csv(f'/Users/ThornE1/PycharmProjects/ips_services/tests/{test_name}_sas_failed.csv')
-        raise
-#     TODO: <---
+    assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
 
 
 def summary_output(test_name, expected_summary_output, summary_output_table, summary_output_columns):
@@ -470,6 +461,16 @@ def summary_output(test_name, expected_summary_output, summary_output_table, sum
 
 
 def assert_frame_not_equal(results, expected, columns, test_name):
+    # TODO: --->
+    # conventional_rounding = ServicesConfiguration().sas_rounding()
+    # pur2_pv = ServicesConfiguration.sas_pur2_pv()
+    #
+    # results[['SERIAL', columns]].to_csv(
+    #     f'/Users/ThornE1/PycharmProjects/ips_services/tests/py_{test_name}_rounding_{conventional_rounding}_pur2_pv_{pur2_pv}.csv')
+    # expected[['SERIAL', columns]].to_csv(
+    #     f'/Us ers/ThornE1/PycharmProjects/ips_services/tests/sas_{test_name}_rounding_{conventional_rounding}_pur2_pv_{pur2_pv}.csv')
+    # TODO: <---
+
     # Mismatching dataframes will result in a positive result
     outcome = []
 
