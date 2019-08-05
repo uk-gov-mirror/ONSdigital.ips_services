@@ -417,6 +417,10 @@ def survey_output(test_name, expected_survey_output, survey_output_columns, expe
     survey_expected.sort_values(by='SERIAL', axis=0, inplace=True)
     survey_expected.index = range(0, len(survey_expected))
 
+    if test_name in ('FARES', 'SPEND', 'RAIL', 'REGIONAL', 'TOWN_AND_STAY'):
+        survey_expected.to_csv(f'/Users/ThornE1/PycharmProjects/ips_services/tests/{test_name}_survey_expected_q3.csv')
+        survey_results.to_csv(f'/Users/ThornE1/PycharmProjects/ips_services/tests/{test_name}_survey_results_q3.csv')
+
     if expected_failure:
         assert_frame_not_equal(survey_results, survey_expected, cols_to_fail, test_name)
 
@@ -461,16 +465,6 @@ def summary_output(test_name, expected_summary_output, summary_output_table, sum
 
 
 def assert_frame_not_equal(results, expected, columns, test_name):
-    # TODO: --->
-    # conventional_rounding = ServicesConfiguration().sas_rounding()
-    # pur2_pv = ServicesConfiguration.sas_pur2_pv()
-    #
-    # results[['SERIAL', columns]].to_csv(
-    #     f'/Users/ThornE1/PycharmProjects/ips_services/tests/py_{test_name}_rounding_{conventional_rounding}_pur2_pv_{pur2_pv}.csv')
-    # expected[['SERIAL', columns]].to_csv(
-    #     f'/Us ers/ThornE1/PycharmProjects/ips_services/tests/sas_{test_name}_rounding_{conventional_rounding}_pur2_pv_{pur2_pv}.csv')
-    # TODO: <---
-
     # Mismatching dataframes will result in a positive result
     outcome = []
 
