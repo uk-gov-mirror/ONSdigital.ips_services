@@ -3,7 +3,6 @@ import pandas as pd
 import ips.persistence.sql as db
 import zipfile
 import shutil
-import pytest
 from pandas.testing import assert_frame_equal
 from ips.util.services_logging import log
 from ips.persistence.persistence import select_data
@@ -36,8 +35,6 @@ month = 'Q3'
 year = '2017'
 
 start_time = time.time()
-
-rail_fixed = False
 
 
 def setup_module(module):
@@ -93,7 +90,7 @@ def setup_pv():
 def update_q3_pvs():
     sql = f"""
     DELETE FROM PROCESS_VARIABLE_PY
-    WHERE PV_NAME = 'samp_port_grp_pv'
+    WHERE PV_NAME in ('samp_port_grp_pv', 'unsamp_port_grp_pv', 'unsamp_region_grp_pv')
     AND RUN_ID = '{run_id}'
     """
 
@@ -201,183 +198,210 @@ def test_traffic_weight():
     )
 
 
-# def test_unsampled_weight():
-#     log.info("Testing Calculation  5 --> unsampled_weight")
-#     unsampled_weight.unsampled_weight_step(run_id)
-#     survey_output(
-#         "UNSAMPLED",
-#         "data/calculations/Q3_2017/unsampled_weight/unsamp_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'UNSAMP_TRAFFIC_WT'
-#         ]
-#     )
-#
-#     summary_output(
-#         "UNSAMPLED",
-#         "data/calculations/Q3_2017/unsampled_weight/unsamp_summary_q32017.csv",
-#         "PS_UNSAMPLED_OOH",
-#         [
-#             'UNSAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'UNSAMP_REGION_GRP_PV', 'CASES', 'SUM_PRIOR_WT',
-#             'SUM_UNSAMP_TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT'
-#         ]
-#     )
-#
-#
-# def test_imbalance_weight():
-#     log.info("Testing Calculation  6 --> imbalance_weight")
-#     imbalance_weight.imbalance_weight_step(run_id)
-#     survey_output(
-#         "IMBALANCE",
-#         "data/calculations/Q3_2017/imbalance_weight/imbalance_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'IMBAL_WT'
-#         ]
-#     )
-#
-#     summary_output(
-#         "IMBALANCE",
-#         "data/calculations/Q3_2017/imbalance_weight/imbalance_summary_q32017.csv",
-#         "PS_IMBALANCE",
-#         [
-#             'FLOW', 'SUM_PRIOR_WT', 'SUM_IMBAL_WT'
-#         ]
-#     )
-#
-#
-# def test_final_weight():
-#     log.info("Testing Calculation  7 --> final_weight")
-#     final_weight.final_weight_step(run_id)
-#     survey_output(
-#         "FINAL",
-#         "data/calculations/Q3_2017/final_weight/final_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'FINAL_WT'
-#         ]
-#     )
-#
-#     summary_output(
-#         "FINAL",
-#         "data/calculations/Q3_2017/final_weight/final_summary_q32017.csv",
-#         "PS_IMBALANCE",
-#         [
-#             'SERIAL', 'SHIFT_WT', 'NON_RESPONSE_WT', 'MINS_WT', 'TRAFFIC_WT',
-#             'UNSAMP_TRAFFIC_WT', 'IMBAL_WT', 'FINAL_WT'
-#         ]
-#     )
-#
-#
-# def test_stay_imputation():
-#     log.info("Testing Calculation  8 --> stay_imputation")
-#     stay_imputation.stay_imputation_step(run_id)
-#     survey_output(
-#         "STAY",
-#         "data/calculations/Q3_2017/fares/stay_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'STAY', 'STAYK'
-#         ]
-#     )
-#
-#
-# def test_fares_imputation():
-#     log.info("Testing Calculation  9 --> fares_imputation")
-#     fares_imputation.fares_imputation_step(run_id)
-#     survey_output(
-#         "FARES",
-#         "data/calculations/Q3_2017/fares/fares_surveysubsample_2017.csv",
-#         [
-#              'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
-#         ]
-#     )
-#
-#
-# def test_spend_imputation():
-#     log.info("Testing Calculation 10 --> spend_imputation")
-#     spend_imputation.spend_imputation_step(run_id)
-#
-#     # Assert 'PUR2_PV', 'SPEND' and 'SPENDK' columns are not equal. For further information see
-#     # https://collaborate2.ons.gov.uk/confluence/display/QSS/Spend+Imputation+Testing+Configuration
-#     status = ServicesConfiguration().sas_pur2_pv()
-#
-#     survey_output(
-#         "SPEND",
-#         "data/calculations/Q3_2017/spend/spend_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'SPEND_IMP_FLAG_PV', 'SPEND_IMP_ELIGIBLE_PV', 'UK_OS_PV', 'PUR1_PV', 'PUR2_PV',
-#             'PUR3_PV', 'DUR1_PV', 'DUR2_PV', 'SPENDK', 'SPEND'
-#         ],
-#         status=status,
-#         false_cols=['PUR2_PV', 'SPEND', 'SPENDK']
-#     )
-#
-#
-# # @pytest.mark.xfail()
-# def test_rail_imputation():
-#     # Expected failure on SPEND column.  For further information see:
-#     # https://collaborate2.ons.gov.uk/confluence/display/QSS/Differing+values+between+SAS+and+Python+outputs
-#     log.info("Testing Calculation 11 --> rail_imputation")
-#     rail_imputation.rail_imputation_step(run_id)
-#
-#     survey_output(
-#         "RAIL",
-#         "data/calculations/Q3_2017/rail/rail_surveysubsample_2017.csvv",
-#         [
-#             'SERIAL', 'RAIL_CNTRY_GRP_PV', 'RAIL_EXERCISE_PV', 'RAIL_IMP_ELIGIBLE_PV', 'SPEND'
-#         ],
-#     )
-#
-#
-# # @pytest.mark.xfail()
-# def test_regional_weight():
-#     # Expected failure on VISIT_WT and EXPENDITURE_WT columns.  For further information see:
-#     # https://collaborate2.ons.gov.uk/confluence/display/QSS/Differing+values+between+SAS+and+Python+outputs
-#
-#     log.info("Testing Calculation 14 --> regional_weight")
-#     regional_weights.regional_weights_step(run_id)
-#
-#     survey_output(
-#         "REGIONAL",
-#         'data/calculations/Q3_2017/regional_weights/regional_surveysubsample_2017.csv',
-#         [
-#             'SERIAL', 'VISIT_WT', 'VISIT_WTK', 'STAY_WT', 'STAY_WTK', 'EXPENDITURE_WT', 'EXPENDITURE_WTK', 'NIGHTS1',
-#             'NIGHTS2', 'NIGHTS3', 'NIGHTS4', 'NIGHTS5', 'NIGHTS6', 'NIGHTS7', 'NIGHTS8', 'STAY1K', 'STAY2K', 'STAY3K',
-#             'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K', 'PURPOSE_PV', 'STAYIMPCTRYLEVEL1_PV',
-#             'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV', 'REG_IMP_ELIGIBLE_PV'
-#         ],
-#     )
-#
-#
-# # @pytest.mark.xfail()
-# def test_town_stay_expenditure_imputation():
-#     # Expected failure on VISIT_WT and EXPENDITURE_WT columns.  For further information see:
-#     # https://collaborate2.ons.gov.uk/confluence/display/QSS/Differing+values+between+SAS+and+Python+outputs
-#
-#     log.info("Testing Calculation 13 --> town_stay_expenditure_imputation")
-#     town_stay_expenditure.town_stay_expenditure_imputation_step(run_id)
-#
-#     survey_output(
-#         "TOWN_AND_STAY",
-#         "data/calculations/Q3_2017/town_and_stay/town_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'SPEND1', 'SPEND2', 'SPEND3', 'SPEND4', 'SPEND5', 'SPEND6', 'SPEND7', 'SPEND8', 'PURPOSE_PV',
-#             'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV',
-#             'TOWN_IMP_ELIGIBLE_PV'
-#         ],
-#     )
-#
-#
-# def test_airmiles():
-#     log.info("Testing Calculation 14 --> airiles")
-#     air_miles.airmiles_step(run_id)
-#     survey_output(
-#         "AIRMILES",
-#         "data/calculations/Q3_2017/stay/air_surveysubsample_2017.csv",
-#         [
-#             'SERIAL', 'UKLEG', 'OVLEG', 'DIRECTLEG'
-#         ]
-#     )
+def test_unsampled_weight():
+    log.info("Testing Calculation  5 --> unsampled_weight")
+    unsampled_weight.unsampled_weight_step(run_id)
+
+    survey_output(
+        "UNSAMPLED",
+        "data/calculations/Q3_2017/unsampled_weight/unsamp_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'UNSAMP_TRAFFIC_WT'
+        ]
+    )
+
+    summary_output(
+        "UNSAMPLED",
+        "data/calculations/Q3_2017/unsampled_weight/unsamp_summary_q32017.csv",
+        "PS_UNSAMPLED_OOH",
+        [
+            'UNSAMP_PORT_GRP_PV', 'ARRIVEDEPART', 'UNSAMP_REGION_GRP_PV', 'CASES', 'SUM_PRIOR_WT',
+            'SUM_UNSAMP_TRAFFIC_WT', 'UNSAMP_TRAFFIC_WT'
+        ]
+    )
 
 
-def survey_output(test_name, expected_survey_output, survey_output_columns, status=True, false_cols=None):
+def test_imbalance_weight():
+    log.info("Testing Calculation  6 --> imbalance_weight")
+    imbalance_weight.imbalance_weight_step(run_id)
+    survey_output(
+        "IMBALANCE",
+        "data/calculations/Q3_2017/imbalance_weight/imbalance_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'IMBAL_WT'
+        ]
+    )
+
+    summary_output(
+        "IMBALANCE",
+        "data/calculations/Q3_2017/imbalance_weight/imbalance_summary_q32017.csv",
+        "PS_IMBALANCE",
+        [
+            'FLOW', 'SUM_PRIOR_WT', 'SUM_IMBAL_WT'
+        ]
+    )
+
+
+def test_final_weight():
+    log.info("Testing Calculation  7 --> final_weight")
+    final_weight.final_weight_step(run_id)
+    survey_output(
+        "FINAL",
+        "data/calculations/Q3_2017/final_weight/final_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'FINAL_WT'
+        ]
+    )
+
+    summary_output(
+        "FINAL",
+        "data/calculations/Q3_2017/final_weight/final_summary_q32017.csv",
+        "PS_IMBALANCE",
+        [
+            'SERIAL', 'SHIFT_WT', 'NON_RESPONSE_WT', 'MINS_WT', 'TRAFFIC_WT',
+            'UNSAMP_TRAFFIC_WT', 'IMBAL_WT', 'FINAL_WT'
+        ]
+    )
+
+
+def test_stay_imputation():
+    log.info("Testing Calculation  8 --> stay_imputation")
+    stay_imputation.stay_imputation_step(run_id)
+    survey_output(
+        "STAY",
+        "data/calculations/Q3_2017/stay/stay_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'STAY', 'STAYK'
+        ]
+    )
+
+
+def test_fares_imputation():
+    log.info("Testing Calculation  9 --> fares_imputation")
+    fares_imputation.fares_imputation_step(run_id)
+    expected_failure = True
+    cols_to_fail = ['FARE']     # TODO: Why is Fare failing regardless of config?
+
+    # Assert failure when using Python's default bankers rounding. For further information see Confluence.
+    conventional_rounding = ServicesConfiguration().sas_rounding()
+    if not conventional_rounding:
+        expected_failure = True
+        cols_to_fail.append('SPEND')
+
+    survey_output(
+        "FARES",
+        "data/calculations/Q3_2017/fares/fares_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'FARE', 'FAREK', 'SPEND', 'SPENDIMPREASON'
+        ],
+        expected_failure=expected_failure,
+        cols_to_fail=cols_to_fail
+    )
+
+
+def test_spend_imputation():
+    log.info("Testing Calculation 10 --> spend_imputation")
+    spend_imputation.spend_imputation_step(run_id)
+    expected_failure = True
+    cols_to_fail = ['SPEND']    # Because Python's internal rounding
+
+    # Assert failure if PUR2_PV isn't modified to match SAS. For further information see Confluence.
+    change_pur2_pv = ServicesConfiguration().sas_pur2_pv()
+    if not change_pur2_pv:
+        cols_to_fail.extend(['PUR2_PV', 'SPENDK'])
+
+    survey_output(
+        "SPEND",
+        "data/calculations/Q3_2017/spend/spend_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'SPEND_IMP_FLAG_PV', 'SPEND_IMP_ELIGIBLE_PV', 'UK_OS_PV', 'PUR1_PV', 'PUR2_PV',
+            'PUR3_PV', 'DUR1_PV', 'DUR2_PV', 'SPENDK', 'SPEND'
+        ],
+        expected_failure=expected_failure,
+        cols_to_fail=cols_to_fail
+    )
+
+
+def test_rail_imputation():
+    # Expected failure regardless of the configuration.  Either SPEND does not match due to PUR2_PV
+    # or Python's internal bankers rounding.  See Confluence for further information.
+    log.info("Testing Calculation 11 --> rail_imputation")
+    rail_imputation.rail_imputation_step(run_id)
+    expected_failure = True
+    cols_to_fail = ['SPEND']
+
+    survey_output(
+        "RAIL",
+        "data/calculations/Q3_2017/rail/rail_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'RAIL_CNTRY_GRP_PV', 'RAIL_EXERCISE_PV', 'RAIL_IMP_ELIGIBLE_PV', 'SPEND'
+        ],
+        expected_failure=expected_failure,
+        cols_to_fail=cols_to_fail
+    )
+
+
+def test_regional_weight():
+    # TODO: --->
+    # Expected failure due to inferred data types in CSV. See Confluence for further information.
+    log.info("Testing Calculation 14 --> regional_weight")
+    regional_weights.regional_weights_step(run_id)
+    expected_failure = True
+    cols_to_fail = ['STAY2K', 'STAY3K', 'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K']
+
+    # Assert failure if PUR2_PV isn't modified to match SAS. For further information see Confluence.
+    refactor_pur2_pv = ServicesConfiguration().sas_pur2_pv()
+    # conventional_rouding = ServicesConfiguration().sas_rounding()
+    if not refactor_pur2_pv:
+        cols_to_fail.append('EXPENDITURE_WT')
+
+    survey_output(
+        "REGIONAL",
+        'data/calculations/Q3_2017/regional_weights/regional_surveysubsample_2017.csv',
+        [
+            'SERIAL', 'VISIT_WT', 'VISIT_WTK', 'STAY_WT', 'STAY_WTK', 'EXPENDITURE_WT', 'EXPENDITURE_WTK', 'NIGHTS1',
+            'NIGHTS2', 'NIGHTS3', 'NIGHTS4', 'NIGHTS5', 'NIGHTS6', 'NIGHTS7', 'NIGHTS8', 'STAY1K', 'STAY2K', 'STAY3K',
+            'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K', 'PURPOSE_PV', 'STAYIMPCTRYLEVEL1_PV',
+            'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV', 'REG_IMP_ELIGIBLE_PV'
+        ],
+        expected_failure=expected_failure,
+        cols_to_fail=cols_to_fail
+    )
+
+
+def test_town_stay_expenditure_imputation():
+    # Expected failure due to inferred data types in CSV. See Confluence for further information.
+    log.info("Testing Calculation 13 --> town_stay_expenditure_imputation")
+    town_stay_expenditure.town_stay_expenditure_imputation_step(run_id)
+    expected_failure = True
+    cols_to_fail = ['SPEND1', 'SPEND2', 'SPEND3', 'SPEND4', 'SPEND5', 'SPEND6', 'SPEND7', 'SPEND8']
+
+    survey_output(
+        "TOWN_AND_STAY",
+        "data/calculations/Q3_2017/town_and_stay/town_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'SPEND1', 'SPEND2', 'SPEND3', 'SPEND4', 'SPEND5', 'SPEND6', 'SPEND7', 'SPEND8', 'PURPOSE_PV',
+            'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV',
+            'TOWN_IMP_ELIGIBLE_PV'
+        ],
+        expected_failure=expected_failure,
+        cols_to_fail=cols_to_fail
+    )
+
+
+def test_airmiles():
+    log.info("Testing Calculation 14 --> airiles")
+    air_miles.airmiles_step(run_id)
+    survey_output(
+        "AIRMILES",
+        "data/calculations/Q3_2017/air_miles/air_surveysubsample_2017.csv",
+        [
+            'SERIAL', 'UKLEG', 'OVLEG', 'DIRECTLEG'
+        ]
+    )
+
+
+def survey_output(test_name, expected_survey_output, survey_output_columns, expected_failure=None, cols_to_fail=None):
     # Get survey results
     survey_subsample = select_data("*", survey_subsample_table, "RUN_ID", run_id)
 
@@ -393,15 +417,12 @@ def survey_output(test_name, expected_survey_output, survey_output_columns, stat
     survey_expected.sort_values(by='SERIAL', axis=0, inplace=True)
     survey_expected.index = range(0, len(survey_expected))
 
-    if not status:
-        columns = false_cols
+    if expected_failure:
+        assert_frame_not_equal(survey_results, survey_expected, cols_to_fail, test_name)
 
-        # Assert columns do not match
-        assert_frame_not_equal(survey_results, survey_expected, columns, test_name)
-
-        # Assert remaining dataframe for Spend Imputation matches for accuracy
-        survey_results.drop(columns, axis=1, inplace=True)
-        survey_expected.drop(columns, axis=1, inplace=True)
+        # Drop failing columns and test remaining dataframe
+        survey_results.drop(cols_to_fail, axis=1, inplace=True)
+        survey_expected.drop(cols_to_fail, axis=1, inplace=True)
 
     # Test survey outputs
     log.info(f"Testing survey results for {test_name}")
@@ -440,7 +461,19 @@ def summary_output(test_name, expected_summary_output, summary_output_table, sum
 
 
 def assert_frame_not_equal(results, expected, columns, test_name):
+    # TODO: --->
+    # conventional_rounding = ServicesConfiguration().sas_rounding()
+    # pur2_pv = ServicesConfiguration.sas_pur2_pv()
+    #
+    # results[['SERIAL', columns]].to_csv(
+    #     f'/Users/ThornE1/PycharmProjects/ips_services/tests/py_{test_name}_rounding_{conventional_rounding}_pur2_pv_{pur2_pv}.csv')
+    # expected[['SERIAL', columns]].to_csv(
+    #     f'/Us ers/ThornE1/PycharmProjects/ips_services/tests/sas_{test_name}_rounding_{conventional_rounding}_pur2_pv_{pur2_pv}.csv')
+    # TODO: <---
+
     # Mismatching dataframes will result in a positive result
+    outcome = []
+
     for col in columns:
         python_df = results[['SERIAL', col]]
         sas_df = expected[['SERIAL', col]]
@@ -448,14 +481,17 @@ def assert_frame_not_equal(results, expected, columns, test_name):
         try:
             log.info(f"Asserting {col} not equal for {test_name}")
             assert_frame_equal(python_df, sas_df)
-        except AssertionError:
+        except AssertionError as err:
             # frames are not equal
             log.info(f"{col} does not match SAS output:  Expected behaviour")
-            return True
+            outcome.append(True)
         else:
             # frames are equal
             log.warning(f"{col} matches SAS output: Unexpected behaviour.")
+            outcome.append(False)
 
+    result = set(outcome)
+    if False in result:
+        assert False
 
-if __name__ == '__main__':
-    setup_pv()
+    assert True

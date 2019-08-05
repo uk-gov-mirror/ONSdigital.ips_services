@@ -252,8 +252,7 @@ def test_fares_imputation():
     fares_imputation.fares_imputation_step(run_id)
     expected_failure = False
 
-    # Assert failure when using Python's default bankers rounding. For further information see
-    # https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+    # Assert failure when using Python's default bankers rounding. For further information see Confluence
     conventional_rounding = ServicesConfiguration().sas_rounding()
     if not conventional_rounding:
         expected_failure = True
@@ -273,15 +272,19 @@ def test_spend_imputation():
     log.info("Testing Calculation 10 --> spend_imputation")
     spend_imputation.spend_imputation_step(run_id)
     expected_failure = False
+    cols_to_fail = []
 
-    # Assert failure when using the refactored PUR2_PV or Python's default bankers rounding. For further information see
-    # https://collaborate2.ons.gov.uk/confluence/display/QSS/Spend+Imputation+Testing+Configuration and
-    # https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
-    refactor_pur2_pv = ServicesConfiguration().sas_pur2_pv()
+    # Assert failure if PUR2_PV isn't modified to match SAS. For further information see Confluence.
+    change_pur2_pv = ServicesConfiguration().sas_pur2_pv()
     conventional_rounding = ServicesConfiguration().sas_rounding()
 
-    if not refactor_pur2_pv or not conventional_rounding:
+    if not conventional_rounding:
         expected_failure = True
+        cols_to_fail = ['SPEND']
+
+    if not change_pur2_pv:
+        expected_failure = True
+        cols_to_fail = ['SPEND', 'PUR2_PV', 'SPENDK']
 
     survey_output(
         "SPEND",
@@ -291,15 +294,14 @@ def test_spend_imputation():
             'PUR3_PV', 'DUR1_PV', 'DUR2_PV', 'SPENDK', 'SPEND'
         ],
         expected_failure=expected_failure,
-        cols_to_fail=['PUR2_PV', 'PUR3_PV', 'SPEND', 'SPENDK']
+        cols_to_fail=cols_to_fail
     )
 
 
 def test_rail_imputation():
-    # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+    # Expected failure.  For further information see Confluence
     log.info("Testing Calculation 11 --> rail_imputation")
     rail_imputation.rail_imputation_step(run_id)
-
 
     survey_output(
         "RAIL",
@@ -313,9 +315,11 @@ def test_rail_imputation():
 
 
 def test_regional_weight():
-    # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+    # Expected failure due to inferred data types in CSV. See Confluence for further information.
     log.info("Testing Calculation 14 --> regional_weight")
     regional_weights.regional_weights_step(run_id)
+    expected_failure = True
+    cols_to_fail = ['EXPENDITURE_WT', 'STAY2K', 'STAY3K', 'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K']
 
     survey_output(
         "REGIONAL",
@@ -326,18 +330,17 @@ def test_regional_weight():
             'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K', 'PURPOSE_PV', 'STAYIMPCTRYLEVEL1_PV',
             'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV', 'REG_IMP_ELIGIBLE_PV'
         ],
-        expected_failure=True,
-        cols_to_fail=['EXPENDITURE_WT', 'STAY1K', 'STAY2K', 'STAY3K', 'STAY4K', 'STAY5K', 'STAY6K', 'STAY7K', 'STAY8K', 'PURPOSE_PV',
-                        'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV',
-                        'STAYIMPCTRYLEVEL4_PV', 'REG_IMP_ELIGIBLE_PV'
-                      ]
+        expected_failure=expected_failure,
+        cols_to_fail=cols_to_fail
     )
 
 
 def test_town_stay_expenditure_imputation():
-    # Expected failure.  For further information see: https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ
+    # Expected failure due to inferred data types in CSV. See Confluence for further information.
     log.info("Testing Calculation 13 --> town_stay_expenditure_imputation")
     town_stay_expenditure.town_stay_expenditure_imputation_step(run_id)
+    expected_failure = True
+    cols_to_fail = ['SPEND1', 'SPEND2', 'SPEND3', 'SPEND4', 'SPEND5', 'SPEND6', 'SPEND7', 'SPEND8']
 
     survey_output(
         "TOWN_AND_STAY",
@@ -347,11 +350,8 @@ def test_town_stay_expenditure_imputation():
             'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV', 'STAYIMPCTRYLEVEL4_PV',
             'TOWN_IMP_ELIGIBLE_PV'
         ],
-        expected_failure=True,
-        cols_to_fail=['SPEND1', 'SPEND2', 'SPEND3', 'SPEND4', 'SPEND5', 'SPEND6', 'SPEND7', 'SPEND8', 'PURPOSE_PV',
-                        'STAYIMPCTRYLEVEL1_PV', 'STAYIMPCTRYLEVEL2_PV', 'STAYIMPCTRYLEVEL3_PV',
-                        'STAYIMPCTRYLEVEL4_PV', 'TOWN_IMP_ELIGIBLE_PV'
-                      ]
+        expected_failure=expected_failure,
+        cols_to_fail=cols_to_fail
     )
 
 
@@ -425,6 +425,8 @@ def summary_output(test_name, expected_summary_output, summary_output_table, sum
 
 def assert_frame_not_equal(results, expected, columns, test_name):
     # Mismatching dataframes will result in a positive result
+    outcome = []
+
     for col in columns:
         python_df = results[['SERIAL', col]]
         sas_df = expected[['SERIAL', col]]
@@ -432,10 +434,15 @@ def assert_frame_not_equal(results, expected, columns, test_name):
         try:
             log.info(f"Asserting {col} not equal for {test_name}")
             assert_frame_equal(python_df, sas_df)
-        except AssertionError:
-            # frames are not equal
+        except AssertionError as err:
             log.info(f"{col} does not match SAS output:  Expected behaviour")
-            return True
+            outcome.append(True)
         else:
-            # frames are equal
             log.warning(f"{col} matches SAS output: Unexpected behaviour.")
+            outcome.append(False)
+
+    result = set(outcome)
+    if False in result:
+        assert False
+
+    assert True
