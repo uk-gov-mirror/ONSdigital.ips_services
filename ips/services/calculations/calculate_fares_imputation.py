@@ -8,7 +8,7 @@ from ips.services.calculations.sas_random import SASRandom
 from ips.services.calculations.sas_rounding import ips_rounding
 
 from ips.util.services_logging import log
-# changessddd
+# changessd
 # dataimport survey_support
 
 INTDATE = 'INTDATE'
