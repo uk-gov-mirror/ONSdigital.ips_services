@@ -1,5 +1,7 @@
 import falcon
 from falcon_multipart.middleware import MultipartMiddleware
+
+from ips.api.health_check import HealthCheck
 from ips.util.services_logging import log
 
 from ips.api.cancel_api import CancelApi
@@ -41,6 +43,7 @@ app.add_route("/run_steps/{run_id}/{value}/{step_number}", RunStepsValueStepApi(
 app.add_route("/pv_sets", PvSetsApi(workflow))
 
 app.add_route("/login/{user_name}/{password}", LoginApi(workflow))
+app.add_route("/health_check", HealthCheck(workflow))
 
 app.add_route("/process_variables/{run_id}", PvApi(workflow))
 
