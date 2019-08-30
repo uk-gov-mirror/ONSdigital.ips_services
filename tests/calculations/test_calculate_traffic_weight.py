@@ -8,8 +8,7 @@ import pandas as pd
 import pytest
 from pandas.util.testing import assert_frame_equal
 
-from ips.services.calculations import do_ips_trafweight_calculation_with_R
-
+from ips.services.calculations.calculate_traffic_weight import do_ips_trafweight_calculation_with_r
 
 @pytest.mark.parametrize('path_to_data', [
     r'../data/calculations/december_2017/traffic_weight',
@@ -23,7 +22,7 @@ def test_calculate(path_to_data):
     df_tr_data = pd.read_csv(path_to_data + '/trafficdata.csv', engine='python')
 
     # do the calculation
-    df_output_merge_final, df_output_summary = do_ips_trafweight_calculation_with_R(df_surveydata, df_tr_data)
+    df_output_merge_final, df_output_summary = do_ips_trafweight_calculation_with_r(df_surveydata, df_tr_data)
 
     # test start - turn on when testing/refactoring intermediate steps
     df_test = pd.read_csv(path_to_data + '/output_final.csv', engine='python')

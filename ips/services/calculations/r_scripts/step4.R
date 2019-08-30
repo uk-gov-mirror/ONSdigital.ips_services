@@ -33,7 +33,7 @@ poprowvec$index <- NULL
 survey_input_aux$TRAF_DESIGN_WEIGHT[survey_input_aux$TRAF_DESIGN_WEIGHT == 0] <- NA
 survey_input_aux <- survey_input_aux[complete.cases(survey_input_aux$TRAF_DESIGN_WEIGHT),]
 
-# declare factors
+# declare factors, adds column T_ with values contained in T1
 survey_input_aux[, "T_"] <- factor(survey_input_aux[, "T1"])
 
 # hide annoying regenesees output
@@ -48,7 +48,8 @@ des <- e.svydesign(data = survey_input_aux, ids = ~ SERIAL, weights = ~ TRAF_DES
 
 df.population <- as.data.frame(poprowvec)
 
-pop.template(data = survey_input_aux, calmodel = ~ T_ - 1)
+# setup and check template (T1..n) against survey and poprec
+#pop.template(data = survey_input_aux, calmodel = ~ T_ - 1) # just prints out some stuff
 population.check(df.population, data = survey_input_aux, calmodel = ~ T_ - 1)
 
 # call regenesees
