@@ -4161,5 +4161,11 @@ create table USER
 INSERT INTO USER (ID, USER_NAME, PASSWORD, FIRST_NAME, SURNAME, ROLE)
 VALUES (1, 'Admin', 'pbkdf2:sha256:50000$jYlAjFyT$a3990f67a04492fdffae29256cc168caf7becbe33ca6fefb2f89c04b00ef9d27',
         null, null, 'admin');
+INSERT INTO USER (ID, USER_NAME, PASSWORD, FIRST_NAME, SURNAME, ROLE)
+VALUES (2, 'Blakee', 'pbkdf2:sha256:150000$i1LqpQT6$b8d796f2bd4444991d1f399ef67a5f89dd44394c0ac5b1402d89db9ed6f770ea',
+        'Elliot', 'Blake', 'user');
+INSERT INTO USER (ID, USER_NAME, PASSWORD, FIRST_NAME, SURNAME, ROLE)
+VALUES (3, 'Lloydk1', 'pbkdf2:sha256:150000$VUkt1oo2$e725b48abee0275dbbe50735db47e5156665c06cd73feef0292a59ffe8ef85d2',
+        'Kimberley', 'Lloyd', 'user');
 
 SET FOREIGN_KEY_CHECKS = 1;
