@@ -36,34 +36,45 @@ columns = [
 
 @service
 def import_survey(run_id, data, month, year):
-    log.info("Importing survey data")
-    df: pd.DataFrame = pd.read_csv(
-        io.BytesIO(data),
-        encoding="ISO-8859-1",
-        engine="python",
-        usecols=lambda x: x.upper() in columns
-    )
+    try:
+        log.info("Importing survey data")
+        df: pd.DataFrame = pd.read_csv(
+            io.BytesIO(data),
+            encoding="ISO-8859-1",
+            engine="python",
+            skipinitialspace=True,
+            usecols=lambda x: x.upper() in columns
+        )
 
-    def convert_col_to_int(data_frame, col):
-        data_frame[col] = data_frame[col].fillna(-1).astype(int).replace('-1', np.nan)
+        def convert_col_to_int(data_frame, col):
+            data_frame[col] = data_frame[col].fillna(-1).astype(int).replace('-1', np.nan)
 
-    df.columns = df.columns.str.upper()
-    df['TANDTSI'] = df['TANDTSI'].round(0)
+        df.columns = df.columns.str.upper()
+        df['TANDTSI'] = df['TANDTSI'].round(0)
+        # [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'DVEXPEND', 'TANDTSI']]
+        [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'TANDTSI']]
+        errors = Errors()
+        validation = validate.validate_survey_data(df, month, year, errors)
+        if not validation:
+            log.error(f"Validation failed: {errors.get_messages()}")
+            raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
+        log.info("Survey validation completed successfully.")
 
-    # [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'DVEXPEND', 'TANDTSI']]
-    [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'TANDTSI']]
+        df = df.sort_values(by='SERIAL')
+        db.import_survey_data(run_id, df)
+        return df
+    except Exception as e:
+        log.error(f"Validation failed: {e}")
+        raise falcon.HTTPError(falcon.HTTP_400, 'data error', e)
 
-    errors = Errors()
-    validation = validate.validate_survey_data(df, month, year, errors)
-    if not validation:
-        log.error(f"Validation failed: {errors.get_messages()}")
-        raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
-
-    log.info("Survey validation completed successfully.")
-
-    df = df.sort_values(by='SERIAL')
-    db.import_survey_data(run_id, df)
-    return df
+def trim_all_columns(df):
+    """
+    Trim whitespace from ends of each value across all series in dataframe
+    """
+    trim_strings = lambda x: x.strip() if isinstance(x, str) else x
+    df = df.applymap(trim_strings)
+    replace_with_null = lambda x: None if x=='' else x
+    return df.applymap(replace_with_null)
 
 
 class Errors:
