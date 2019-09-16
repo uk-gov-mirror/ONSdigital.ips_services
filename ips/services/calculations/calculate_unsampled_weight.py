@@ -143,6 +143,7 @@ def r_survey_input(survey_input: pd.DataFrame) -> None:
     )
 
     df_aux_variables['OOH_DESIGN_WEIGHT'] = values
+    df_aux_variables = df_aux_variables[df_aux_variables.OOH_DESIGN_WEIGHT > 0]
     df_aux_variables = df_aux_variables.sort_values(['SERIAL'])
 
     # Create input to pass into GES weighting
