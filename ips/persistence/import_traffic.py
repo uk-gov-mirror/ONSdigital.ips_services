@@ -17,7 +17,8 @@ def import_traffic_data(import_type, dataframe, run_id):
 
     try:
         delete_traffic(run_id=run_id, data_source_id=import_type.value)
+        log.info("Importing traffic data")
         insert_traffic(dataframe)
     except Exception as err:
-        log.error(f"Cannot insert traffic_data dataframe into database: {err}")
+        log.error(f"Cannot insert Traffic data into database: {err}")
         return None

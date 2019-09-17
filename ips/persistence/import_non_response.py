@@ -17,8 +17,9 @@ def import_non_response(run_id, dataframe):
 
     try:
         delete_non_response(run_id=run_id)
+        log.info(f"Importing non_response data")
         insert_non_response(dataframe)
 
     except Exception as err:
-        log.error(f"Cannot insert non_response dataframe into table: {err}")
+        log.error(f"Cannot insert Non Response into table: {err}")
         return None

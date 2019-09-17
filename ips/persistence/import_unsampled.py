@@ -21,7 +21,8 @@ def import_unsampled(run_id, dataframe):
 
     try:
         delete_unsampled(run_id=run_id)
+        log.info("Importing Unsampled data")
         insert_unsampled(dataframe)
     except Exception as err:
-        log.error(f"Cannot insert unsampled_data dataframe into database: {err}")
+        log.error(f"Cannot insert Unsampled_data into database: {err}")
         return None

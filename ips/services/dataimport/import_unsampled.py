@@ -11,7 +11,6 @@ from ips.services.dataimport import CSVType
 
 @service
 def import_unsampled(run_id, data, month, year):
-    log.info("Importing unsampled data")
     df = pd.read_csv(
         io.BytesIO(data),
         encoding="ISO-8859-1",
@@ -27,7 +26,7 @@ def import_unsampled(run_id, data, month, year):
         log.error(f"Validation failed: {errors.get_messages()}")
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
 
-    log.info(f"{CSVType.Unsampled.name} validation completed successfully.")
+    log.info(f"{CSVType.Unsampled.name} validation completed successfully")
     db.import_unsampled(run_id, df)
     return df
 
