@@ -31,10 +31,6 @@ def get_sql_connection():
         eng = engi
         return engi.connect()
     except Exception as err:
-        log.error(f"Username: {username}")
-        log.error(f"Database: {database}")
-        log.error(f"Server: {server}")
-
         log.error(f"get_sql_connection failed: {err}")
         raise err
 

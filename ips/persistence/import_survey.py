@@ -19,5 +19,6 @@ def import_survey_data(run_id, df):
     df['RUN_ID'] = pandas.Series(run_id, index=df.index)
 
     delete_ss(run_id=run_id)
+    log.info("Importing Survey data")
     insert_ss(df)
 

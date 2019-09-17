@@ -14,7 +14,6 @@ from ips.services.dataimport.schemas import traffic_schema
 
 @service
 def _import_traffic(import_type, run_id, data, month, year):
-    log.info("Importing traffic data")
     df: pd.DataFrame = pd.read_csv(
         io.BytesIO(data),
         encoding="ISO-8859-1",
@@ -30,7 +29,7 @@ def _import_traffic(import_type, run_id, data, month, year):
         log.error(f"Validation failed: {errors.get_messages()}")
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
 
-    log.info(f"{import_type.name} validation completed successfully.")
+    log.info(f"{import_type.name} validation completed successfully")
     db.import_traffic_data(import_type, df, run_id)
     return df
 

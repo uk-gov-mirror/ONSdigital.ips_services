@@ -12,7 +12,6 @@ from ips.services.dataimport import CSVType
 
 @service
 def import_shift(run_id, data, month, year):
-    log.info("Importing shift data")
     df = pd.read_csv(
         io.BytesIO(data),
         encoding="ISO-8859-1",
@@ -28,7 +27,7 @@ def import_shift(run_id, data, month, year):
         log.error(f"Validation failed: {errors.get_messages()}")
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
 
-    log.info(f"{CSVType.Shift.name} validation completed successfully.")
+    log.info(f"{CSVType.Shift.name} validation completed successfully")
     db.import_shift_data(run_id, df)
     return df
 

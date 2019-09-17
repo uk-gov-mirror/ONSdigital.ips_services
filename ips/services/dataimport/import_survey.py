@@ -37,7 +37,6 @@ columns = [
 @service
 def import_survey(run_id, data, month, year):
     try:
-        log.info("Importing survey data")
         df: pd.DataFrame = pd.read_csv(
             io.BytesIO(data),
             encoding="ISO-8859-1",
