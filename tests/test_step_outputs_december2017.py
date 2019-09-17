@@ -424,6 +424,7 @@ def summary_output(test_name, expected_summary_output, summary_output_table, sum
 
 
 def assert_frame_not_equal(results, expected, columns, test_name):
+    # See https://collaborate2.ons.gov.uk/confluence/x/ArlfAQ for more info
     # Mismatching dataframes will result in a positive result
     outcome = []
 
