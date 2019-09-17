@@ -4,76 +4,6 @@ grant all on ips.* to 'ips'@'%' with grant option;
 
 use ips;
 
--- create table AUDIT_LOG
--- (
---     AUDIT_ID          decimal       not null,
---     ACTIONED_BY       varchar(20)   not null,
---     ACTION            varchar(30)   not null,
---     OBJECT            varchar(100)  not null,
---     LOG_DATE          date          not null,
---     AUDIT_LOG_DETAILS varchar(1000) not null
--- );
-
-
--- create table COLUMN_LOOKUP
--- (
---     LOOKUP_COLUMN varchar(50)  not null,
---     LOOKUP_KEY    decimal(2)   not null,
---     DISPLAY_VALUE varchar(100) not null
--- );
-
-
--- create table DATA_SOURCE
--- (
---     DATA_SOURCE_ID   decimal     not null
---         primary key,
---     DATA_SOURCE_NAME varchar(30) not null
--- );
---
--- INSERT INTO ips.DATA_SOURCE (DATA_SOURCE_ID, DATA_SOURCE_NAME)
--- VALUES (1, 'Sea');
--- INSERT INTO ips.DATA_SOURCE (DATA_SOURCE_ID, DATA_SOURCE_NAME)
--- VALUES (2, 'Air');
--- INSERT INTO ips.DATA_SOURCE (DATA_SOURCE_ID, DATA_SOURCE_NAME)
--- VALUES (3, 'Tunnel');
--- INSERT INTO ips.DATA_SOURCE (DATA_SOURCE_ID, DATA_SOURCE_NAME)
--- VALUES (4, 'Shift');
--- INSERT INTO ips.DATA_SOURCE (DATA_SOURCE_ID, DATA_SOURCE_NAME)
--- VALUES (5, 'Non Response');
--- INSERT INTO ips.DATA_SOURCE (DATA_SOURCE_ID, DATA_SOURCE_NAME)
--- VALUES (6, 'Unsampled');
--- create table DELTAS
--- (
---     DELTA_NUMBER decimal(38)  not null,
---     RUN_DATE     date         not null,
---     BACKOUT_DATE date         null,
---     DESCRIPTION  varchar(100) not null
--- );
-
-
--- create table EXPORT_COLUMN
--- (
---     EXPORT_TYPE_ID  decimal     not null,
---     COLUMN_SOURCE   varchar(3)  not null,
---     COLUMN_ORDER_NO decimal(4)  not null,
---     COLUMN_DESC     varchar(30) not null,
---     COLUMN_TYPE     varchar(20) null,
---     COLUMN_LENGTH   decimal(38) null
--- );
-
-
--- create table EXPORT_DATA_DETAILS
--- (
---     ED_ID          varchar(40) not null,
---     ED_NAME        varchar(30) not null,
---     EXPORT_TYPE_ID decimal     not null,
---     FORMAT_ID      decimal     not null,
---     DATE_CREATED   date        not null,
---     ED_STATUS      decimal(2)  not null,
---     USER_ID        varchar(20) not null
--- );
-
-
 create table EXPORT_DATA_DOWNLOAD
 (
     RUN_ID            varchar(40) not null,
@@ -82,23 +12,6 @@ create table EXPORT_DATA_DOWNLOAD
     SOURCE_TABLE      varchar(40) null,
     DATE_CREATED      text        null
 );
-
-
--- create table EXPORT_TYPE
--- (
---     EXPORT_TYPE_ID   decimal     not null,
---     EXPORT_TYPE_NAME varchar(30) not null,
---     EXPORT_TYPE_DEF  text        not null
--- );
-
-
--- create table FORMAT_TYPE
--- (
---     FORMAT_ID   decimal       not null,
---     FORMAT_NAME varchar(30)   not null,
---     FORMAT_DEF  varchar(2000) not null
--- );
-
 
 create table NON_RESPONSE_DATA
 (
@@ -114,42 +27,6 @@ create table NON_RESPONSE_DATA
     MIGTOTAL       decimal     null,
     ORDTOTAL       decimal     null
 );
-
-
--- create table PROCESS_NAME
--- (
---     PN_ID        decimal     not null,
---     PROCESS_NAME varchar(30) not null
--- );
-
-
--- create table PROCESS_VARIABLE
--- (
---     RUN_ID              varchar(40)   not null,
---     PROCESS_VARIABLE_ID decimal       not null,
---     PV_NAME             varchar(30)   not null,
---     PV_DESC             varchar(1000) not null,
---     PV_DEF              text          not null
--- );
-
-
--- create table PROCESS_VARIABLE_BACKUP
--- (
---     RUN_ID              varchar(40)   not null,
---     PROCESS_VARIABLE_ID decimal       not null,
---     PV_NAME             varchar(30)   not null,
---     PV_DESC             varchar(1000) not null,
---     PV_DEF              text          not null
--- );
-
-
--- create table PROCESS_VARIABLE_LOG
--- (
---     PROCESS_VARIABLE_ID decimal       not null,
---     PVL_DATE            date          not null,
---     PVL_REASON          varchar(1000) not null
--- );
-
 
 create table PROCESS_VARIABLE_PY
 (
@@ -1775,26 +1652,6 @@ if row[''PURPOSE''] in (20,21,22):
     row[''TYPE_PV''] = 1
 else:
     row[''TYPE_PV''] = 2');
-
--- create table PROCESS_VARIABLE_PY_BACKUP
--- (
---     RUN_ID              varchar(40)   not null,
---     PROCESS_VARIABLE_ID decimal       not null,
---     PV_NAME             varchar(30)   not null,
---     PV_DESC             varchar(1000) not null,
---     PV_DEF              text          not null
--- );
---
---
--- create table PROCESS_VARIABLE_PY_BACKUP_2
--- (
---     RUN_ID              varchar(40)   not null,
---     PROCESS_VARIABLE_ID decimal       not null,
---     PV_NAME             varchar(30)   not null,
---     PV_DESC             varchar(1000) not null,
---     PV_DEF              text          not null
--- );
-
 
 create table PROCESS_VARIABLE_SET
 (
@@ -3582,571 +3439,571 @@ create table SURVEY_UNSAMP_AUX
     T1                   int           null
 );
 
-INSERT INTO ips.RUN
-(RUN_ID, RUN_NAME, RUN_DESC, USER_ID, PERIOD, YEAR, RUN_STATUS, RUN_TYPE_ID, LAST_MODIFIED)
-VALUES ('b63786be-25b1-4f30-bfd9-a240a10f0ede', 'TM_Create_and_Edit_Test',
-        'Test run to check run creation and editing are still working after changing the fieldwork selection options',
-        'smptester', "01", 2019, 0, 0, CURDATE()),
-       ('0eada784-7caf-4f68-b26f-4699c9bf0032', 'TestRun1', 'Demo test run', 'smptester', "02", 2018, 3, 0, CURDATE()),
-       ('09e5c1872-3f8e-4ae5-85dc-c67a602d011e', 'IPS_Test_Run_December_2017',
-        'IPS run that contains data for the December period of 2017. This is our demo run, skip the dataimport step.',
-        'smptester', "12", 2017, 2, 1, CURDATE()),
-       ('6aee5893-79bd-4e6b-923e-c41a9d3b56d9', 'IPS_Run December 2017', 'Demo Run', 'smptester', "11", 2017, 3, 0,
-        CURDATE()),
-       ('b33e6aa9-415a-408f-a871-04701fadbd70', 'HandoverRun', 'Test run for handover demo.', 'mahont1', "01", 2019, 0,
-        0, CURDATE());
+-- INSERT INTO ips.RUN
+-- (RUN_ID, RUN_NAME, RUN_DESC, USER_ID, PERIOD, YEAR, RUN_STATUS, RUN_TYPE_ID, LAST_MODIFIED)
+-- VALUES ('b63786be-25b1-4f30-bfd9-a240a10f0ede', 'TM_Create_and_Edit_Test',
+--         'Test run to check run creation and editing are still working after changing the fieldwork selection options',
+--         'smptester', "01", 2019, 0, 0, CURDATE()),
+--        ('0eada784-7caf-4f68-b26f-4699c9bf0032', 'TestRun1', 'Demo test run', 'smptester', "02", 2018, 3, 0, CURDATE()),
+--        ('09e5c1872-3f8e-4ae5-85dc-c67a602d011e', 'IPS_Test_Run_December_2017',
+--         'IPS run that contains data for the December period of 2017. This is our demo run, skip the dataimport step.',
+--         'smptester', "12", 2017, 2, 1, CURDATE()),
+--        ('6aee5893-79bd-4e6b-923e-c41a9d3b56d9', 'IPS_Run December 2017', 'Demo Run', 'smptester', "11", 2017, 3, 0,
+--         CURDATE()),
+--        ('b33e6aa9-415a-408f-a871-04701fadbd70', 'HandoverRun', 'Test run for handover demo.', 'mahont1', "01", 2019, 0,
+--         0, CURDATE());
 
-CREATE TABLE G_PVs
-(
-    PV_ID int(11)      NOT NULL,
-    Name  varchar(255) NOT NULL,
-    PRIMARY KEY (PV_ID)
-);
+-- CREATE TABLE G_PVs
+-- (
+--     PV_ID int(11)      NOT NULL,
+--     Name  varchar(255) NOT NULL,
+--     PRIMARY KEY (PV_ID)
+-- );
+--
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (12, 'imbal_port_fact_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (13, 'stay_imp_flag_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (14, 'stay_imp_eligible_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (33, 'osport2_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (47, 'rail_cntry_grp_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (34, 'osport3_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (35, 'osport4_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (36, 'apd_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (37, 'qmfare_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (38, 'duty_free_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (39, 'spend_imp_eligible_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (40, 'uk_os_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (41, 'pur1_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (42, 'pur2_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (43, 'pur3_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (44, 'dur1_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (45, 'dur2_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (46, 'imbal_ctry_fact_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (15, 'StayImpCtryLevel1_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (16, 'StayImpCtryLevel2_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (28, 'ukport1_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (29, 'ukport2_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (30, 'ukport3_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (31, 'ukport4_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (32, 'osport1_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (48, 'rail_exercise_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (49, 'rail_imp_eligible_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (50, 'spend_imp_flag_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (51, 'purpose_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (52, 'town_imp_eligible_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (53, 'reg_imp_eligible_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (54, 'mins_ctry_grp_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (55, 'mins_port_grp_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (56, 'samp_port_grp_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (57, 'unsamp_port_grp_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (4, 'shift_flag_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (5, 'crossings_flag_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (6, 'shift_port_grp_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (7, 'nr_flag_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (8, 'nr_port_grp_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (9, 'mins_flag_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (10, 'imbal_eligible_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (11, 'imbal_port_grp_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (58, 'unsamp_region_grp_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (1, 'weekday_end_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (2, 'am_pm_night_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (3, 'mig_flag_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (17, 'StayImpCtryLevel3_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (18, 'StayImpCtryLevel4_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (19, 'stay_purpose_grp_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (20, 'fares_imp_flag_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (21, 'fares_imp_eligible_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (22, 'discnt_f1_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (23, 'discnt_package_cost_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (24, 'discnt_f2_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (25, 'fage_pv');
+-- INSERT INTO G_PVs(PV_ID, Name)
+-- VALUES (26, 'type_pv');
+--
+-- CREATE TABLE `G_PV_Variables`
+-- (
+--     `PV_Variable_ID` int(11)      NOT NULL,
+--     `PV_ID`          int(11)      NOT NULL,
+--     `Name`           varchar(255) NOT NULL,
+--     PRIMARY KEY (`PV_Variable_ID`),
+--     KEY `FK__G_PV_Vari__PV_ID__2739D489` (`PV_ID`),
+--     CONSTRAINT `FK__G_PV_Vari__PV_ID__2739D489` FOREIGN KEY (`PV_ID`) REFERENCES `G_PVs` (`PV_ID`) ON DELETE CASCADE ON UPDATE CASCADE
+-- );
+--
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (1, 12, 'row["IMBAL_PORT_FACT_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (2, 12, 'row["IMBAL_PORT_GRP_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (3, 12, 'row["ARRIVEDEPART"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (4, 13, 'row["STAY_IMP_FLAG_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (5, 13, 'row["NUMNIGHTS"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (6, 14, 'row["STAY_IMP_ELIGIBLE_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (7, 14, 'row["PURPOSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (8, 14, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (9, 14, 'row["MINS_FLAG_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (10, 33, 'row["RESIDENCE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (11, 33, 'row["UKFOREIGN"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (12, 33, 'row["UKPORT1_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (13, 33, 'row["OSPORT2_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (14, 33, 'row["COUNTRYVISIT"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (15, 33, 'row["OSPORT1_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (16, 47, 'row["RAIL_CNTRY_GRP_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (17, 47, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (18, 47, 'row["RESIDENCE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (19, 47, 'row["COUNTRYVISIT"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (20, 47, 'railcountry');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (21, 34, 'row["OSPORT3_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (22, 34, 'row["OSPORT2_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (23, 35, 'row["OSPORT3_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (24, 35, 'row["OSPORT4_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (25, 36, 'row["APD_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (26, 36, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (27, 36, 'row["OSPORT2_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (28, 36, 'APDBAND');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (29, 37, 'row["MINS_FLAG_PV"])');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (30, 37, 'row["QMFARE_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (31, 37, 'row["OSPORT3_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (32, 37, 'row["MINS_FLAG_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (33, 38, 'row["PURPOSE"])');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (34, 38, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (35, 38, 'row["PURPOSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (36, 38, 'row["DUTY_FREE_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (37, 39, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (38, 39, 'row["PURPOSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (39, 39, 'row["SPEND_IMP_ELIGIBLE_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (40, 39, 'row["MINS_FLAG_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (41, 40, 'row["UK_OS_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (42, 40, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (43, 41, 'row["DVPACKAGE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (44, 41, 'row["IND"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (45, 41, 'row["PUR1_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (46, 41, 'row["PURPOSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (47, 42, 'row["IND"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (48, 42, 'row["PUR2_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (49, 42, 'row["PURPOSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (50, 43, 'row["PURPOSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (51, 43, 'row["PUR3_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (52, 44, 'row["DUR1_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (53, 44, 'row["STAY"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (54, 45, 'row["DUR2_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (55, 45, 'row["STAY"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (56, 46, 'row["RESIDENCE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (57, 46, 'row["IMBAL_CTRY_FACT_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (58, 15, 'row["STAYIMPCTRYLEVEL1_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (59, 15, 'row["COUNTRYVISIT"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (60, 15, 'row["RESIDENCE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (61, 15, 'row["UKFOREIGN"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (62, 16, 'row["STAYIMPCTRYLEVEL1_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (63, 16, 'row["STAYIMPCTRYLEVEL2_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (64, 28, 'row["PORTROUTE"]</PV_DEF>');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (65, 28, 'row["UKPORT1_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (66, 28, 'row["PORTROUTE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (67, 29, 'row["UKPORT2_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (68, 29, 'row["UKPORT1_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (69, 30, 'row["UKPORT2_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (70, 30, 'row["UKPORT3_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (71, 31, 'row["UKPORT4_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (72, 31, 'row["UKPORT3_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (73, 32, 'row["DVPORTCODE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (74, 32, 'row["OSPORT1_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (75, 32, 'row["CHANGECODE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (76, 48, 'row["RAIL_CNTRY_GRP_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (77, 48, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (78, 48, 'row["RAIL_EXERCISE_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (79, 49, 'row["RAIL_IMP_ELIGIBLE_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (80, 49, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (81, 50, 'row["SPEND_IMP_FLAG_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (82, 50, 'row["SPEND"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (83, 51, 'row["PURPOSE_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (84, 51, 'row["PURPOSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (85, 52, 'row["RESPNSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (86, 52, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (87, 52, 'row["TOWN_IMP_ELIGIBLE_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (88, 52, 'row["PURPOSE"])');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (89, 52, 'row["PURPOSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (90, 53, 'row["RESPNSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (91, 53, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (92, 53, 'row["REG_IMP_ELIGIBLE_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (93, 53, 'row["PURPOSE"])');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (94, 53, 'row["PURPOSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (95, 54, '<PV_DEF>row["MINS_CTRY_GRP_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (96, 54, 'row["FLOW"]</PV_DEF>');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (97, 55, 'row["MINS_PORT_GRP_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (98, 55, 'row["PORTROUTE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (99, 56, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (100, 56, 'row["RESIDENCE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (101, 56, 'row["HAUL"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (102, 56, 'row["DVPORTCODE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (103, 56, 'Irish');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (104, 56, 'IoM');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (105, 56, 'row["ARRIVEDEPART"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (106, 56, 'row["SAMP_PORT_GRP_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (107, 56, 'ChannelI');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (108, 56, 'dvpc');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (109, 56, 'row["COUNTRYVISIT"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (110, 56, 'row["PORTROUTE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (111, 57, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (112, 57, 'row["RESIDENCE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (113, 57, 'row["DVPORTCODE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (114, 57, 'row["UNSAMP_PORT_GRP_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (115, 57, 'Irish');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (116, 57, 'IoM');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (117, 57, 'ChannelI');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (118, 57, 'dvpc');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (119, 57, 'row["COUNTRYVISIT"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (120, 57, 'row["PORTROUTE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (121, 4, 'row["SHIFT_FLAG_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (122, 4, 'row["PORTROUTE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (123, 5, 'row["CROSSINGS_FLAG_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (124, 5, 'row["PORTROUTE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (125, 6, 'row["SHIFT_PORT_GRP_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (126, 6, 'row["PORTROUTE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (127, 7, 'row["RESPNSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (128, 7, 'row["NR_FLAG_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (129, 8, '<PV_DEF>row["NR_PORT_GRP_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (130, 9, 'row["TYPEINTERVIEW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (131, 9, 'row["RESPNSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (132, 9, 'row["MINS_FLAG_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (133, 10, 'row["RESPNSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (134, 10, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (135, 10, 'row["IMBAL_ELIGIBLE_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (136, 10, 'row["INTENDLOS"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (137, 10, 'row["PURPOSE"]))');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (138, 10, 'row["PURPOSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (139, 11, 'row["IMBAL_PORT_GRP_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (140, 11, 'row["PORTROUTE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (141, 58, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (142, 58, 'row["RESIDENCE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (143, 58, 'row["UNSAMP_REGION_GRP_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (144, 58, 'row["DVPORTCODE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (145, 58, 'row["UNSAMP_PORT_GRP_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (146, 58, 'row["ARRIVEDEPART"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (147, 58, 'dvpc');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (148, 58, 'row["COUNTRYVISIT"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (149, 58, 'row["REGION"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (150, 58, 'row["PORTROUTE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (151, 1, 'd');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (152, 1, 'row["INTDATE"][:2]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (153, 1, 'row["INTDATE"][2:4]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (154, 1, 'year');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (155, 1, 'weekday');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (156, 1, 'month');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (157, 1, 'dayweek');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (158, 1, 'row["INTDATE"][4:8]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (159, 1, 'row["WEEKDAY_END_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (160, 1, 'row["WEEKDAY"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (161, 1, 'day');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (162, 1, 'row["PORTROUTE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (163, 2, 'row["AM_PM_NIGHT_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (164, 2, 'row["PORTROUTE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (165, 2, 'row["AM_PM_NIGHT"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (166, 3, 'row["LOSKEY"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (167, 3, 'row["MIG_FLAG_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (168, 17, 'row["STAYIMPCTRYLEVEL2_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (169, 17, 'row["STAYIMPCTRYLEVEL3_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (170, 18, 'row["STAYIMPCTRYLEVEL2_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (171, 18, 'row["STAYIMPCTRYLEVEL4_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (172, 19, 'row["PURPOSE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (173, 19, 'row["STAY_PURPOSE_GRP_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (174, 20, 'row["FARES_IMP_FLAG_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (175, 20, 'row["DVFARE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (176, 21, 'row["FARES_IMP_FLAG_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (177, 21, 'row["FARES_IMP_ELIGIBLE_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (178, 21, 'row["MINS_FLAG_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (179, 21, 'row["FAREKEY"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (180, 22, 'row["DISCNT_F1_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (181, 22, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (182, 23, 'row["DISCNT_F1_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (183, 23, 'row["DISCNT_PACKAGE_COST_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (184, 23, 'row["DISCNT_PACKAGE_COST_PV"],');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (185, 23, 'row["PACKAGE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (186, 24, 'row["FLOW"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (187, 24, 'row["DISCNT_F2_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (188, 24, 'row["PACKAGE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (189, 25, 'row["KIDAGE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (190, 25, 'row["AGE"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (191, 25, 'row["FAGE_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (192, 26, 'row["TYPE_PV"]');
+-- INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
+-- VALUES (193, 26, 'row["PURPOSE"]');
 
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (12, 'imbal_port_fact_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (13, 'stay_imp_flag_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (14, 'stay_imp_eligible_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (33, 'osport2_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (47, 'rail_cntry_grp_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (34, 'osport3_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (35, 'osport4_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (36, 'apd_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (37, 'qmfare_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (38, 'duty_free_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (39, 'spend_imp_eligible_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (40, 'uk_os_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (41, 'pur1_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (42, 'pur2_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (43, 'pur3_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (44, 'dur1_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (45, 'dur2_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (46, 'imbal_ctry_fact_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (15, 'StayImpCtryLevel1_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (16, 'StayImpCtryLevel2_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (28, 'ukport1_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (29, 'ukport2_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (30, 'ukport3_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (31, 'ukport4_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (32, 'osport1_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (48, 'rail_exercise_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (49, 'rail_imp_eligible_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (50, 'spend_imp_flag_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (51, 'purpose_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (52, 'town_imp_eligible_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (53, 'reg_imp_eligible_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (54, 'mins_ctry_grp_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (55, 'mins_port_grp_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (56, 'samp_port_grp_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (57, 'unsamp_port_grp_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (4, 'shift_flag_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (5, 'crossings_flag_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (6, 'shift_port_grp_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (7, 'nr_flag_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (8, 'nr_port_grp_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (9, 'mins_flag_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (10, 'imbal_eligible_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (11, 'imbal_port_grp_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (58, 'unsamp_region_grp_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (1, 'weekday_end_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (2, 'am_pm_night_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (3, 'mig_flag_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (17, 'StayImpCtryLevel3_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (18, 'StayImpCtryLevel4_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (19, 'stay_purpose_grp_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (20, 'fares_imp_flag_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (21, 'fares_imp_eligible_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (22, 'discnt_f1_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (23, 'discnt_package_cost_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (24, 'discnt_f2_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (25, 'fage_pv');
-INSERT INTO G_PVs(PV_ID, Name)
-VALUES (26, 'type_pv');
-
-CREATE TABLE `G_PV_Variables`
-(
-    `PV_Variable_ID` int(11)      NOT NULL,
-    `PV_ID`          int(11)      NOT NULL,
-    `Name`           varchar(255) NOT NULL,
-    PRIMARY KEY (`PV_Variable_ID`),
-    KEY `FK__G_PV_Vari__PV_ID__2739D489` (`PV_ID`),
-    CONSTRAINT `FK__G_PV_Vari__PV_ID__2739D489` FOREIGN KEY (`PV_ID`) REFERENCES `G_PVs` (`PV_ID`) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (1, 12, 'row["IMBAL_PORT_FACT_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (2, 12, 'row["IMBAL_PORT_GRP_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (3, 12, 'row["ARRIVEDEPART"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (4, 13, 'row["STAY_IMP_FLAG_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (5, 13, 'row["NUMNIGHTS"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (6, 14, 'row["STAY_IMP_ELIGIBLE_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (7, 14, 'row["PURPOSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (8, 14, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (9, 14, 'row["MINS_FLAG_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (10, 33, 'row["RESIDENCE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (11, 33, 'row["UKFOREIGN"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (12, 33, 'row["UKPORT1_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (13, 33, 'row["OSPORT2_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (14, 33, 'row["COUNTRYVISIT"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (15, 33, 'row["OSPORT1_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (16, 47, 'row["RAIL_CNTRY_GRP_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (17, 47, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (18, 47, 'row["RESIDENCE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (19, 47, 'row["COUNTRYVISIT"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (20, 47, 'railcountry');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (21, 34, 'row["OSPORT3_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (22, 34, 'row["OSPORT2_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (23, 35, 'row["OSPORT3_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (24, 35, 'row["OSPORT4_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (25, 36, 'row["APD_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (26, 36, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (27, 36, 'row["OSPORT2_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (28, 36, 'APDBAND');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (29, 37, 'row["MINS_FLAG_PV"])');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (30, 37, 'row["QMFARE_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (31, 37, 'row["OSPORT3_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (32, 37, 'row["MINS_FLAG_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (33, 38, 'row["PURPOSE"])');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (34, 38, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (35, 38, 'row["PURPOSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (36, 38, 'row["DUTY_FREE_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (37, 39, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (38, 39, 'row["PURPOSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (39, 39, 'row["SPEND_IMP_ELIGIBLE_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (40, 39, 'row["MINS_FLAG_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (41, 40, 'row["UK_OS_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (42, 40, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (43, 41, 'row["DVPACKAGE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (44, 41, 'row["IND"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (45, 41, 'row["PUR1_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (46, 41, 'row["PURPOSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (47, 42, 'row["IND"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (48, 42, 'row["PUR2_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (49, 42, 'row["PURPOSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (50, 43, 'row["PURPOSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (51, 43, 'row["PUR3_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (52, 44, 'row["DUR1_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (53, 44, 'row["STAY"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (54, 45, 'row["DUR2_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (55, 45, 'row["STAY"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (56, 46, 'row["RESIDENCE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (57, 46, 'row["IMBAL_CTRY_FACT_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (58, 15, 'row["STAYIMPCTRYLEVEL1_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (59, 15, 'row["COUNTRYVISIT"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (60, 15, 'row["RESIDENCE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (61, 15, 'row["UKFOREIGN"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (62, 16, 'row["STAYIMPCTRYLEVEL1_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (63, 16, 'row["STAYIMPCTRYLEVEL2_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (64, 28, 'row["PORTROUTE"]</PV_DEF>');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (65, 28, 'row["UKPORT1_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (66, 28, 'row["PORTROUTE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (67, 29, 'row["UKPORT2_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (68, 29, 'row["UKPORT1_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (69, 30, 'row["UKPORT2_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (70, 30, 'row["UKPORT3_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (71, 31, 'row["UKPORT4_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (72, 31, 'row["UKPORT3_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (73, 32, 'row["DVPORTCODE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (74, 32, 'row["OSPORT1_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (75, 32, 'row["CHANGECODE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (76, 48, 'row["RAIL_CNTRY_GRP_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (77, 48, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (78, 48, 'row["RAIL_EXERCISE_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (79, 49, 'row["RAIL_IMP_ELIGIBLE_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (80, 49, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (81, 50, 'row["SPEND_IMP_FLAG_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (82, 50, 'row["SPEND"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (83, 51, 'row["PURPOSE_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (84, 51, 'row["PURPOSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (85, 52, 'row["RESPNSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (86, 52, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (87, 52, 'row["TOWN_IMP_ELIGIBLE_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (88, 52, 'row["PURPOSE"])');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (89, 52, 'row["PURPOSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (90, 53, 'row["RESPNSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (91, 53, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (92, 53, 'row["REG_IMP_ELIGIBLE_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (93, 53, 'row["PURPOSE"])');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (94, 53, 'row["PURPOSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (95, 54, '<PV_DEF>row["MINS_CTRY_GRP_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (96, 54, 'row["FLOW"]</PV_DEF>');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (97, 55, 'row["MINS_PORT_GRP_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (98, 55, 'row["PORTROUTE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (99, 56, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (100, 56, 'row["RESIDENCE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (101, 56, 'row["HAUL"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (102, 56, 'row["DVPORTCODE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (103, 56, 'Irish');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (104, 56, 'IoM');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (105, 56, 'row["ARRIVEDEPART"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (106, 56, 'row["SAMP_PORT_GRP_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (107, 56, 'ChannelI');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (108, 56, 'dvpc');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (109, 56, 'row["COUNTRYVISIT"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (110, 56, 'row["PORTROUTE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (111, 57, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (112, 57, 'row["RESIDENCE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (113, 57, 'row["DVPORTCODE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (114, 57, 'row["UNSAMP_PORT_GRP_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (115, 57, 'Irish');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (116, 57, 'IoM');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (117, 57, 'ChannelI');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (118, 57, 'dvpc');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (119, 57, 'row["COUNTRYVISIT"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (120, 57, 'row["PORTROUTE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (121, 4, 'row["SHIFT_FLAG_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (122, 4, 'row["PORTROUTE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (123, 5, 'row["CROSSINGS_FLAG_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (124, 5, 'row["PORTROUTE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (125, 6, 'row["SHIFT_PORT_GRP_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (126, 6, 'row["PORTROUTE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (127, 7, 'row["RESPNSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (128, 7, 'row["NR_FLAG_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (129, 8, '<PV_DEF>row["NR_PORT_GRP_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (130, 9, 'row["TYPEINTERVIEW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (131, 9, 'row["RESPNSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (132, 9, 'row["MINS_FLAG_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (133, 10, 'row["RESPNSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (134, 10, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (135, 10, 'row["IMBAL_ELIGIBLE_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (136, 10, 'row["INTENDLOS"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (137, 10, 'row["PURPOSE"]))');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (138, 10, 'row["PURPOSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (139, 11, 'row["IMBAL_PORT_GRP_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (140, 11, 'row["PORTROUTE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (141, 58, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (142, 58, 'row["RESIDENCE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (143, 58, 'row["UNSAMP_REGION_GRP_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (144, 58, 'row["DVPORTCODE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (145, 58, 'row["UNSAMP_PORT_GRP_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (146, 58, 'row["ARRIVEDEPART"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (147, 58, 'dvpc');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (148, 58, 'row["COUNTRYVISIT"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (149, 58, 'row["REGION"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (150, 58, 'row["PORTROUTE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (151, 1, 'd');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (152, 1, 'row["INTDATE"][:2]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (153, 1, 'row["INTDATE"][2:4]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (154, 1, 'year');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (155, 1, 'weekday');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (156, 1, 'month');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (157, 1, 'dayweek');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (158, 1, 'row["INTDATE"][4:8]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (159, 1, 'row["WEEKDAY_END_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (160, 1, 'row["WEEKDAY"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (161, 1, 'day');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (162, 1, 'row["PORTROUTE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (163, 2, 'row["AM_PM_NIGHT_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (164, 2, 'row["PORTROUTE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (165, 2, 'row["AM_PM_NIGHT"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (166, 3, 'row["LOSKEY"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (167, 3, 'row["MIG_FLAG_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (168, 17, 'row["STAYIMPCTRYLEVEL2_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (169, 17, 'row["STAYIMPCTRYLEVEL3_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (170, 18, 'row["STAYIMPCTRYLEVEL2_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (171, 18, 'row["STAYIMPCTRYLEVEL4_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (172, 19, 'row["PURPOSE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (173, 19, 'row["STAY_PURPOSE_GRP_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (174, 20, 'row["FARES_IMP_FLAG_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (175, 20, 'row["DVFARE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (176, 21, 'row["FARES_IMP_FLAG_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (177, 21, 'row["FARES_IMP_ELIGIBLE_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (178, 21, 'row["MINS_FLAG_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (179, 21, 'row["FAREKEY"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (180, 22, 'row["DISCNT_F1_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (181, 22, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (182, 23, 'row["DISCNT_F1_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (183, 23, 'row["DISCNT_PACKAGE_COST_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (184, 23, 'row["DISCNT_PACKAGE_COST_PV"],');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (185, 23, 'row["PACKAGE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (186, 24, 'row["FLOW"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (187, 24, 'row["DISCNT_F2_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (188, 24, 'row["PACKAGE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (189, 25, 'row["KIDAGE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (190, 25, 'row["AGE"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (191, 25, 'row["FAGE_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (192, 26, 'row["TYPE_PV"]');
-INSERT INTO G_PV_Variables(PV_Variable_ID, PV_ID, Name)
-VALUES (193, 26, 'row["PURPOSE"]');
-
-CREATE TABLE PV_Block
-(
-    Block_ID    int(11)      NOT NULL AUTO_INCREMENT,
-    Run_ID      varchar(255) NOT NULL,
-    Block_Index int(11)      NOT NULL,
-    PV_ID       int(11)      NOT NULL,
-    PRIMARY KEY (Block_ID),
-    KEY pv_fk (PV_ID),
-    CONSTRAINT pv_fk FOREIGN KEY (PV_ID) REFERENCES G_PVs (PV_ID) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-
-CREATE TABLE PV_Expression
-(
-    Expression_ID    int(11) NOT NULL AUTO_INCREMENT,
-    Block_ID         int(11) NOT NULL,
-    Expression_Index int(11) NOT NULL,
-    PRIMARY KEY (Expression_ID),
-    KEY block_fk (Block_ID),
-    CONSTRAINT block_fk FOREIGN KEY (Block_ID) REFERENCES PV_Block (Block_ID) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-CREATE TABLE PV_Element
-(
-    Element_ID    int(11)      NOT NULL AUTO_INCREMENT,
-    Expression_ID int(11)      NOT NULL,
-    type          varchar(255) NOT NULL,
-    content       varchar(255) NOT NULL,
-    PRIMARY KEY (Element_ID),
-    KEY expression_fk (Expression_ID),
-    CONSTRAINT expression_fk FOREIGN KEY (Expression_ID) REFERENCES PV_Expression (Expression_ID) ON DELETE CASCADE ON UPDATE CASCADE
-);
+-- CREATE TABLE PV_Block
+-- (
+--     Block_ID    int(11)      NOT NULL AUTO_INCREMENT,
+--     Run_ID      varchar(255) NOT NULL,
+--     Block_Index int(11)      NOT NULL,
+--     PV_ID       int(11)      NOT NULL,
+--     PRIMARY KEY (Block_ID),
+--     KEY pv_fk (PV_ID),
+--     CONSTRAINT pv_fk FOREIGN KEY (PV_ID) REFERENCES G_PVs (PV_ID) ON DELETE CASCADE ON UPDATE CASCADE
+-- );
+--
+--
+-- CREATE TABLE PV_Expression
+-- (
+--     Expression_ID    int(11) NOT NULL AUTO_INCREMENT,
+--     Block_ID         int(11) NOT NULL,
+--     Expression_Index int(11) NOT NULL,
+--     PRIMARY KEY (Expression_ID),
+--     KEY block_fk (Block_ID),
+--     CONSTRAINT block_fk FOREIGN KEY (Block_ID) REFERENCES PV_Block (Block_ID) ON DELETE CASCADE ON UPDATE CASCADE
+-- );
+--
+-- CREATE TABLE PV_Element
+-- (
+--     Element_ID    int(11)      NOT NULL AUTO_INCREMENT,
+--     Expression_ID int(11)      NOT NULL,
+--     type          varchar(255) NOT NULL,
+--     content       varchar(255) NOT NULL,
+--     PRIMARY KEY (Element_ID),
+--     KEY expression_fk (Expression_ID),
+--     CONSTRAINT expression_fk FOREIGN KEY (Expression_ID) REFERENCES PV_Expression (Expression_ID) ON DELETE CASCADE ON UPDATE CASCADE
+-- );
 
 create table USER
 (
