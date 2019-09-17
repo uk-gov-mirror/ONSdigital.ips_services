@@ -13,10 +13,10 @@ logging:
     console_level: ${LOG_CONSOLE_LEVEL}
 
 rounding:
-  sas_rounding: False
+    sas_rounding: True
 
 spend_work_around:
-  change_pur2_pv: False
+  change_pur2_pv: True
 
 shift_weight:
   name: SHIFT_WEIGHT
