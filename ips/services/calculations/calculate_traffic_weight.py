@@ -206,7 +206,13 @@ def r_population_input(df_survey_input, df_tr_totals):
     df_mod_pop_totals = df_mod_totals.pivot_table(index=MODEL_GROUP,
                                                   columns=T1,
                                                   values=TRAFFIC_TOTAL_COLUMN)
-    df_mod_pop_totals = df_mod_pop_totals.add_prefix('T_')
+
+    cols = df_mod_pop_totals.columns.tolist()
+
+    for i in range(len(cols)):
+        cols[i] = 'T_' + str(int(cols[i]))
+
+    df_mod_pop_totals.columns = cols
 
     df_mod_pop_totals[MODEL_GROUP] = 1
     cols = [MODEL_GROUP] + [col for col in df_mod_pop_totals if col != MODEL_GROUP]
