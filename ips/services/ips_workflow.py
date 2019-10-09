@@ -15,6 +15,7 @@ import ips.services.steps.stay_imputation as stay_imputation
 import ips.services.steps.town_stay_expenditure as town_stay_expenditure
 import ips.services.steps.traffic_weight as traffic_weight
 import ips.services.steps.unsampled_weight as unsampled_weight
+from ips.persistence.sql import get_table_values
 from ips.persistence.persistence import truncate_table
 from ips.util.services_logging import log
 
@@ -207,7 +208,10 @@ class IPSWorkflow:
                 mesg = e.message
             else:
                 mesg = str(e).strip("'")
-            self.set_step_status(run_id, runs.FAILED, "")
+
+            step = get_table_values('RUN').iloc[0, 9][5:]
+
+            self.set_step_status(run_id, runs.FAILED, step)
             self.set_status(run_id, runs.FAILED, mesg)
             log.error(f"Run {run_id} has failed : {mesg}")
             runs.set_percent_done(run_id, 100)
