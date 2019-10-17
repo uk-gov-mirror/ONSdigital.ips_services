@@ -209,7 +209,8 @@ class IPSWorkflow:
             else:
                 mesg = str(e).strip("'")
 
-            step = get_table_values('RUN').iloc[0, 9][5:6]
+            run_df = get_table_values('RUN')
+            step = run_df.loc[run_df['RUN_ID'] == run_id].iloc[0, 9][5:6]
 
             self.set_step_status(run_id, runs.FAILED, step)
             self.set_status(run_id, runs.FAILED, mesg)
