@@ -54,7 +54,7 @@ services:
       DB_NAME: ${DB_NAME}
 
   ips-db:
-     image: mysql:latest
+     image: mysql:5.7
      container_name: ips-db
      command: --default-authentication-plugin=mysql_native_password
      restart: always
