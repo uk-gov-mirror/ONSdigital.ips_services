@@ -63,10 +63,10 @@ def error_check(df_survey_in, df_reference_in, run_id):
     df_sum_check_1 = df_merge_totals[
         df_merge_totals['OOHDESIGNWEIGHT'] > 0 & df_merge_totals['OOHDESIGNWEIGHT'].notnull()]
     df_sum_check_2 = pd.concat([df_sum_check_1[df_sum_check_1['UNSAMP_LIFTED'].isna()],
-                                df_sum_check_1[df_sum_check_1['UNSAMP_LIFTED'] < 0]])
+                                df_sum_check_1[df_sum_check_1['UNSAMP_LIFTED'] <= 0]])
 
     if len(df_sum_check_2):
-        error_str = "step 5 - No traffic total but sampled records present for"
+        error_str = "Step 5 - No traffic total but sampled records present for"
         for index, record in df_sum_check_2.iterrows():
             threshold_string = \
                 error_str + " " + 'UNSAMP_PORT_GRP_PV' + " = " + str(record[0]) \
@@ -77,10 +77,10 @@ def error_check(df_survey_in, df_reference_in, run_id):
     # Error check 2
     df_sum_check_1 = df_merge_totals[df_merge_totals['UNSAMP_LIFTED'] > 0 & df_merge_totals['UNSAMP_LIFTED'].notnull()]
     df_sum_check_2 = pd.concat([df_sum_check_1[df_sum_check_1['OOHDESIGNWEIGHT'].isna()],
-                                df_sum_check_1[df_sum_check_1['OOHDESIGNWEIGHT'] < 0]])
+                                df_sum_check_1[df_sum_check_1['OOHDESIGNWEIGHT'] <= 0]])
 
     if len(df_sum_check_2):
-        error_str = "step 5 - No records to match traffic against for"
+        error_str = "Step 5 - No records to match traffic against for"
         for index, record in df_sum_check_2.iterrows():
             threshold_string = \
                 error_str + " " + 'UNSAMP_PORT_GRP_PV' + " = " + str(record[0]) \

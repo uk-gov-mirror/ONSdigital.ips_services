@@ -129,41 +129,37 @@ def r_population_input(df_survey_input, df_tr_totals, run_id):
     # Error check 1
     df_sum_check_1 = df_merge_totals[
         df_merge_totals['TRAFDESIGNWEIGHT'] > 0 & df_merge_totals['TRAFDESIGNWEIGHT'].notnull()]
-    df_sum_check_2 = df_sum_check_1[df_sum_check_1['TRAFFICTOTAL'] < 0 | df_sum_check_1['TRAFFICTOTAL'].isnull()]
+    # df_sum_check_2 = df_sum_check_1[df_sum_check_1['TRAFFICTOTAL'] <= 0 | df_sum_check_1['TRAFFICTOTAL'].isnull()]
+    df_sum_check_2 = pd.concat([df_sum_check_1[df_sum_check_1['TRAFFICTOTAL'].isna()],
+                                df_sum_check_1[df_sum_check_1['TRAFFICTOTAL'] <= 0]])
 
     if len(df_sum_check_2):
-        # threshold_string_cap = 4000
-        error_str = "step 4 - No traffic total but sampled records present for"
+        error_str = "Step 4 - No traffic total but sampled records present for"
 
         threshold_string = ""
         for index, record in df_sum_check_2.iterrows():
-            threshold_string += \
+            threshold_string = \
                 error_str + " " + 'SAMP_PORT_GRP_PV' + " = " + str(record[0]) \
                 + " " + 'ARRIVEDEPART' + " = " + str(record[1]) + "\n"
             log_errors(threshold_string)(pd.DataFrame(), run_id, 4)
-
-        # threshold_string_capped = threshold_string[:threshold_string_cap]
-        # log.error(threshold_string_capped)
         raise ValueError(threshold_string)
 
     # Error check 2
     df_sum_check_1 = df_merge_totals[df_merge_totals['TRAFFICTOTAL'] > 0 & df_merge_totals['TRAFFICTOTAL'].notnull()]
-    df_sum_check_2 = df_sum_check_1[
-        df_sum_check_1['TRAFDESIGNWEIGHT'] < 0 | df_sum_check_1['TRAFDESIGNWEIGHT'].isnull()]
+    # df_sum_check_2 = df_sum_check_1[
+    #     df_sum_check_1['TRAFDESIGNWEIGHT'] <= 0 | df_sum_check_1['TRAFDESIGNWEIGHT'].isnull()]
+    df_sum_check_2 = pd.concat([df_sum_check_1[df_sum_check_1['TRAFDESIGNWEIGHT'].isna()],
+                                df_sum_check_1[df_sum_check_1['TRAFDESIGNWEIGHT'] <= 0]])
 
     if len(df_sum_check_2):
-        # threshold_string_cap = 4000
-        error_str = "step 4 - No records to match traffic against for"
+        error_str = "Step 4 - No records to match traffic against for"
 
         threshold_string = ""
         for index, record in df_sum_check_2.iterrows():
-            threshold_string += \
+            threshold_string = \
                 error_str + " " + 'SAMP_PORT_GRP_PV' + " = " + str(record[0]) \
                 + " " + 'ARRIVEDEPART' + " = " + str(record[1]) + "\n"
             log_errors(threshold_string)(pd.DataFrame(), run_id, 4)
-
-        # threshold_string_capped = threshold_string[:threshold_string_cap]
-        # log.error(threshold_string_capped)
         raise ValueError(threshold_string)
 
     # Sort input values
