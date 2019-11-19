@@ -71,7 +71,9 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
         elif row['FLOW'] > 4:
             df_input.at[index, 'OPERA_PV'] = 3
 
-        # Locally this comes back as np.nan but on docker compose it is None
+        # Locally this comes back as np.nan but on docker compose it is None, comment out as per
+
+        # if np.isnan.row['OPERA_PV']:
         if row['OPERA_PV'] is None:
             df_input.at[index, 'OPERA_PV'] = round(sas_random.random(), 0) + 1
 
