@@ -70,7 +70,8 @@ def error_check(df_survey_in, df_reference_in, run_id):
         for index, record in df_sum_check_2.iterrows():
             threshold_string = \
                 error_str + " " + 'UNSAMP_PORT_GRP_PV' + " = " + str(record[0]) \
-                + " " + 'ARRIVEDEPART' + " = " + str(record[1]) + "\n"
+                + " " + 'UNSAMP_REGION_GRP_PV' + " = " + str(record[1]) \
+                + " " + 'ARRIVEDEPART' + " = " + str(record[2]) + "\n"
             log_errors(threshold_string)(pd.DataFrame(), run_id, 5)
         raise ValueError(threshold_string)
 
@@ -84,7 +85,8 @@ def error_check(df_survey_in, df_reference_in, run_id):
         for index, record in df_sum_check_2.iterrows():
             threshold_string = \
                 error_str + " " + 'UNSAMP_PORT_GRP_PV' + " = " + str(record[0]) \
-                + " " + 'ARRIVEDEPART' + " = " + str(record[1]) + "\n"
+                + " " + 'UNSAMP_REGION_GRP_PV' + " = " + str(record[1]) \
+                + " " + 'ARRIVEDEPART' + " = " + str(record[2]) + "\n"
             log_errors(threshold_string)(pd.DataFrame(), run_id, 5)
         raise ValueError(threshold_string)
 
