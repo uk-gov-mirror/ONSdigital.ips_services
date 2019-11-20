@@ -36,6 +36,7 @@ SPEND = 'SPEND'
 SPENDIMPREASON = 'SPENDIMPREASON'
 DUTY_FREE_PV = 'DUTY_FREE_PV'
 PACKAGE = 'PACKAGE'
+OPERA_PV = 'OPERA_PV'
 
 # Setup thresh and strata base nested lists. These are used to group the data
 # differently at each iteration.
@@ -111,7 +112,7 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
 
     df_output = df_output.apply(compute_additional_spend, axis=1)
 
-    return df_output[[var_serial, SPEND, SPENDIMPREASON, FARE, FAREK]]
+    return df_output[[var_serial, SPEND, SPENDIMPREASON, FARE, FAREK, OPERA_PV]]
 
 
 def calculate_non_pack_fare(row: Series) -> float:
