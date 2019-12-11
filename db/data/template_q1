@@ -72,7 +72,8 @@ elif row[''IMBAL_PORT_GRP_PV''] == 17 and row[''ARRIVEDEPART''] == 1:
     row[''IMBAL_PORT_FACT_PV''] = 1.0
 elif row[''IMBAL_PORT_GRP_PV''] == 17 and row[''ARRIVEDEPART''] == 2:
     row[''IMBAL_PORT_FACT_PV''] = 1.0
-elif row[''IMBAL_PORT_GRP_PV''] == 18 : row[''IMBAL_PORT_GRP_PV''] = 1.0
+elif row[''IMBAL_PORT_GRP_PV''] == 18:
+    row[''IMBAL_PORT_FACT_PV''] = 1.0
 else:
     row[''IMBAL_PORT_FACT_PV''] = 1.0
 
