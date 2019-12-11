@@ -392,6 +392,9 @@ def survey_output(test_name, expected_survey_output, survey_output_columns, expe
 
     # Test survey outputs
     log.info(f"Testing survey results for {test_name}")
+
+
+
     assert_frame_equal(survey_results, survey_expected, check_dtype=False, check_less_precise=True)
 
 
