@@ -61,6 +61,11 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
     sas_random = SASRandom(123456)
 
     for index, row in df_input.iterrows():
+        # Locally this comes back as np.nan but on docker compose it is None, comment out as per
+        # if np.isnan.row['OPERA_PV']:
+        if row['OPERA_PV'] is None:
+            df_input.at[index, 'OPERA_PV'] = round(sas_random.random(), 0) + 1
+
         if row['FLOW'] < 5:
             carrier = row['DVLINECODE']
 
@@ -73,10 +78,7 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
         if row['FLOW'] > 4:
             df_input.at[index, 'OPERA_PV'] = 3
 
-        # Locally this comes back as np.nan but on docker compose it is None, comment out as per
-        # if np.isnan.row['OPERA_PV']:
-        if row['OPERA_PV'] is None:
-            df_input.at[index, 'OPERA_PV'] = round(sas_random.random(), 0) + 1
+
 
     df_eligible = df_input.loc[df_input['FARES_IMP_ELIGIBLE_PV'] == 1.0]
 
