@@ -69,3 +69,7 @@ def traffic_weight_step(run_id):
 
     # Store Traffic Wt Summary
     idm.store_step_summary(run_id, config)
+
+
+if __name__ == '__main__':
+    traffic_weight_step('h3re-1s-y0ur-run-1d')
