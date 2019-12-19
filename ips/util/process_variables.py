@@ -8,8 +8,83 @@ import numpy as np
 # for exec
 # noinspection PyUnresolvedReferences
 import math
-from ips.persistence.persistence import insert_from_dataframe
+# for exec
+# noinspection PyUnresolvedReferences
+from datetime import datetime
 
+from ips.persistence.persistence import insert_from_dataframe
+from RestrictedPython import compile_restricted
+from RestrictedPython import safe_builtins
+
+def getitem(object, name, default=None):  # known special case of getitem
+    """
+    extend to ensure only specific items can be accessed
+    """
+    print("Accessing item: ", name)
+    # raise RestrictedException("You bad boy!")
+    return object[name]
+
+
+def _write_wrapper():
+    # Construct the write wrapper class
+    def _handler(secattr, error_msg):
+        # Make a class method.
+        def handler(self, *args):
+            try:
+                f = getattr(self.ob, secattr)
+            except AttributeError:
+                raise TypeError(error_msg)
+            f(*args)
+        return handler
+
+    class Wrapper(object):
+        def __init__(self, ob):
+            self.__dict__['ob'] = ob
+
+        __setitem__ = _handler(
+            '__guarded_setitem__',
+            'object does not support item or slice assignment')
+
+        __delitem__ = _handler(
+            '__guarded_delitem__',
+            'object does not support item or slice assignment')
+
+        __setattr__ = _handler(
+            '__guarded_setattr__',
+            'attribute-less object (assign or del)')
+
+        __delattr__ = _handler(
+            '__guarded_delattr__',
+            'attribute-less object (assign or del)')
+    return Wrapper
+
+
+def _write_guard():
+    # Nested scope abuse!
+    # safetypes and Wrapper variables are used by guard()
+    safetypes = {dict, list, pandas.DataFrame, pandas.Series}
+    Wrapper = _write_wrapper()
+
+    def guard(ob):
+        # Don't bother wrapping simple types, or objects that claim to
+        # handle their own write security.
+        if type(ob) in safetypes or hasattr(ob, '_guarded_writes'):
+            return ob
+        # Hand the object to the Wrapper instance, then return the instance.
+        return Wrapper(ob)
+    return guard
+
+
+write_guard = _write_guard()
+
+safe_globals = dict(__builtins__=safe_builtins)
+
+safe_builtins['_getitem_'] = getitem
+safe_builtins['_getattr_'] = getattr
+# safe_builtins['__getattribute__'] = pandas.DataFrame.__getattribute__
+safe_builtins['_write_'] = write_guard
+safe_builtins['math'] = math
+safe_builtins['datetime'] = datetime
 
 def modify_values(row, dataset, pvs):
     """
@@ -25,9 +100,11 @@ def modify_values(row, dataset, pvs):
     """
 
     for pv in pvs:
+        safe_builtins['row'] = row
+        safe_builtins['dataset'] = dataset
         code = pv['PROCVAR_RULE']
         try:
-            exec(code)
+            exec(code, safe_globals, None)
         except ValueError:
             name = pv['PROCVAR_NAME']
             log.error(f"ValueError on PV: {name}")
@@ -84,7 +161,11 @@ def parallel_func(pv_df, pv_list, dataset=None):
 
 def compile_pvs(pv_list):
     for a in pv_list:
-        a['PROCVAR_RULE'] = compile(a['PROCVAR_RULE'], 'pv', 'exec')
+        a['PROCVAR_RULE'] = compile_restricted(
+            a['PROCVAR_RULE'],
+            filename=a['PROCVAR_NAME'],
+            mode='exec'
+        )
 
 
 def parallelise_pvs(dataframe, process_variables, dataset=None):
