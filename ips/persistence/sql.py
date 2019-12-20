@@ -159,3 +159,20 @@ def execute_sql_statement_id(sq):
     finally:
         if conn is not None:
             conn.close()
+
+
+def get_column_names(table: str):
+    log.debug(f"getting column names for: {table}")
+    conn = None
+    try:
+        conn = get_sql_connection()
+        result = conn.execute("select * from  " + table + " limit 1")
+        column_names = [i[0] for i in result.cursor.description]
+        return column_names
+    except Exception as err:
+        log.error(f"execute_sql_statement failed: {err}")
+        raise err
+    finally:
+        if conn is not None:
+            conn.close()
+

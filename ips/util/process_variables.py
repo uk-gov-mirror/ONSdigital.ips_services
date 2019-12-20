@@ -16,11 +16,11 @@ from ips.persistence.persistence import insert_from_dataframe
 from RestrictedPython import compile_restricted
 from RestrictedPython import safe_builtins
 
+
 def getitem(object, name, default=None):  # known special case of getitem
     """
-    extend to ensure only specific items can be accessed
+    extend to ensure only specific items can be accessed if required
     """
-    print("Accessing item: ", name)
     # raise RestrictedException("You bad boy!")
     return object[name]
 
@@ -35,6 +35,7 @@ def _write_wrapper():
             except AttributeError:
                 raise TypeError(error_msg)
             f(*args)
+
         return handler
 
     class Wrapper(object):
@@ -56,6 +57,7 @@ def _write_wrapper():
         __delattr__ = _handler(
             '__guarded_delattr__',
             'attribute-less object (assign or del)')
+
     return Wrapper
 
 
@@ -72,6 +74,7 @@ def _write_guard():
             return ob
         # Hand the object to the Wrapper instance, then return the instance.
         return Wrapper(ob)
+
     return guard
 
 
@@ -81,10 +84,10 @@ safe_globals = dict(__builtins__=safe_builtins)
 
 safe_builtins['_getitem_'] = getitem
 safe_builtins['_getattr_'] = getattr
-# safe_builtins['__getattribute__'] = pandas.DataFrame.__getattribute__
 safe_builtins['_write_'] = write_guard
 safe_builtins['math'] = math
 safe_builtins['datetime'] = datetime
+
 
 def modify_values(row, dataset, pvs):
     """
@@ -154,7 +157,6 @@ def get_pvs():
 
 
 def parallel_func(pv_df, pv_list, dataset=None):
-
     compile_pvs(pv_list)
     return pv_df.apply(modify_values, axis=1, args=(dataset, pv_list))
 
