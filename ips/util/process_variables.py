@@ -63,9 +63,9 @@ def _write_wrapper():
 
 def _write_guard():
     # Nested scope abuse!
-    # safetypes and Wrapper variables are used by guard()
+    # safetypes and wrapper variables are used by guard()
     safetypes = {dict, list, pandas.DataFrame, pandas.Series}
-    Wrapper = _write_wrapper()
+    wrapper = _write_wrapper()
 
     def guard(ob):
         # Don't bother wrapping simple types, or objects that claim to
@@ -73,7 +73,7 @@ def _write_guard():
         if type(ob) in safetypes or hasattr(ob, '_guarded_writes'):
             return ob
         # Hand the object to the Wrapper instance, then return the instance.
-        return Wrapper(ob)
+        return wrapper(ob)
 
     return guard
 
@@ -106,6 +106,7 @@ def modify_values(row, dataset, pvs):
         safe_builtins['row'] = row
         safe_builtins['dataset'] = dataset
         code = pv['PROCVAR_RULE']
+        log.debug(f"Executing PV {pv['PROCVAR_NAME']}")
         try:
             exec(code, safe_globals, None)
         except ValueError:
@@ -151,7 +152,7 @@ def get_pvs():
         raise ConnectionError("Cannot get database connection")
 
     with engine.connect() as conn:
-        sql = "SELECT PROCVAR_NAME,PROCVAR_RULE FROM  SAS_PROCESS_VARIABLE ORDER BY  PROCVAR_ORDER"
+        sql = "SELECT PROCVAR_NAME,PROCVAR_RULE FROM SAS_PROCESS_VARIABLE ORDER BY  PROCVAR_ORDER"
         v = conn.engine.execute(sql)
         return v.fetchall()
 
@@ -163,6 +164,7 @@ def parallel_func(pv_df, pv_list, dataset=None):
 
 def compile_pvs(pv_list):
     for a in pv_list:
+        log.debug(f"Compiling PV: {a['PROCVAR_NAME']}")
         a['PROCVAR_RULE'] = compile_restricted(
             a['PROCVAR_RULE'],
             filename=a['PROCVAR_NAME'],

@@ -15,7 +15,6 @@ from ips.services.dataimport.import_traffic import import_tunnel
 from ips.services.steps import shift_weight, non_response_weight, minimums_weight, traffic_weight, unsampled_weight, \
     imbalance_weight, final_weight, stay_imputation, fares_imputation, spend_imputation, rail_imputation, \
     regional_weights, town_stay_expenditure, air_miles
-from ips.util.services_configuration import ServicesConfiguration
 
 input_survey_data = 'data/import_data/dec/ips1712bv4_amtspnd.csv'
 input_shift_data = 'data/calculations/december_2017/New_Dec_Data/Poss shifts Dec 2017.csv'
@@ -124,7 +123,6 @@ def test_fares_imputation():
     fares_imputation.fares_imputation_step(run_id)
 
 
-
 def test_spend_imputation():
     log.info("Testing Calculation 10 --> spend_imputation")
     spend_imputation.spend_imputation_step(run_id)
@@ -151,4 +149,3 @@ def test_town_stay_expenditure_imputation():
 def test_airmiles():
     log.info("Testing Calculation 14 --> airiles")
     air_miles.airmiles_step(run_id)
-
