@@ -112,22 +112,22 @@ def modify_values(row, dataset, pvs):
         except ValueError:
             name = pv['PROCVAR_NAME']
             log.error(f"ValueError on PV: {name}")
-            raise ValueError
+            raise Exception(f"ValueError exception on PV: {pv['PROCVAR_NAME']}")
 
         except KeyError:
             name = pv['PROCVAR_NAME']
             log.error(f"KeyError on PV: {name}")
-            raise KeyError
+            raise Exception(f"KeyError exception on PV: {pv['PROCVAR_NAME']}")
 
         except TypeError:
             name = pv['PROCVAR_NAME']
             log.error(f"TypeError on PV: {name}")
-            raise TypeError
+            raise Exception(f"TypeError exception on PV: {pv['PROCVAR_NAME']}")
 
         except SyntaxError:
             name = pv['PROCVAR_NAME']
             log.error(f"SyntaxError on PV: {name}")
-            raise SyntaxError
+            raise Exception(f"SyntaxError exception on PV: {pv['PROCVAR_NAME']}")
 
     if dataset in ('survey', 'shift'):
         row['SHIFT_PORT_GRP_PV'] = str(row['SHIFT_PORT_GRP_PV'])[:10]

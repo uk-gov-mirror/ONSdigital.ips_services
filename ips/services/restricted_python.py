@@ -66,7 +66,7 @@ def test_pvs(template: str) -> None:
         df.apply(pv_exec.modify_values, axis=1, dataset=dataset, pvs=pvs)
 
     except Exception as err:
-        raise InvalidPVs("Invalid PVs: " + str(err))
+        raise InvalidPVs(str(err))
 
 
 def get_pvs(template: str):
