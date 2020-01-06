@@ -85,4 +85,7 @@ def get_pvs(template: str):
 
 
 if __name__ == "__main__":
-    test_pvs('TEMPLATE')
+    try:
+        test_pvs('TEMPLATE')
+    except Exception:
+        pass

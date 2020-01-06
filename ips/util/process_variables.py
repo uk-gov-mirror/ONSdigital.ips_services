@@ -109,25 +109,10 @@ def modify_values(row, dataset, pvs):
         log.debug(f"Executing PV {pv['PROCVAR_NAME']}")
         try:
             exec(code, safe_globals, None)
-        except ValueError:
+        except Exception as err:
             name = pv['PROCVAR_NAME']
-            log.error(f"ValueError on PV: {name}")
-            raise Exception(f"ValueError exception on PV: {pv['PROCVAR_NAME']}")
-
-        except KeyError:
-            name = pv['PROCVAR_NAME']
-            log.error(f"KeyError on PV: {name}")
-            raise Exception(f"KeyError exception on PV: {pv['PROCVAR_NAME']}")
-
-        except TypeError:
-            name = pv['PROCVAR_NAME']
-            log.error(f"TypeError on PV: {name}")
-            raise Exception(f"TypeError exception on PV: {pv['PROCVAR_NAME']}")
-
-        except SyntaxError:
-            name = pv['PROCVAR_NAME']
-            log.error(f"SyntaxError on PV: {name}")
-            raise Exception(f"SyntaxError exception on PV: {pv['PROCVAR_NAME']}")
+            log.error(f"Error in PV: {name}, Message: {str(err)}")
+            raise Exception(f"Error in PV: {pv['PROCVAR_NAME']}, Message: {str(err)}")
 
     if dataset in ('survey', 'shift'):
         row['SHIFT_PORT_GRP_PV'] = str(row['SHIFT_PORT_GRP_PV'])[:10]
