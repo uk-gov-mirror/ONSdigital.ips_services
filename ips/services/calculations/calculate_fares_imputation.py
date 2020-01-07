@@ -60,14 +60,14 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
 
     sas_random = SASRandom(123456)
 
-    for index, row in df_input.iterrows():
-        if row['FLOW'] < 5:
-            carrier = row['DVLINECODE']
-
-            if 1000 <= carrier <= 1999:
-                df_input.at[index, 'OPERA_PV'] = 1
-            elif 2000 <= carrier <= 88880:
-                df_input.at[index, 'OPERA_PV'] = 2
+    # for index, row in df_input.iterrows():
+    #     if row['FLOW'] < 5:
+    #         carrier = row['DVLINECODE']
+    #
+    #         if 1000 <= carrier <= 1999:
+    #             df_input.at[index, 'OPERA_PV'] = 1
+    #         elif 2000 <= carrier <= 88880:
+    #             df_input.at[index, 'OPERA_PV'] = 2
 
     for index, row in df_input.iterrows():
         if row['FLOW'] > 4:
