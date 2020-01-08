@@ -8,7 +8,6 @@ from ips.api.validation.validate import validate
 from ips.api.validation.validate_run_id import validate_run_id
 from ips.persistence import data_management as db
 from ips.persistence.persistence import get_responses
-from ips.util.services_logging import log
 
 
 # noinspection PyUnusedLocal,PyMethodMayBeStatic

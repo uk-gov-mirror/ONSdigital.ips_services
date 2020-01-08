@@ -66,13 +66,14 @@ def import_survey(run_id, data, month, year):
         log.error(f"Validation failed: {e}")
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', e)
 
+
 def trim_all_columns(df):
     """
     Trim whitespace from ends of each value across all series in dataframe
     """
     trim_strings = lambda x: x.strip() if isinstance(x, str) else x
     df = df.applymap(trim_strings)
-    replace_with_null = lambda x: None if x=='' else x
+    replace_with_null = lambda x: None if x == '' else x
     return df.applymap(replace_with_null)
 
 

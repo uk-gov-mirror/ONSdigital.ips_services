@@ -1497,7 +1497,6 @@ INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DE
 VALUES ('TEMPLATE', 1, 'weekday_end_pv', 'weekday_end_pv', '
 if dataset == ''survey'':
     weekday = float(''nan'')
-    from datetime import datetime
     day = int(row[''INTDATE''][:2])
     month = int(row[''INTDATE''][2:4])
     year = int(row[''INTDATE''][4:8])

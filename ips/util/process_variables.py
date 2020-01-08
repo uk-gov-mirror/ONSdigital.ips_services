@@ -2,13 +2,99 @@ import multiprocessing
 
 from functools import partial
 import pandas
+
+from ips.services.restricted_python import Status, ErrorStatus, SuccessfulStatus
 from ips.util.services_logging import log
 import ips.persistence.sql as db
 import numpy as np
 # for exec
 # noinspection PyUnresolvedReferences
 import math
+# for exec
+# noinspection PyUnresolvedReferences
+from datetime import datetime
+
 from ips.persistence.persistence import insert_from_dataframe
+from RestrictedPython import compile_restricted
+from RestrictedPython import safe_builtins
+
+
+class PVExecutionError(Exception):
+    def __init__(self, message, pv):
+        self.errorMessage = message
+        self.PV = pv
+
+
+def getitem(object, name, default=None):  # known special case of getitem
+    """
+    extend to ensure only specific items can be accessed if required
+    """
+    # raise RestrictedException("You bad boy!")
+    return object[name]
+
+
+def _write_wrapper():
+    # Construct the write wrapper class
+    def _handler(secattr, error_msg):
+        # Make a class method.
+        def handler(self, *args):
+            try:
+                f = getattr(self.ob, secattr)
+            except AttributeError:
+                raise TypeError(error_msg)
+            f(*args)
+
+        return handler
+
+    class Wrapper(object):
+        def __init__(self, ob):
+            self.__dict__['ob'] = ob
+
+        __setitem__ = _handler(
+            '__guarded_setitem__',
+            'object does not support item or slice assignment')
+
+        __delitem__ = _handler(
+            '__guarded_delitem__',
+            'object does not support item or slice assignment')
+
+        __setattr__ = _handler(
+            '__guarded_setattr__',
+            'attribute-less object (assign or del)')
+
+        __delattr__ = _handler(
+            '__guarded_delattr__',
+            'attribute-less object (assign or del)')
+
+    return Wrapper
+
+
+def _write_guard():
+    # Nested scope abuse!
+    # safetypes and wrapper variables are used by guard()
+    safetypes = {dict, list, pandas.DataFrame, pandas.Series}
+    wrapper = _write_wrapper()
+
+    def guard(ob):
+        # Don't bother wrapping simple types, or objects that claim to
+        # handle their own write security.
+        if type(ob) in safetypes or hasattr(ob, '_guarded_writes'):
+            return ob
+        # Hand the object to the Wrapper instance, then return the instance.
+        return wrapper(ob)
+
+    return guard
+
+
+write_guard = _write_guard()
+
+safe_globals = dict(__builtins__=safe_builtins)
+
+safe_builtins['_getitem_'] = getitem
+safe_builtins['_getattr_'] = getattr
+safe_builtins['_write_'] = write_guard
+safe_builtins['math'] = math
+safe_builtins['datetime'] = datetime
 
 
 def modify_values(row, dataset, pvs):
@@ -25,28 +111,16 @@ def modify_values(row, dataset, pvs):
     """
 
     for pv in pvs:
+        safe_builtins['row'] = row
+        safe_builtins['dataset'] = dataset
         code = pv['PROCVAR_RULE']
+        log.debug(f"Executing PV {pv['PROCVAR_NAME']}")
         try:
-            exec(code)
-        except ValueError:
+            exec(code, safe_globals, None)
+        except Exception as err:
             name = pv['PROCVAR_NAME']
-            log.error(f"ValueError on PV: {name}")
-            raise ValueError
-
-        except KeyError:
-            name = pv['PROCVAR_NAME']
-            log.error(f"KeyError on PV: {name}")
-            raise KeyError
-
-        except TypeError:
-            name = pv['PROCVAR_NAME']
-            log.error(f"TypeError on PV: {name}")
-            raise TypeError
-
-        except SyntaxError:
-            name = pv['PROCVAR_NAME']
-            log.error(f"SyntaxError on PV: {name}")
-            raise SyntaxError
+            log.error(f"Error in PV: {name}, Message: {str(err)}")
+            raise PVExecutionError(str(err), pv['PROCVAR_NAME'])
 
     if dataset in ('survey', 'shift'):
         row['SHIFT_PORT_GRP_PV'] = str(row['SHIFT_PORT_GRP_PV'])[:10]
@@ -71,20 +145,28 @@ def get_pvs():
         raise ConnectionError("Cannot get database connection")
 
     with engine.connect() as conn:
-        sql = "SELECT PROCVAR_NAME,PROCVAR_RULE FROM  SAS_PROCESS_VARIABLE ORDER BY  PROCVAR_ORDER"
+        sql = "SELECT PROCVAR_NAME,PROCVAR_RULE FROM SAS_PROCESS_VARIABLE ORDER BY  PROCVAR_ORDER"
         v = conn.engine.execute(sql)
         return v.fetchall()
 
 
 def parallel_func(pv_df, pv_list, dataset=None):
-
     compile_pvs(pv_list)
     return pv_df.apply(modify_values, axis=1, args=(dataset, pv_list))
 
 
-def compile_pvs(pv_list):
+def compile_pvs(template, pv_list) -> Status:
     for a in pv_list:
-        a['PROCVAR_RULE'] = compile(a['PROCVAR_RULE'], 'pv', 'exec')
+        log.debug(f"Compiling PV: {a['PROCVAR_NAME']}")
+        try:
+            a['PROCVAR_RULE'] = compile_restricted(
+                a['PROCVAR_RULE'],
+                filename=a['PROCVAR_NAME'],
+                mode='exec'
+            )
+        except Exception as err:
+            return ErrorStatus(template, str(err), a['PROCVAR_NAME'])
+    return SuccessfulStatus(template)
 
 
 def parallelise_pvs(dataframe, process_variables, dataset=None):

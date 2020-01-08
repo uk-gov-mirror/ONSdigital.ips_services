@@ -21,6 +21,8 @@ from ips.api.run_api import RunApi
 from ips.api.run_steps_api import RunStepsApi, RunStepsValueApi, RunStepsValueStepApi
 from ips.api.start_service import StartApi
 from ips.api.status_api import StatusApi
+from ips.api.test_pvs_api import PvTestApi
+
 from ips.services import ips_workflow
 
 workflow = ips_workflow.IPSWorkflow()
@@ -46,6 +48,7 @@ app.add_route("/login/{user_name}/{password}", LoginApi(workflow))
 app.add_route("/health_check", HealthCheck(workflow))
 
 app.add_route("/process_variables/{run_id}", PvApi(workflow))
+app.add_route("/process_variables/test/{template}", PvTestApi(workflow))
 
 app.add_route("/builder/{run_id}", PvBuilderApi(workflow))
 

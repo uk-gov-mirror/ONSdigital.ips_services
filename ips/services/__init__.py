@@ -14,7 +14,7 @@ def service(func):
         except Exception as err:
             error = f'Error calling service {func.__name__}. Error: ' + str(err)
             log.error(error)
-            raise falcon.HTTPError(falcon.HTTP_400, 'service error', error)
+            raise falcon.HTTPError(falcon.HTTP_400, 'service error',  str(err))
 
     return wrapper
 
