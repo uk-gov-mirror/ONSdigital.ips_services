@@ -22,12 +22,11 @@ class PvTestApi(Api):
                     'template': template,
                 }
             else:
-                a = typing.Type[ErrorStatus]
                 result = {
-                    'status': a.status,
-                    'template': a.template,
-                    'errorMessage': a.errorMessage,
-                    'PV': a.PV
+                    'status': r.status,
+                    'template': r.template,
+                    'errorMessage': r.errorMessage,
+                    'PV': r.PV
                 }
         resp.status = falcon.HTTP_200
         resp.body = json.dumps(result)

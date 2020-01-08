@@ -1,4 +1,5 @@
 import falcon
+import typing
 
 import ips.persistence.sql as db
 from ips.util import process_variables as pv_exec
@@ -49,6 +50,8 @@ class Status(object):
     def __init__(self, pv_template):
         self.template = pv_template
         self.status = ""
+        self.errorMessage = ""
+        self.PV = ""
 
 
 class ErrorStatus(Status):
