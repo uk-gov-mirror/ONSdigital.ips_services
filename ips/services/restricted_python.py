@@ -1,3 +1,5 @@
+import falcon
+
 import ips.persistence.sql as db
 from ips.util import process_variables as pv_exec
 from ips.services.dataimport.import_survey import import_survey
@@ -47,7 +49,7 @@ def get_dataframe() -> pd.DataFrame:
     return df
 
 
-@service
+# @service
 def test_pvs(template: str) -> None:
     try:
         df = get_dataframe()
@@ -66,7 +68,8 @@ def test_pvs(template: str) -> None:
         df.apply(pv_exec.modify_values, axis=1, dataset=dataset, pvs=pvs)
 
     except Exception as err:
-        raise InvalidPVs(str(err))
+        raise falcon.HTTPError(falcon.HTTP_400, str(err))
+        # raise InvalidPVs(str(err))
 
 
 def get_pvs(template: str):
