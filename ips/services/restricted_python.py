@@ -68,7 +68,7 @@ def test_pvs(template: str) -> None:
         df.apply(pv_exec.modify_values, axis=1, dataset=dataset, pvs=pvs)
 
     except Exception as err:
-        raise falcon.HTTPError(falcon.HTTP_400, "{errorMessage: \"str(err))\"}")
+        raise falcon.HTTPError(falcon.HTTP_400, "{errorMessage: \"" + str(err) + "\"}")
         # raise InvalidPVs(str(err))
 
 
