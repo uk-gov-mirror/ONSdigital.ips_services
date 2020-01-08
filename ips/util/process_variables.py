@@ -2,6 +2,8 @@ import multiprocessing
 
 from functools import partial
 import pandas
+
+from ips.services.restricted_python import Status, ErrorStatus, SuccessfulStatus
 from ips.util.services_logging import log
 import ips.persistence.sql as db
 import numpy as np
@@ -15,6 +17,12 @@ from datetime import datetime
 from ips.persistence.persistence import insert_from_dataframe
 from RestrictedPython import compile_restricted
 from RestrictedPython import safe_builtins
+
+
+class PVExecutionError(Exception):
+    def __init__(self, message, pv):
+        self.errorMessage = message
+        self.PV = pv
 
 
 def getitem(object, name, default=None):  # known special case of getitem
@@ -112,7 +120,7 @@ def modify_values(row, dataset, pvs):
         except Exception as err:
             name = pv['PROCVAR_NAME']
             log.error(f"Error in PV: {name}, Message: {str(err)}")
-            raise Exception(f"Error in PV: {pv['PROCVAR_NAME']}, Message: {str(err)}")
+            raise PVExecutionError(str(err), pv['PROCVAR_NAME'])
 
     if dataset in ('survey', 'shift'):
         row['SHIFT_PORT_GRP_PV'] = str(row['SHIFT_PORT_GRP_PV'])[:10]
@@ -147,14 +155,18 @@ def parallel_func(pv_df, pv_list, dataset=None):
     return pv_df.apply(modify_values, axis=1, args=(dataset, pv_list))
 
 
-def compile_pvs(pv_list):
+def compile_pvs(template, pv_list) -> Status:
     for a in pv_list:
         log.debug(f"Compiling PV: {a['PROCVAR_NAME']}")
-        a['PROCVAR_RULE'] = compile_restricted(
-            a['PROCVAR_RULE'],
-            filename=a['PROCVAR_NAME'],
-            mode='exec'
-        )
+        try:
+            a['PROCVAR_RULE'] = compile_restricted(
+                a['PROCVAR_RULE'],
+                filename=a['PROCVAR_NAME'],
+                mode='exec'
+            )
+        except Exception as err:
+            return ErrorStatus(template, str(err), a['PROCVAR_NAME'])
+    return SuccessfulStatus(template)
 
 
 def parallelise_pvs(dataframe, process_variables, dataset=None):

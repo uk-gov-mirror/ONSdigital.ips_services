@@ -8,10 +8,6 @@ import pandas as pd
 import os
 
 
-class InvalidPVs(Exception):
-    pass
-
-
 def get_dataframe() -> pd.DataFrame:
     survey_subsample_table = 'SURVEY_SUBSAMPLE'
     run_id = 'test-pv'
@@ -49,12 +45,32 @@ def get_dataframe() -> pd.DataFrame:
     return df
 
 
-# @service
-def test_pvs(template: str) -> None:
+class Status(object):
+    def __init__(self, pv_template):
+        self.template = pv_template
+        self.status = ""
+
+
+class ErrorStatus(Status):
+    def __init__(self, pv_template, message, pv):
+        super().__init__(pv_template)
+        self.status = "error"
+        self.errorMessage = message
+        self.PV = pv
+
+
+class SuccessfulStatus(Status):
+    def __init__(self, pv_template):
+        super().__init__(pv_template)
+        self.status = "successful"
+
+
+@service
+def test_pvs(pv_template: str) -> Status:
     try:
         df = get_dataframe()
         # Get the process variables for TEMPLATE
-        process_variables = get_pvs(template)
+        process_variables = get_pvs(pv_template)
 
         pvs = []
         for a in process_variables:
@@ -62,14 +78,18 @@ def test_pvs(template: str) -> None:
             pvs.append(c)
 
         if len(pvs) == 0:
-            raise Exception(f'No PVS for template {template}')
-        pv_exec.compile_pvs(pvs)
+            raise Exception(f'No PVS for template {pv_template}')
+
+        s = pv_exec.compile_pvs(pv_template, pvs)
+        if s is not None and isinstance(s, ErrorStatus):
+            return s
+
         dataset = "survey"
         df.apply(pv_exec.modify_values, axis=1, dataset=dataset, pvs=pvs)
+        return SuccessfulStatus(pv_template)
 
-    except Exception as err:
-        raise falcon.HTTPError(falcon.HTTP_400, "{errorMessage: \"" + str(err) + "\"}")
-        # raise InvalidPVs(str(err))
+    except pv_exec.PVExecutionError as err:
+        return ErrorStatus(pv_template, "PV execution failed: " + err.errorMessage, err.PV)
 
 
 def get_pvs(template: str):
@@ -88,7 +108,22 @@ def get_pvs(template: str):
 
 
 if __name__ == "__main__":
-    try:
-        test_pvs('TEMPLATE')
-    except Exception:
-        pass
+    template = 'TEMPLATE'
+
+    status = test_pvs(template)
+    r = test_pvs(template)
+    if r is not None:
+        if isinstance(r, SuccessfulStatus):
+            result = {
+                'status': 'successful',
+                'template': template,
+            }
+            print(falcon.json.dumps(result))
+        else:
+            result = {
+                'status': r.status,
+                'template': r.template,
+                'errorMessage': r.errorMessage,
+                'PV': r.PV
+            }
+            print(falcon.json.dumps(result))
