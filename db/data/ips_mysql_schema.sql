@@ -61,7 +61,7 @@ elif row[''IMBAL_PORT_GRP_PV''] == 4 and row[''ARRIVEDEPART''] == 1:
 elif row[''IMBAL_PORT_GRP_PV''] == 4 and row[''ARRIVEDEPART''] == 2:
     row[''IMBAL_PORT_FACT_PV''] = 1.00
 elif row[''IMBAL_PORT_GRP_PV''] == 5 and row[''ARRIVEDEPART''] == 1:
-    row[''IMBAL_PORT_FACT_PV''] = 0.God damn stones
+    row[''IMBAL_PORT_FACT_PV''] = 0
 elif row[''IMBAL_PORT_GRP_PV''] == 5 and row[''ARRIVEDEPART''] == 2:
     row[''IMBAL_PORT_FACT_PV''] = 1.04
 elif row[''IMBAL_PORT_GRP_PV''] == 6 and row[''ARRIVEDEPART''] == 1:
