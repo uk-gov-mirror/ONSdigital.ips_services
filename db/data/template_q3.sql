@@ -1,11 +1,13 @@
 use ips;
 
-INSERT INTO PROCESS_VARIABLE_SET(run_id, name, user, period, year)
+SET SQL_SAFE_UPDATES = 0;
+
+INSERT INTO ips.PROCESS_VARIABLE_SET(run_id, name, user, period, year)
 VALUES ('Template_Quarter_3', 'Template_Quarter_3', 'Template', 'Q3', 2019);
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('Template_Quarter_3', 12, 'imbal_port_fact_pv', 'imbal_port_fact_pv', 'if row[''IMBAL_PORT_GRP_PV''] == 1 and row[''ARRIVEDEPART''] == 1:
-    row[''IMBAL_PORT_FACT_PV''] = 1.0
+    row[''IMBAL_PORT_FACT_PV''] = 1.00
 elif row[''IMBAL_PORT_GRP_PV''] == 1 and row[''ARRIVEDEPART''] == 2:
     row[''IMBAL_PORT_FACT_PV''] = 0.99
 elif row[''IMBAL_PORT_GRP_PV''] == 2 and row[''ARRIVEDEPART''] == 1:
@@ -17,9 +19,9 @@ elif row[''IMBAL_PORT_GRP_PV''] == 3 and row[''ARRIVEDEPART''] == 1:
 elif row[''IMBAL_PORT_GRP_PV''] == 3 and row[''ARRIVEDEPART''] == 2:
     row[''IMBAL_PORT_FACT_PV''] = 0.99
 elif row[''IMBAL_PORT_GRP_PV''] == 4 and row[''ARRIVEDEPART''] == 1:
-    row[''IMBAL_PORT_FACT_PV''] = 1.0
+    row[''IMBAL_PORT_FACT_PV''] = 1.00
 elif row[''IMBAL_PORT_GRP_PV''] == 4 and row[''ARRIVEDEPART''] == 2:
-    row[''IMBAL_PORT_FACT_PV''] = 1.0
+    row[''IMBAL_PORT_FACT_PV''] = 1.00
 elif row[''IMBAL_PORT_GRP_PV''] == 5 and row[''ARRIVEDEPART''] == 1:
     row[''IMBAL_PORT_FACT_PV''] = 1.00
 elif row[''IMBAL_PORT_GRP_PV''] == 5 and row[''ARRIVEDEPART''] == 2:
@@ -43,7 +45,7 @@ elif row[''IMBAL_PORT_GRP_PV''] == 9 and row[''ARRIVEDEPART''] == 2:
 elif row[''IMBAL_PORT_GRP_PV''] == 10 and row[''ARRIVEDEPART''] == 1:
     row[''IMBAL_PORT_FACT_PV''] = 0.98
 elif row[''IMBAL_PORT_GRP_PV''] == 10 and row[''ARRIVEDEPART''] == 2:
-    row[''IMBAL_PORT_FACT_PV''] = 1.0
+    row[''IMBAL_PORT_FACT_PV''] = 1.00
 elif row[''IMBAL_PORT_GRP_PV''] == 11 and row[''ARRIVEDEPART''] == 1:
     row[''IMBAL_PORT_FACT_PV''] = 0.96
 elif row[''IMBAL_PORT_GRP_PV''] == 11 and row[''ARRIVEDEPART''] == 2:
@@ -73,7 +75,7 @@ elif row[''IMBAL_PORT_GRP_PV''] == 17 and row[''ARRIVEDEPART''] == 1:
 elif row[''IMBAL_PORT_GRP_PV''] == 17 and row[''ARRIVEDEPART''] == 2:
     row[''IMBAL_PORT_FACT_PV''] = 1.02
 elif row[''IMBAL_PORT_GRP_PV''] == 18:
-    row[''IMBAL_PORT_FACT_PV''] = 1.0
+    row[''IMBAL_PORT_FACT_PV''] = 1.00
 else:
     row[''IMBAL_PORT_FACT_PV''] = 1.0
 
@@ -99,7 +101,7 @@ INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DE
 VALUES ('Template_Quarter_3', 33, 'osport2_pv', 'osport2_pv', '
 if row[''UKPORT1_PV''] == 641:
     if not math.isnan(row[''OSPORT1_PV'']):
-        row[''OSPORT2_PV''] = int(float(row[''OSPORT1_PV'']) / 100.0)
+        row[''OSPORT2_PV''] = int(float(row[''OSPORT1_PV'']) / 1000.0)
 else:
     if not math.isnan(row[''OSPORT1_PV'']):
         row[''OSPORT2_PV''] = int(float(row[''OSPORT1_PV'']) / 1000.0)
@@ -110,16 +112,16 @@ if row[''UKFOREIGN''] == 1 and math.isnan(row[''OSPORT1_PV'']):
 if row[''UKFOREIGN''] == 2 and math.isnan(row[''OSPORT1_PV'']):
     row[''OSPORT2_PV''] = row[''RESIDENCE'']
 
-if row[''OSPORT2_PV''] == 300:
+if row[''OSPORT2_PV''] == 292:
     row[''OSPORT2_PV''] = 2500
-elif row[''OSPORT2_PV''] == 310:
-    row[''OSPORT2_PV''] = 2200
-elif row[''OSPORT2_PV''] == 320:
-    row[''OSPORT2_PV''] = 1000
-elif row[''OSPORT2_PV''] == 150:
-    row[''OSPORT2_PV''] = 210
-elif row[''OSPORT2_PV''] == 160:
-    row[''OSPORT2_PV''] = 210
+elif row[''OSPORT2_PV''] == 470:
+    row[''OSPORT2_PV''] = 300
+elif row[''OSPORT2_PV''] == 831:
+    row[''OSPORT2_PV''] = 372
+elif row[''OSPORT2_PV''] == 832:
+    row[''OSPORT2_PV''] = 372
+elif row[''OSPORT2_PV''] == 833:
+    row[''OSPORT2_PV''] = 372
 ');
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
@@ -159,27 +161,27 @@ elif railcountry in (112,100,191,203,246,300,348,973,428,440,807,504,616,642,643
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('Template_Quarter_3', 34, 'osport3_pv', 'osport3_pv', '
 
-if row[''OSPORT2_PV''] in (40,56,250,276,372,438,442,492,528,756,830,831,832,833,921,922,923,924,926,931):
+if row[''OSPORT2_PV''] in (40,56,250,276,372,438,442,492,528,756,830,831,832,833,922,924,926,931):
     row[''OSPORT3_PV''] = 1
 elif row[''OSPORT2_PV''] in (208,233,234,246,248,352,428,440,578,744,752):
     row[''OSPORT3_PV''] = 2
 elif row[''OSPORT2_PV''] in (31,51,112,203,268,348,498,616,642,643,703,804):
     row[''OSPORT3_PV''] = 3
-elif row[''OSPORT2_PV''] in (8,20,70,100,191,292,300,336,380,470,499,620,621,674,688,705,792,807,901,902,911,912,951,973):
+elif row[''OSPORT2_PV''] in (8,20,70,100,191,292,300,336,380,470,499,620,621,674,688,705,792,807,901,902,911,912,951):
     row[''OSPORT3_PV''] = 4
-elif row[''OSPORT2_PV''] in (12,434,504,732,736,788,818):
+elif row[''OSPORT2_PV''] in (12,434,504,732,788,818):
     row[''OSPORT3_PV''] = 5
 elif row[''OSPORT2_PV''] in (24,72,108,120,132,140,148,174,175,178,180,204,226,231,232,262,266,270,288,324,384,404,426,430,450,454,466,478,480,508,516,562,566,624,638,646,654,678,686,690,694,706,710,716,748,768,800,834,854,894):
     row[''OSPORT3_PV''] = 6
 elif row[''OSPORT2_PV''] in (60,124,304,840):
     row[''OSPORT3_PV''] = 7
-elif row[''OSPORT2_PV''] in (28,32,44,52,68,76,84,92,136,152,170,188,192,212,214,218,222,238,254,308,312,320,328,332,340,388,474,484,500,530,533,558,591,600,604,630,652,659,660,662,663,666,670,740,780,796,850,858,862):
+elif row[''OSPORT2_PV''] in (28,32,44,52,68,76,84,92,136,152,170,188,192,212,214,218,222,238,254,308,312,320,328,332,340,388,474,484,500,531,533,534,535,558,591,600,604,630,652,659,660,662,663,666,670,740,780,796,850,858,862):
     row[''OSPORT3_PV''] = 8
 elif row[''OSPORT2_PV''] in (4,50,64,96,104,116,144,156,158,344,356,360,392,398,408,410,417,418,446,458,462,496,524,586,608,626,702,704,762,764,795,860):
     row[''OSPORT3_PV''] = 9
 elif row[''OSPORT2_PV''] in (48,275,364,368,376,400,414,422,512,634,682,760,784,887):
     row[''OSPORT3_PV''] = 10
-elif row[''OSPORT2_PV''] in (10,16,36,74,86,90,162,166,184,239,242,258,260,296,316,334,520,540,548,554,570,574,580,581,583,584,585,598,612,772,776,798,876,882):
+elif row[''OSPORT2_PV''] in (10,16,36,74,90,162,166,184,239,242,258,260,296,316,334,520,540,548,554,570,574,580,581,583,84,585,598,612,772,776,798,876,882):
     row[''OSPORT3_PV''] = 11
 elif row[''OSPORT2_PV''] in (940,941,942,943,944,945,946,947,949):
     row[''OSPORT3_PV''] = 12
@@ -195,19 +197,13 @@ else:
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('Template_Quarter_3', 36, 'apd_pv', 'apd_pv', '
-if row[''OSPORT2_PV''] in (210,500,600,700,800):
+if row[''OSPORT2_PV''] in (2,8,12,40,56,70,100,112,191,203,208,233,234,246,250,251,276,292,300):
     APDBAND = 1
-elif row[''OSPORT2_PV''] in (1000,1100,1200,1700,2000):
+elif row[''OSPORT2_PV''] in (301,304,348,352,372,380,428,434,440,442,470,492,498,499,504,528,578,616):
     APDBAND = 1
-elif row[''OSPORT2_PV''] in (2100,2200,2300,2390,2500):
+elif row[''OSPORT2_PV''] in (620,621,642,688,703,705,732,752,756,788,792,804,807,831,832,833):
     APDBAND = 1
-elif row[''OSPORT2_PV''] in (2590,2800,2830,2840,150,160):
-    APDBAND = 1
-elif row[''OSPORT2_PV''] in (310,320,340,2760,3020,3030):
-    APDBAND = 1
-elif row[''OSPORT2_PV''] in (3040,3050,3060,3130,3170,3180):
-    APDBAND = 1
-elif row[''OSPORT2_PV''] in (3000,3010):
+elif row[''OSPORT2_PV''] in (901,902,911,912,913,921,923,924,926,931,933,951,2500,1000,210,2200):
     APDBAND = 1
 else:
     APDBAND = 2
@@ -215,9 +211,9 @@ else:
 if row[''FLOW''] > 4:
     row[''APD_PV''] = 0
 elif APDBAND == 1:
-    row[''APD_PV''] = 10/2
+    row[''APD_PV''] = 13
 else:
-    row[''APD_PV''] = 40/2
+    row[''APD_PV''] = 71
 ');
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
@@ -237,7 +233,7 @@ else:
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('Template_Quarter_3', 39, 'spend_imp_eligible_pv', 'spend_imp_eligible_pv', '
-if (row[''FLOW''] in (1,4,5,8) and row[''PURPOSE''] < 80 and row[''PURPOSE''] != 23 and row[''PURPOSE''] != 24 and row[''MINS_FLAG_PV''] == 0) or (row[''FLOW''] in (1,4,5,8) and str(row[''PURPOSE'']) == ''nan'' and row[''MINS_FLAG_PV''] == 0):
+if (row[''FLOW''] in (1,4,5,8) and row[''PURPOSE''] < 80 and row[''PURPOSE''] != 23 and row[''PURPOSE''] != 24 and row[''MINS_FLAG_PV''] == 0):
     row[''SPEND_IMP_ELIGIBLE_PV''] = 1
 else:
     row[''SPEND_IMP_ELIGIBLE_PV''] = 0
@@ -265,7 +261,7 @@ elif row[''PURPOSE''] in (20,21,22):
     row[''PUR1_PV''] = 3
 elif row[''PURPOSE''] in (11,12):
     row[''PUR1_PV''] = 4
-elif row[''PURPOSE''] == 40:
+elif row[''PURPOSE''] in (47,60,61,62,63,64,65,66):
     row[''PUR1_PV''] = 5
 elif row[''PURPOSE''] == 71:
     row[''PUR1_PV''] = 6
@@ -326,7 +322,8 @@ elif row[''STAY''] >= 31:
 ');
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
-VALUES ('Template_Quarter_3', 46, 'imbal_ctry_fact_pv', 'imbal_ctry_fact_pv', 'if row[''RESIDENCE''] == 352 or row[''RESIDENCE''] == 40 or row[''RESIDENCE''] in (292, 470, 902, 901) or row[''RESIDENCE''] == 792 or row[''RESIDENCE''] == 620 or row[''RESIDENCE''] == 621 or row[''RESIDENCE''] in (973, 70, 191, 807, 499, 688, 951, 705)  or row[''RESIDENCE''] == 234:
+VALUES ('Template_Quarter_3', 46, 'imbal_ctry_fact_pv', 'imbal_ctry_fact_pv', '
+if row[''RESIDENCE''] == 352 or row[''RESIDENCE''] == 40 or row[''RESIDENCE''] in (292, 470, 902, 901) or row[''RESIDENCE''] == 792 or row[''RESIDENCE''] == 620 or row[''RESIDENCE''] == 621 or row[''RESIDENCE''] in (973, 70, 191, 807, 499, 688, 951, 705)  or row[''RESIDENCE''] == 234:
     row[''IMBAL_CTRY_FACT_PV''] = 1.02
 elif row[''RESIDENCE''] == 56 or row[''RESIDENCE''] == 442:
     row[''IMBAL_CTRY_FACT_PV''] = 1.04
@@ -337,7 +334,7 @@ elif row[''RESIDENCE''] == 276:
 elif (row[''RESIDENCE''] == 380) or row[''RESIDENCE''] == 674:
     row[''IMBAL_CTRY_FACT_PV''] = 1.08
 elif row[''RESIDENCE''] == 528:
-    row[''IMBAL_CTRY_FACT_PV''] = 1.00
+    row[''IMBAL_CTRY_FACT_PV''] = 1.0
 elif row[''RESIDENCE''] == 208:
     row[''IMBAL_CTRY_FACT_PV''] = 1.08
 elif row[''RESIDENCE''] in (246, 248, 578, 744, 752):
@@ -358,7 +355,7 @@ elif row[''RESIDENCE''] in (710, 516):
     row[''IMBAL_CTRY_FACT_PV''] = 0.96
 elif row[''RESIDENCE''] in (36, 334, 554):
     row[''IMBAL_CTRY_FACT_PV''] = 1.0
-elif row[''RESIDENCE''] in (242, 598, 598, 258, 16, 296, 316, 580, 581, 583, 584, 772, 540, 74, 86, 90, 162, 166, 184, 296, 520, 548, 570, 574, 585, 612, 776, 798, 876, 882) or row[''RESIDENCE''] in (50, 96, 144, 458, 702) or (row[''RESIDENCE''] == 356) or row[''RESIDENCE''] in (586, 4, 64, 104, 116, 360, 410, 418, 446, 524, 608, 158, 764, 704, 626):
+elif row[''RESIDENCE''] in (242, 598, 598, 258, 16, 296, 316, 580, 581, 583, 584, 772, 540, 74, 86, 90, 162, 166, 184, 296, 520, 548, 570, 574, 585, 612, 776, 798, 876, 882) or row[''RESIDENCE''] in (50, 96, 144, 458, 702) or (row[''RESIDENCE''] == 356) or row[''RESIDENCE''] in (586, 4, 64, 104, 116, 360, 410, 418, 446, 524, 608, 58, 764, 704, 626):
     row[''IMBAL_CTRY_FACT_PV''] = 1.12
 elif row[''RESIDENCE''] == 344:
     row[''IMBAL_CTRY_FACT_PV''] = 1.02
@@ -403,9 +400,9 @@ elif row[''STAYIMPCTRYLEVEL1_PV''] in (70, 191, 807, 499, 951, 688, 705, 100, 64
     row[''STAYIMPCTRYLEVEL2_PV''] = 7
 elif row[''STAYIMPCTRYLEVEL1_PV''] in (348, 616, 8, 643, 51, 31, 112, 233, 268, 398, 417, 428, 440, 498, 762, 795, 804, 860):
     row[''STAYIMPCTRYLEVEL2_PV''] = 8
-elif row[''STAYIMPCTRYLEVEL1_PV''] in (12, 434, 504, 736, 788, 818, 732):
+elif row[''STAYIMPCTRYLEVEL1_PV''] in (12, 434, 504, 729, 728, 788, 818, 732):
     row[''STAYIMPCTRYLEVEL2_PV''] = 11
-elif row[''STAYIMPCTRYLEVEL1_PV''] in (270, 288, 566, 694, 654, 404, 426, 454, 480,690, 834, 800, 894, 72, 716, 204, 266, 324,624, 384, 430, 466, 478, 562, 686, 768, 854, 24, 108, 120, 140, 148, 178, 180, 231, 450, 508, 646, 706, 262, 10, 132, 174, 226, 260, 175, 638, 678, 232):
+elif row[''STAYIMPCTRYLEVEL1_PV''] in  (270, 288, 566, 694, 654, 404, 426, 454, 480, 690,834, 800, 894, 72, 716, 204, 266, 324, 624, 384, 430,466, 478, 562, 686, 768, 854, 24, 108, 120, 140, 148, 178, 180, 231, 450, 508, 646, 706, 262, 10, 132, 174,226, 260, 175, 638, 678, 232):
     row[''STAYIMPCTRYLEVEL2_PV''] = 12
 elif row[''STAYIMPCTRYLEVEL1_PV''] in (748, 710, 516):
     row[''STAYIMPCTRYLEVEL2_PV''] = 13
@@ -425,25 +422,25 @@ elif row[''STAYIMPCTRYLEVEL1_PV''] in (4, 104, 116, 410, 418, 446, 704, 626, 408
     row[''STAYIMPCTRYLEVEL2_PV''] = 25
 elif row[''STAYIMPCTRYLEVEL1_PV''] in (334, 36, 554):
     row[''STAYIMPCTRYLEVEL2_PV''] = 31
-elif row[''STAYIMPCTRYLEVEL1_PV''] in (242, 598, 258, 296, 316, 581, 580, 584, 583, 16, 772, 581, 540, 74, 86, 162, 166, 184, 798, 520, 570, 574, 585, 612, 882, 90, 776, 798, 548, 876):
+elif row[''STAYIMPCTRYLEVEL1_PV''] in (242, 598, 258, 296, 316, 581, 580, 584, 583, 16, 772, 540, 74, 162, 166, 184, 520, 570, 574, 585, 612, 882, 90, 776, 798, 548, 876):
     row[''STAYIMPCTRYLEVEL2_PV''] = 32
 elif row[''STAYIMPCTRYLEVEL1_PV''] in (124, 666, 304):
     row[''STAYIMPCTRYLEVEL2_PV''] = 41
 elif row[''STAYIMPCTRYLEVEL1_PV''] in (840, 630, 850):
     row[''STAYIMPCTRYLEVEL2_PV''] = 42
-elif row[''STAYIMPCTRYLEVEL1_PV''] in (60, 388, 780, 28, 44, 52, 92, 136, 212, 308, 500, 660, 659, 662, 670, 796, 192, 214, 312, 652, 663, 332, 474, 530, 533, 84, 328):
+elif row[''STAYIMPCTRYLEVEL1_PV''] in (60, 388, 780, 28, 44, 52, 92, 136, 212, 308, 500, 660, 659, 662, 670, 796, 192, 214, 312, 652, 663, 332, 474, 531, 533, 534, 535, 84, 328):
     row[''STAYIMPCTRYLEVEL2_PV''] = 43
 elif row[''STAYIMPCTRYLEVEL1_PV''] in (484, 340, 320,222, 558, 188, 862, 591):
     row[''STAYIMPCTRYLEVEL2_PV''] = 44
-elif row[''STAYIMPCTRYLEVEL1_PV''] in (76, 68, 152, 170, 218, 604, 858, 862, 254, 740):
+elif row[''STAYIMPCTRYLEVEL1_PV''] in (76, 68, 170, 218, 604, 862, 254, 740):
     row[''STAYIMPCTRYLEVEL2_PV''] = 45
 elif row[''STAYIMPCTRYLEVEL1_PV''] in (238, 32, 858, 600, 152):
     row[''STAYIMPCTRYLEVEL2_PV''] = 46
-elif row[''STAYIMPCTRYLEVEL1_PV''] in (40, 42, 43, 44):
+elif row[''STAYIMPCTRYLEVEL1_PV''] in (40,44):
     row[''STAYIMPCTRYLEVEL2_PV''] = 51
 elif row[''STAYIMPCTRYLEVEL1_PV''] in (41,45, 46, 47, 49):
     row[''STAYIMPCTRYLEVEL2_PV''] = 52
-elif row[''STAYIMPCTRYLEVEL1_PV''] in (0, 969, 99):
+elif row[''STAYIMPCTRYLEVEL1_PV''] in (0, 958, 969, 981):
     row[''STAYIMPCTRYLEVEL2_PV''] = 91
 else:
     row[''STAYIMPCTRYLEVEL2_PV''] = 99');
@@ -636,20 +633,20 @@ else:
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('Template_Quarter_3', 51, 'purpose_pv', 'purpose_pv', '
-if row[''PURPOSE''] == 3 or row[''PURPOSE''] == 4 or row[''PURPOSE''] == 31 or row[''PURPOSE''] == 32:
+if row[''PURPOSE''] == 20 or row[''PURPOSE''] == 21 or row[''PURPOSE''] == 22:
     row[''PURPOSE_PV''] = 1
-elif row[''PURPOSE''] == 1 or row[''PURPOSE''] == 2:
+elif row[''PURPOSE''] == 10 or row[''PURPOSE''] == 14 or row[''PURPOSE''] == 17 or row[''PURPOSE''] == 18:
     row[''PURPOSE_PV''] = 2
-elif row[''PURPOSE''] == 5:
+elif row[''PURPOSE''] in (47,60,61,62,63,64,65,66):
     row[''PURPOSE_PV''] = 3
-elif row[''PURPOSE''] == 61 or row[''PURPOSE''] == 62 or row[''PURPOSE''] == 6:
+elif row[''PURPOSE''] == 11 or row[''PURPOSE''] == 12 or row[''PURPOSE''] == 6:
     row[''PURPOSE_PV''] = 4
 else:
     row[''PURPOSE_PV''] = 5');
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('Template_Quarter_3', 52, 'town_imp_eligible_pv', 'town_imp_eligible_pv', '
-if row[''FLOW''] in (1,5) and row[''RESPNSE''] != 5 and (row[''PURPOSE''] <= 89 or row[''PURPOSE''] == 92 or math.isnan(row[''PURPOSE''])):
+if row[''FLOW''] in (1,5) and row[''RESPNSE''] != 5 and (row[''PURPOSE''] <= 89 or row[''PURPOSE''] == 92):
     row[''TOWN_IMP_ELIGIBLE_PV''] = 1
 else:
     row[''TOWN_IMP_ELIGIBLE_PV''] = 0
@@ -657,7 +654,7 @@ else:
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('Template_Quarter_3', 53, 'reg_imp_eligible_pv', 'reg_imp_eligible_pv', '
-if row[''FLOW''] in (1,5) and row[''RESPNSE''] != 5 and (row[''PURPOSE''] <= 89 or row[''PURPOSE''] == 92 or math.isnan(row[''PURPOSE''])):
+if row[''FLOW''] in (1,5) and row[''RESPNSE''] != 5 and (row[''PURPOSE''] <= 89 or row[''PURPOSE''] == 92):
     row[''REG_IMP_ELIGIBLE_PV''] = 1
 else:
     row[''REG_IMP_ELIGIBLE_PV''] = 0
@@ -672,7 +669,7 @@ VALUES ('Template_Quarter_3', 55, 'mins_port_grp_pv', 'mins_port_grp_pv', '
 row[''MINS_PORT_GRP_PV''] = int(row[''PORTROUTE''])');
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
-VALUES ('Template_Quarter_3', 56, 'samp_port_grp_pv', 'samp_port_grp_pv', 'if row[''PORTROUTE''] in (111,113,119,161,171):
+VALUES ('Template_Quarter_3', 56, 'SAMP_PORT_GRP_PV', 'SAMP_PORT_GRP_PV', 'if row[''PORTROUTE''] in (111,113,119,161,171):
     row[''SAMP_PORT_GRP_PV''] = ''A111''
 elif row[''PORTROUTE''] in (121,123,129,162,172):
     row[''SAMP_PORT_GRP_PV''] = ''A121''
@@ -680,7 +677,7 @@ elif row[''PORTROUTE''] in (131,132,133,134,135,163,173):
     row[''SAMP_PORT_GRP_PV''] = ''A131''
 elif row[''PORTROUTE''] in (141,142,143,144,145,164,174):
     row[''SAMP_PORT_GRP_PV''] = ''A141''
-elif row[''PORTROUTE''] in (151,152,153,154,165,175):
+elif row[''PORTROUTE''] in (151,152,153,154,158,165,175):
     row[''SAMP_PORT_GRP_PV''] = ''A151''
 elif row[''PORTROUTE''] in (181,183,189):
     row[''SAMP_PORT_GRP_PV''] = ''A181''
@@ -799,12 +796,12 @@ elif(Irish)and row[''PORTROUTE''] in (211,221,231,219):
     row[''SAMP_PORT_GRP_PV''] = ''AME''
 elif(Irish)and row[''PORTROUTE''] in (241,249):
     row[''SAMP_PORT_GRP_PV''] = ''ALE''
-elif(Irish)and row[''PORTROUTE''] in (201,202,203,204):
+elif(Irish)and row[''PORTROUTE''] in (201,202):
     row[''SAMP_PORT_GRP_PV''] = ''ASE''
 elif(Irish)and (row[''PORTROUTE''] >= 300)and (row[''PORTROUTE''] < 600):
     row[''SAMP_PORT_GRP_PV''] = ''ARE''
 elif(ChannelI)and (row[''PORTROUTE''] >= 100)and (row[''PORTROUTE''] < 300):
-    row[''SAMP_PORT_GRP_PV''] = ''MAC'' Samp
+    row[''SAMP_PORT_GRP_PV''] = ''MAC''
 elif(ChannelI)and (row[''PORTROUTE''] >= 300)and (row[''PORTROUTE''] < 600):
     row[''SAMP_PORT_GRP_PV''] = ''RAC''
 elif(IoM)and (row[''PORTROUTE''] >= 100)and (row[''PORTROUTE''] < 300):
@@ -818,7 +815,8 @@ if row[''SAMP_PORT_GRP_PV''] == ''EGS'':
 if row[''SAMP_PORT_GRP_PV''] == ''MAM'':
     row[''SAMP_PORT_GRP_PV''] = ''MAC''
 if row[''SAMP_PORT_GRP_PV''] == ''RAM'':
-    row[''SAMP_PORT_GRP_PV''] = ''RAC''  ');
+    row[''SAMP_PORT_GRP_PV''] = ''RAC''
+');
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('Template_Quarter_3', 57, 'unsamp_port_grp_pv', 'unsamp_port_grp_pv', 'if row[''PORTROUTE''] in (111, 113, 119, 161):
@@ -829,7 +827,7 @@ elif row[''PORTROUTE''] in (131, 132, 133, 134, 135, 163, 173):
     row[''UNSAMP_PORT_GRP_PV''] = ''A131''
 elif row[''PORTROUTE''] in (141, 142, 143, 144, 145, 164):
     row[''UNSAMP_PORT_GRP_PV''] = ''A141''
-elif row[''PORTROUTE''] in (151, 152, 153, 165):
+elif row[''PORTROUTE''] in (151, 152, 153, 158, 165):
     row[''UNSAMP_PORT_GRP_PV''] = ''A151''
 elif row[''PORTROUTE''] in (181, 183, 189):
     row[''UNSAMP_PORT_GRP_PV''] = ''A181''
@@ -845,7 +843,7 @@ elif row[''PORTROUTE''] in (231, 232, 233, 234):
     row[''UNSAMP_PORT_GRP_PV''] = ''A231''
 elif row[''PORTROUTE''] in (241, 243):
     row[''UNSAMP_PORT_GRP_PV''] = ''A241''
-elif row[''PORTROUTE''] in (381, 382, 391, 341, 331, 451):
+elif row[''PORTROUTE''] in (381, 382, 391, 393, 341, 331, 451):
     row[''UNSAMP_PORT_GRP_PV''] = ''A991''
 elif row[''PORTROUTE''] in (401, 411, 441, 443, 471):
     row[''UNSAMP_PORT_GRP_PV''] = ''A992''
@@ -921,7 +919,7 @@ if dataset == ''survey'':
             ChannelI = 1
         elif ((row[''FLOW''] in (2,4)) and (row[''COUNTRYVISIT''] in (831, 832, 931))):
             ChannelI = 1
-    if (Irish) and row[''PORTROUTE''] in (111, 121, 131, 141, 132, 142, 119, 161, 162, 163, 164, 165, 151, 152):
+    if (Irish) and row[''PORTROUTE''] in (111, 121, 131, 141, 132, 142, 119, 129, 161, 162, 163, 164, 165, 151, 152):
         row[''UNSAMP_PORT_GRP_PV''] = ''AHE''
     elif (Irish) and row[''PORTROUTE''] in (181, 191, 192, 189, 199):
         row[''UNSAMP_PORT_GRP_PV''] = ''AGE''
@@ -1003,29 +1001,29 @@ INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DE
 VALUES ('Template_Quarter_3', 11, 'imbal_port_grp_pv', 'imbal_port_grp_pv', '
 if row[''PORTROUTE''] in (111, 113, 119, 161, 171):
     row[''IMBAL_PORT_GRP_PV''] = 1
-elif row[''PORTROUTE''] in (121, 123, 151, 153, 162, 165, 172, 175):
+elif row[''PORTROUTE''] in (121, 123, 129, 151, 153, 162, 165, 172, 175):
     row[''IMBAL_PORT_GRP_PV''] = 2
 elif row[''PORTROUTE''] in (131, 132, 133, 134, 135, 163, 173):
     row[''IMBAL_PORT_GRP_PV''] = 3
 elif row[''PORTROUTE''] in (141, 142, 143, 144, 145, 164, 174):
     row[''IMBAL_PORT_GRP_PV''] = 4
-elif row[''PORTROUTE''] in (191, 193):
+elif row[''PORTROUTE''] in (191, 192, 193):
     row[''IMBAL_PORT_GRP_PV''] = 5
 elif row[''PORTROUTE''] in (181, 183, 189, 199):
     row[''IMBAL_PORT_GRP_PV''] = 6
-elif row[''PORTROUTE''] in (211, 213, 219, 221, 223, 231):
+elif row[''PORTROUTE''] in (211, 221, 213, 223, 231, 233, 234, 219):
     row[''IMBAL_PORT_GRP_PV''] = 7
-elif row[''PORTROUTE''] in (201, 203):
+elif row[''PORTROUTE''] in (201, 202, 203, 204):
     row[''IMBAL_PORT_GRP_PV''] = 8
-elif row[''PORTROUTE''] in (241, 243, 311, 319, 321, 351, 361, 371, 381, 391, 401, 411, 421, 441, 451, 461, 471, 481):
+elif row[''PORTROUTE''] in (311, 313, 318, 321, 331, 461, 351, 371, 381, 391, 398, 401, 411, 241, 441, 443, 451, 361, 481, 421, 319, 243, 471):
     row[''IMBAL_PORT_GRP_PV''] = 9
-elif row[''PORTROUTE''] in (641, 671, 672, 681, 682, 691, 692, 731):
+elif row[''PORTROUTE''] in (671, 672, 681, 682, 691, 692, 731, 641):
     row[''IMBAL_PORT_GRP_PV''] = 10
-elif row[''PORTROUTE''] in (611, 612, 701, 711, 721, 722, 812):
+elif row[''PORTROUTE''] in (611, 612, 613, 701, 711, 721, 722, 723):
     row[''IMBAL_PORT_GRP_PV''] = 11
-elif row[''PORTROUTE''] in (621, 631, 632, 633, 634, 651, 661, 662):
+elif row[''PORTROUTE''] in (621, 631, 632, 633, 634, 635, 636, 651, 661, 662):
     row[''IMBAL_PORT_GRP_PV''] = 12
-elif row[''PORTROUTE''] == 911:
+elif row[''PORTROUTE''] in (911, 913):
     row[''IMBAL_PORT_GRP_PV''] = 13
 elif row[''PORTROUTE''] == 921:
     row[''IMBAL_PORT_GRP_PV''] = 14
@@ -1034,7 +1032,9 @@ elif row[''PORTROUTE''] == 811:
 elif row[''IMBAL_PORT_GRP_PV''] == 9999:
     row[''IMBAL_PORT_GRP_PV''] = 16
 elif row[''PORTROUTE''] == 951:
-    row[''IMBAL_PORT_GRP_PV''] = 17');
+    row[''IMBAL_PORT_GRP_PV''] = 17
+elif row[''PORTROUTE''] == 812:
+    row[''IMBAL_PORT_GRP_PV''] = 18');
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('Template_Quarter_3', 58, 'unsamp_region_grp_pv', 'unsamp_region_grp_pv', 'dvpc = 0
@@ -1052,11 +1052,11 @@ if dataset == ''survey'':
                 row[''REGION''] = ''''
         else:
             row[''REGION''] = dvpc
-        if row[''REGION''] in (8,20,31,40,51,56,70,100,112,191,203,208,233,234,246,250,268,276,348,352,380,398,417,428,440,442,492,498,499,528,578,616,642,643,674,688,703,705,752,756,762,795,804,807,860,940,942,943,944,945,946,950,951):
+        if row[''REGION''] in (8,20,31,40,51,56,70,100,112,191,203,208,233,234,246,250,268,276,348,352,380,398,417,428,440,442,492,498,499,528,578,616,642,643,674,688,703,705,752,756,762,795,804,807,860,940,941,942,943,944,945,946,950,951):
             row[''UNSAMP_REGION_GRP_PV''] = 1.0
         elif row[''REGION''] in (124,304,630,666,840,850):
             row[''UNSAMP_REGION_GRP_PV''] = 2.0
-        elif row[''REGION''] in (4,36,50,64,96,104,116,126,144,156,158,242,356,360,408,410,418,446,458,462,496,524,554,586,608,626,702,704,764):
+        elif row[''REGION''] in (4,36,50,64,96,104,116,126,144,156,158,242,334,356,360,408,410,418,446,458,462,496,524,554,586,608,626,702,704,764):
             row[''UNSAMP_REGION_GRP_PV''] = 3.0
         elif row[''REGION''] in (12,24,48,72,108,120,132,140,148,174,178,180,204,226,231,232,262,266,270,288,324,348,384,404,426,430,434,450,454,466,478,480,504,508,516,562,566,624,646,654,678,686,690,694,706,710,716,732,736,748,768,788,800,818,834,854,894):
             row[''UNSAMP_REGION_GRP_PV''] = 4.0
@@ -1064,7 +1064,7 @@ if dataset == ''survey'':
             row[''UNSAMP_REGION_GRP_PV''] = 5.0
         elif row[''REGION''] == 344:
             row[''UNSAMP_REGION_GRP_PV''] = 6.0
-        elif row[''REGION''] in (16,28,32,44,48,52,60,68,76,84,90,92,136,152,166,170,184,188,192,212,214,218,222,238,254,258,296,308,312,316,320,328,332,340,364,368,376,388,400,414,422,474,484,500,512,520,530,533,540,548,558,580,581,584,591,598,604,634,638,659,660,662,670,682,690,740,760,776,780,784,796,798,858,862,882,887,949):
+        elif row[''REGION''] in (16,28,32,44,48,52,60,68,76,84,90,92,136,152,166,170,184,188,192,212,214,218,222,238,254,258,296,308,312,316,320,328,332,340,364,368,376,388,400,414,422,474,484,500,512,520,530,533,535,540,548,558,580,581,584,591,598,600,604,634,638,659,660,662,670,682,690,740,760,776,780,784,796,798,858,862,882,887,949):
             row[''UNSAMP_REGION_GRP_PV''] = 7.0
         elif row[''REGION''] == 300:
             row[''UNSAMP_REGION_GRP_PV''] = 8.0
@@ -1096,7 +1096,6 @@ INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DE
 VALUES ('Template_Quarter_3', 1, 'weekday_end_pv', 'weekday_end_pv', '
 if dataset == ''survey'':
     weekday = float(''nan'')
-    from datetime import datetime
 
     day = int(row[''INTDATE''][:2])
     month = int(row[''INTDATE''][2:4])
@@ -1192,7 +1191,7 @@ if row[''PURPOSE''] in (20, 21, 22, 24, 25):
     row[''STAY_PURPOSE_GRP_PV''] = 1
 elif row[''PURPOSE''] in (10, 15, 16):
     row[''STAY_PURPOSE_GRP_PV''] = 2
-elif row[''PURPOSE''] == 40:
+elif row[''PURPOSE''] in (47,60,61,62,63,64,65,66):
     row[''STAY_PURPOSE_GRP_PV''] = 3
 elif row[''PURPOSE''] in (11, 12):
     row[''STAY_PURPOSE_GRP_PV''] = 4
@@ -1218,18 +1217,19 @@ else:
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('Template_Quarter_3', 22, 'discnt_f1_pv', 'discnt_f1_pv', '
-if row[''FLOW''] in (1, 2, 3, 4, 5, 6, 7, 8):
+if row[''FLOW''] in (1,3,5,7):
+    row[''DISCNT_F1_PV''] = 0.85
+if row[''FLOW''] in (2,4,6,8):
     row[''DISCNT_F1_PV''] = 0.85');
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('Template_Quarter_3', 23, 'discnt_package_cost_pv', 'discnt_package_cost_pv', '
-packagecost = None
 if row[''PACKAGE''] in (1 ,2):
-    if packagecost != 999999:
-        if not packagecost==None:
-            row[''DISCNT_PACKAGE_COST_PV''] = row[''DISCNT_F1_PV''] * packagecost
-    else:
-        row[''DISCNT_PACKAGE_COST_PV''] = packagecost
+    if row[''DVPACKCOST''] != 999999:
+        if not row[''DVPACKCOST''] == None:
+            row[''DISCNT_PACKAGE_COST_PV''] = row[''DVPACKCOST''] * 0.85
+else:
+    row[''DISCNT_PACKAGE_COST_PV''] = row[''DVPACKCOST'']
 row[''DISCNT_PACKAGE_COST_PV''] = round(row[''DISCNT_PACKAGE_COST_PV''], 1)');
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
