@@ -61,7 +61,7 @@ elif row[''IMBAL_PORT_GRP_PV''] == 4 and row[''ARRIVEDEPART''] == 1:
 elif row[''IMBAL_PORT_GRP_PV''] == 4 and row[''ARRIVEDEPART''] == 2:
     row[''IMBAL_PORT_FACT_PV''] = 1.00
 elif row[''IMBAL_PORT_GRP_PV''] == 5 and row[''ARRIVEDEPART''] == 1:
-    row[''IMBAL_PORT_FACT_PV''] = 0
+    row[''IMBAL_PORT_FACT_PV''] = 0.96
 elif row[''IMBAL_PORT_GRP_PV''] == 5 and row[''ARRIVEDEPART''] == 2:
     row[''IMBAL_PORT_FACT_PV''] = 1.04
 elif row[''IMBAL_PORT_GRP_PV''] == 6 and row[''ARRIVEDEPART''] == 1:
@@ -1266,7 +1266,7 @@ if row[''PACKAGE''] in (1 ,2):
             row[''DISCNT_PACKAGE_COST_PV''] = row[''DVPACKCOST''] * 0.85
 else:
     row[''DISCNT_PACKAGE_COST_PV''] = row[''DVPACKCOST'']
-row[''DISCNT_PACKAGE_COST_PV''] = round(row[''DISCNT_PACKAGE_COST_PV''], 1)');
+row[''DISCNT_PACKAGE_COST_PV''] = round(row[''DISCNT_PACKAGE_COST_PV''], 2)');
 
 INSERT INTO ips.PROCESS_VARIABLE_PY (RUN_ID, PROCESS_VARIABLE_ID, PV_NAME, PV_DESC, PV_DEF)
 VALUES ('Template_Quarter_2', 24, 'discnt_f2_pv', 'discnt_f2_pv', '
