@@ -16,4 +16,4 @@ RUN pip install -r requirements.txt && \
     R CMD INSTALL r-packages/DBI_1.0.0.tar.gz && \
     R CMD INSTALL r-packages/RMySQL_0.10.17.tar.gz
 
-CMD [ "waitress-serve", "--listen=*:5000", "--threads=16", "ips.app:app" ]
+CMD [ "waitress-serve", "--listen=*:5000", "--threads=6", "ips.app:app" ]
