@@ -526,12 +526,19 @@ def store_step_summary(run_id, step_configuration):
 
 def is_valid_run_id(run_id: str) -> bool:
 
-    df = select_data(column_name="run_id", table='SURVEY_SUBSAMPLE', condition1="RUN_ID", condition2=run_id)
+    sql = f"""
+        SELECT EXISTS(SELECT 1 FROM SURVEY_SUBSAMPLE WHERE RUN_ID='{run_id}')
+    """
 
-    if df.empty:
+    res = execute_sql(sql)
+    a = res.first()
+    if a is None:
         return False
-    else:
+    b = a[0]
+
+    if b == 1:
         return True
+    return False
 
 
 def pur2_pv():
