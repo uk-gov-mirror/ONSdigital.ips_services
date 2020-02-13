@@ -1,10 +1,3 @@
-# Title     : TODO
-# Objective : TODO
-# Created by: paul
-# Created on: 06/03/2019
-
-library(DBI)
-library(RMySQL)
 
 # hide annoying regenesees output
 if (.Platform$OS.type == "unix") {
@@ -14,10 +7,10 @@ if (.Platform$OS.type == "unix") {
 }
 
 suppressMessages(library(ReGenesees))
+suppressMessages(library(DBI))
+suppressMessages(library(RMySQL))
 
-sink()
-
-args = commandArgs(trailingOnly = TRUE)
+args <- commandArgs(trailingOnly = TRUE)
 
 m <- dbDriver("MySQL")
 con <- dbConnect(m, user = args[1], password = args[2], host = args[3], dbname = args[4])
@@ -36,13 +29,6 @@ survey_input_aux <- survey_input_aux[complete.cases(survey_input_aux$TRAF_DESIGN
 # declare factors
 survey_input_aux[, "T_"] <- factor(survey_input_aux[, "T1"])
 
-# hide annoying regenesees output
-if (.Platform$OS.type == "unix") {
-    sink("/dev/null")
-} else {
-    sink("nul:")
-}
-
 # set up survey design
 des <- e.svydesign(data = survey_input_aux, ids = ~ SERIAL, weights = ~ TRAF_DESIGN_WEIGHT)
 
@@ -53,8 +39,6 @@ population.check(df.population, data = survey_input_aux, calmodel = ~ T_ - 1)
 
 # call regenesees
 survey_input_aux[, "TW_WEIGHT"] <- weights(e.calibrate(des, df.population, calmodel = ~ T_ - 1, calfun = "linear", aggregate.stage = 1))
-
-sink()
 
 survey_input_aux[, "TRAFFIC_WT"] <- survey_input_aux[, "TW_WEIGHT"] / survey_input_aux[, "TRAF_DESIGN_WEIGHT"]
 

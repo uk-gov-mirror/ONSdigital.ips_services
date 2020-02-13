@@ -1,8 +1,4 @@
-# Title     : TODO
-# Objective : TODO
-# Created by: paul
-# Created on: 06/03/2019
-
+#
 library(DBI)
 library(RMySQL)
 
@@ -13,11 +9,11 @@ if (.Platform$OS.type == "unix") {
     sink("nul:")
 }
 
-library(ReGenesees)
+suppressMessages(library(ReGenesees))
+suppressMessages(library(DBI))
+suppressMessages(library(RMySQL))
 
-sink()
-
-args = commandArgs(trailingOnly = TRUE)
+args <- commandArgs(trailingOnly = TRUE)
 
 m <- dbDriver("MySQL")
 con <- dbConnect(m, user = args[1], password = args[2], host = args[3], dbname = args[4])
@@ -34,13 +30,6 @@ survey_input_aux <- survey_input_aux[complete.cases(survey_input_aux$OOH_DESIGN_
 
 # declare factors
 survey_input_aux[, "T_"] <- factor(survey_input_aux[, "T1"])
-
-# hide annoying regenesees output
-if (.Platform$OS.type == "unix") {
-    sink("/dev/null")
-} else {
-    sink("nul:")
-}
 
 # set up survey design
 des <- e.svydesign(data = survey_input_aux, ids = ~ SERIAL, weights = ~ OOH_DESIGN_WEIGHT)

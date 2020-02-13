@@ -30,7 +30,7 @@ def log_warnings(warning_str: str) -> Callable[[pd.DataFrame], None]:
                 warn += f"[{df.columns[i]} = {str(record[i])}]"
                 if i != (items - 1):
                     warn += " : "
-            log.warning(warn)
+            log.debug(warn)
             if run_id is not None and step_id is not None:
                 runs.insert_issue(run_id, step_id, 2, warn)
 

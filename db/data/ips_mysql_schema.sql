@@ -3826,6 +3826,11 @@ create table SURVEY_SUBSAMPLE
 create index SURVEY_SUBSAMPLE_RUN_ID_index
     on SURVEY_SUBSAMPLE (RUN_ID);
 
+create index SURVEY_SUBSAMPLE_SERIAL_index
+    on SURVEY_SUBSAMPLE (SERIAL);
+
+create index SURVEY_SUBSAMPLE_RESPNSE_index
+    on SURVEY_SUBSAMPLE (RESPNSE);
 
 -- create table SURVEY_VALUE
 -- (

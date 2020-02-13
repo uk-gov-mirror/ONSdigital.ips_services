@@ -1,8 +1,10 @@
 import traceback
+import warnings
 from typing import Optional
 
 import pandas
 import sqlalchemy
+import pymysql
 from ips.util.services_configuration import Configuration
 from ips.util.services_logging import log
 
@@ -16,6 +18,8 @@ database = config['database']
 server = config['server']
 
 connection_string = f"mysql+pymysql://{username}:{password}@{server}/{database}"
+
+warnings.filterwarnings('ignore', category=pymysql.Warning)
 
 
 def get_sql_connection():
