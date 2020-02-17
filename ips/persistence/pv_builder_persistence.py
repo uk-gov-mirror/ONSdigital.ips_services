@@ -21,7 +21,6 @@ def _store_pv_bytes(run_id, pv_id, code_bytes, pv_name, pv_desc):
     insert_into_pv_bytes(RUN_ID=run_id, PV_DEF=str(code_bytes), PROCESS_VARIABLE_ID=pv_id, PV_NAME=pv_name, PV_DESC=pv_desc)
 
 
-
 def _get_index(el):
     return el[-1:]
 
