@@ -66,6 +66,7 @@ class IPSWorkflow:
         return runs.get_status(run_id)
 
     def set_status(self, run_id: str, status: int, step: str) -> None:
+        print("workflow set status", step)
         runs.set_status(run_id, status, step)
         if status == runs.DONE:
             self.in_progress = False
@@ -213,7 +214,7 @@ class IPSWorkflow:
             step = run_df.loc[run_df['RUN_ID'] == run_id].iloc[0, 9][5:6]
 
             self.set_step_status(run_id, runs.FAILED, step)
-            self.set_status(run_id, runs.FAILED, mesg)
+            self.set_status(run_id, runs.FAILED, step)
             log.error(f"Run {run_id} has failed : {mesg}")
             runs.set_percent_done(run_id, 100)
             return
