@@ -135,10 +135,11 @@ def calculate_non_pack_fare(row: Series) -> float:
     if fage_pv == 2:
         # Ensure date is on or later than the 1st of May 2016
         # This is because APD for under 16's was removed from this date.
-        if year >= 2016 and month >= 5 and day >= 1:
+        if year == 2016 and month in range(5, 12):
             return child_fare * (fare - apd_pv)
-        else:
-            return (child_fare * (fare - apd_pv)) + apd_pv
+        if year > 2016:
+            return child_fare * (fare - apd_pv)
+        return (child_fare * (fare - apd_pv)) + apd_pv
 
     if fage_pv == 6:
         return fare
