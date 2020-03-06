@@ -87,7 +87,7 @@ def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_wei
             err_str = "Error: No complete or partial responses"
             threshold_string = err_str + " " + "MINS_PORT_GRP_PV" + " : " + str(record[0]) \
                                + " " + "MINS_CTRY_GRP_PV" + " : " + str(record[1])
-        log_errors(threshold_string)(pd.DataFrame, run_id, 3)
+        log_errors(threshold_string)(pd.DataFrame(), run_id, 3)
         raise ValueError(threshold_string)
     else:
         df_summary[min_weight] = np.where(df_summary[PRIOR_WEIGHT_FULL_COLUMN] > 0,
