@@ -79,16 +79,15 @@ def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_wei
 
     df_summary = df_summary.merge(df_summin, on=STRATA, how='outer')
 
-    df_check_prior_gross_fulls = df_summary[df_summary[PRIOR_WEIGHT_FULL_COLUMN] <= 0]
-
-    # Collect data outside of specified threshold
-    threshold_string = ""
-    for index, record in df_check_prior_gross_fulls.iterrows():
-        threshold_string += "___||___" \
-                            + df_check_prior_gross_fulls.columns[0] + " : " + str(record[0])
+    df_check_prior_gross_fulls = df_summary[df_summary[PRIOR_WEIGHT_FULL_COLUMN].isnull()]
 
     if not df_check_prior_gross_fulls.empty and not df_summig.empty:
-        log_errors('Error: No complete or partial responses.')(df_check_prior_gross_fulls, run_id, 3)
+        threshold_string = ""
+        for index, record in df_check_prior_gross_fulls.iterrows():
+            err_str = "Error: No complete or partial responses"
+            threshold_string = err_str + " " + "MINS_PORT_GRP_PV" + " : " + str(record[0]) \
+                               + " " + "MINS_CTRY_GRP_PV" + " : " + str(record[1])
+        log_errors(threshold_string)(pd.DataFrame, run_id, 3)
         raise ValueError(threshold_string)
     else:
         df_summary[min_weight] = np.where(df_summary[PRIOR_WEIGHT_FULL_COLUMN] > 0,

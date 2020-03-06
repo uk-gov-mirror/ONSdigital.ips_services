@@ -71,22 +71,30 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
     # Only keep rows that exist in df_nonresponsedata_sorted 
     df_grossmignonresp = pd.merge(df_nonresponsedata_sorted, df_psw, on=SHIFTS_STRATA, how='left')
 
+    df_grossmignonresp_err_chk = pd.merge(df_nonresponsedata_sorted, df_psw, on=SHIFTS_STRATA, how='left')
+
     # Add gross values using the primary sampling weight and add two new columns to df_grossmignonresp
     df_grossmignonresp['SHIFT_WT'].fillna(0, inplace=True)
     df_grossmignonresp['grossmignonresp'] = df_grossmignonresp[PSW_COLUMN] * df_grossmignonresp[NR_TOTALS_COLUMN]
-
     df_grossmignonresp['grossordnonresp'] = df_grossmignonresp[PSW_COLUMN] * df_grossmignonresp[NON_MIG_TOTALS_COLUMN]
 
-    # Validate that non-response totals can be grossed
-    df_migtotal_not_zero = df_grossmignonresp[df_grossmignonresp[NR_TOTALS_COLUMN] != 0]
+    # Error Check -  Validate that non-response totals can be grossed
+    df_grossmignonresp_err_chk['grossmignonresp'] = df_grossmignonresp_err_chk[PSW_COLUMN] * df_grossmignonresp_err_chk[NR_TOTALS_COLUMN]
+    df_grossmignonresp_err_chk['grossordnonresp'] = df_grossmignonresp_err_chk[PSW_COLUMN] * df_grossmignonresp_err_chk[NON_MIG_TOTALS_COLUMN]
+
+    df_migtotal_not_zero = df_grossmignonresp_err_chk[df_grossmignonresp_err_chk[NR_TOTALS_COLUMN] != 0]
+    df_migtotal_error = df_migtotal_not_zero[df_migtotal_not_zero['grossmignonresp'].isnull()]
 
     threshold_string = ""
-    for index, record in df_migtotal_not_zero.iterrows():
-        threshold_string += "___||___" \
-                            + df_migtotal_not_zero.columns[0] + " : " + str(record[0])
+    for index, record in df_migtotal_error.iterrows():
+        error_str = "Step 2 - Unable to gross up non-response total : "
+        threshold_string = \
+            error_str + " " + " NR_PORT_GRP_PV " + str(record[8]) \
+            + " " + "ARRIVEDEPART" + " = " + str(record[3]) \
+            + " " + "WEEKDAY_END_PV" + " = " + str(record[9])
 
-    if len(df_migtotal_not_zero[df_migtotal_not_zero['grossmignonresp'].isnull()]) > 0:
-        log_errors("Unable to gross up non-response total.")(df_migtotal_not_zero, run_id, 2)
+    if len(df_migtotal_error):
+        log_errors(threshold_string)(pd.DataFrame(), run_id, 2)
         raise ValueError(threshold_string)
 
     # Summarise over non-response strata
@@ -148,14 +156,15 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
 
     df_gross_resp_is_zero = df_gnr[df_gnr[GROSS_RESP_COLUMN] == 0]
 
-    threshold_string = ""
     for index, record in df_gross_resp_is_zero.iterrows():
-        threshold_string += "___||___" \
-                            + df_gross_resp_is_zero.columns[0] + " : " + str(record[0])
+        error_str = "Step 2 - Gross Response is zero : "
+        threshold_string = \
+            error_str + " " + " NR_PORT_GRP_PV " + str(record[0]) \
+            + " " + "ARRIVEDEPART" + " = " + str(record[1])
 
     # Collect data outside of specified threshold
-    if len(df_gross_resp_is_zero) > 0:
-        log_errors("Gross response is 0")(df_gross_resp_is_zero, run_id, 2)
+    if len(df_gross_resp_is_zero):
+        log_errors(threshold_string)(pd.DataFrame(), run_id, 2)
         raise ValueError(threshold_string)
 
     # Sort df_gnr and df_surveydata ready for producing summary

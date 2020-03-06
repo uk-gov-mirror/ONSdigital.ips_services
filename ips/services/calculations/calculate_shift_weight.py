@@ -3,7 +3,7 @@ import pandas as pd
 
 from ips.util.services_logging import log
 
-from ips.services.calculations import log_warnings
+from ips.services.calculations import log_warnings, log_errors
 
 OUTPUT_TABLE_NAME = 'SAS_SHIFT_WT'
 SUMMARY_TABLE_NAME = 'SAS_PS_SHIFT_DATA'
@@ -249,11 +249,12 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     # Collect data outside of specified threshold
     threshold_string = ""
     for index, record in df_shift_flag.iterrows():
-        threshold_string += "___||___" \
-                            + df_shift_flag.columns[0] + " : " + str(record[0])
+        err_str = "Case(s) contain no shift factor(s) :"
+        threshold_string = err_str + " " + df_shift_flag.columns[0] + " = " + str(record[0])
 
-    if len(df_shift_flag) > 0:
-        log.error('Case(s) contain no shift factor(s):' + threshold_string)
+    if len(df_shift_flag):
+        log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
+        raise ValueError(threshold_string)
     else:
         df_surveydata_merge.loc[df_surveydata_merge[FACTOR_COLUMN].isnull() &
                                 (df_surveydata_merge[FLAG_COLUMN] != 1), FACTOR_COLUMN] = 1
@@ -267,12 +268,13 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
 
     # Collect data outside of specified threshold
 
-    if len(df_crossings_flag) > 0:
+    if len(df_crossings_flag):
         threshold_string = ""
         for index, record in df_crossings_flag.iterrows():
-            threshold_string += "___||___" \
-                                + df_crossings_flag.columns[0] + " : " + str(record[0])
-        log.error('Case(s) contain no crossings factor(s):' + threshold_string)
+            err_str = "Case(s) contain no crossings factor(s):"
+            threshold_string = err_str + " " + df_crossings_flag.columns[0] + " : " + str(record[0])
+        log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
+        raise ValueError(threshold_string)
     else:
         df_surveydata_merge.loc[df_surveydata_merge[CROSSING_FACTOR_COLUMN].isnull() &
                                 (df_surveydata_merge.CROSSINGS_FLAG_PV != 1), CROSSING_FACTOR_COLUMN] = 1
@@ -287,12 +289,13 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
 
     # Collect data outside of specified threshold
 
-    if len(df_possible_shifts) > 0:
+    if len(df_possible_shifts):
         threshold_string = ""
         for index, record in df_possible_shifts.iterrows():
-            threshold_string += "___||___" \
-                                + df_possible_shifts.columns[0] + " : " + str(record[0])
-        log.error('Case(s) has an invalid number of possible shifts' + threshold_string)
+            err_str = "Case(s) has an invalid number of possible shifts - "
+            threshold_string = err_str + " " + df_possible_shifts.columns[0] + " : " + str(record[0])
+        log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
+        raise ValueError(threshold_string)
 
     # Check for invalid crossings data by extracting incorrect values.
     df_invalid_crossings = df_surveydata_merge[df_surveydata_merge[CROSSING_FACTOR_COLUMN] < 0]
@@ -301,24 +304,26 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
 
     # Collect data outside of specified threshold
 
-    if len(df_possible_crossings) > 0:
+    if len(df_possible_crossings):
         threshold_string = ""
         for index, record in df_possible_crossings.iterrows():
-            threshold_string += "___||___" \
-                                + df_possible_crossings.columns[0] + " : " + str(record[0])
-        log.error('Case(s) has an invalid number of total crossings' + threshold_string)
+            err_str = "Case(s) has an invalid number of total crossings"
+            threshold_string = err_str + " " + df_possible_crossings.columns[0] + " : " + str(record[0])
+        log_errors(threshold_string)
+        raise ValueError(threshold_string)
 
     # Check for missing migration sampling intervals by extracting incorrect values.
     df_missing_migsi = df_surveydata_merge[df_surveydata_merge['MIGSI'].isnull()]
 
     # Collect data outside of specified threshold
 
-    if len(df_missing_migsi) > 0:
+    if len(df_missing_migsi):
         threshold_string = ""
         for index, record in df_missing_migsi.iterrows():
-            threshold_string += "___||___" \
-                                + df_missing_migsi.columns[0] + " : " + str(record[0])
-        log.error('Case(s) missing migration sampling interval' + threshold_string)
+            err_str = "Case(s) missing migration sampling interval"
+            threshold_string = err_str + " " + df_missing_migsi.columns[0] + " : " + str(record[0])
+        log_errors(threshold_string)
+        raise ValueError(threshold_string)
 
     # --------------------------------------------------------------------
     # Calculate shift weight: PS - add round to match expected in test?
