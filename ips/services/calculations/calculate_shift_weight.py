@@ -283,7 +283,7 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     # --------------------------------------------------------------------
     # Check for invalid shift data by extracting incorrect values
     # --------------------------------------------------------------------
-    df_invalid_shifts = df_surveydata_merge[df_surveydata_merge[FACTOR_COLUMN] < 0]
+    df_invalid_shifts = df_surveydata_merge[df_surveydata_merge[FACTOR_COLUMN] <= 0]
 
     df_possible_shifts = pd.merge(df_shift_flag, df_invalid_shifts, on=['SERIAL'], how='left')
 
@@ -298,7 +298,7 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
         raise ValueError(threshold_string)
 
     # Check for invalid crossings data by extracting incorrect values.
-    df_invalid_crossings = df_surveydata_merge[df_surveydata_merge[CROSSING_FACTOR_COLUMN] < 0]
+    df_invalid_crossings = df_surveydata_merge[df_surveydata_merge[CROSSING_FACTOR_COLUMN] <= 0]
 
     df_possible_crossings = pd.merge(df_crossings_flag, df_invalid_crossings, on=['SERIAL'], how='left')
 
