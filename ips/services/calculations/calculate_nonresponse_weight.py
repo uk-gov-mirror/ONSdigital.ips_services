@@ -85,16 +85,15 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
     df_migtotal_not_zero = df_grossmignonresp_err_chk[df_grossmignonresp_err_chk[NR_TOTALS_COLUMN] != 0]
     df_migtotal_error = df_migtotal_not_zero[df_migtotal_not_zero['grossmignonresp'].isnull()]
 
-    threshold_string = ""
-    for index, record in df_migtotal_error.iterrows():
-        error_str = "Step 2 - Unable to gross up non-response total : "
-        threshold_string = \
-            error_str + " " + " NR_PORT_GRP_PV " + str(record[8]) \
-            + " " + "ARRIVEDEPART" + " = " + str(record[3]) \
-            + " " + "WEEKDAY_END_PV" + " = " + str(record[9])
-
     if len(df_migtotal_error):
-        log_errors(threshold_string)(pd.DataFrame(), run_id, 2)
+        threshold_string = ""
+        for index, record in df_migtotal_error.iterrows():
+            error_str = "Step 2 - Unable to gross up non-response total : "
+            threshold_string = \
+                error_str + " " + " NR_PORT_GRP_PV " + str(record[8]) \
+                + " " + "ARRIVEDEPART" + " = " + str(record[3]) \
+                + " " + "WEEKDAY_END_PV" + " = " + str(record[9])
+            log_errors(threshold_string)(pd.DataFrame(), run_id, 2)
         raise ValueError(threshold_string)
 
     # Summarise over non-response strata
@@ -156,15 +155,14 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
 
     df_gross_resp_is_zero = df_gnr[df_gnr[GROSS_RESP_COLUMN] == 0]
 
-    for index, record in df_gross_resp_is_zero.iterrows():
-        error_str = "Step 2 - Gross Response is zero : "
-        threshold_string = \
-            error_str + " " + " NR_PORT_GRP_PV " + str(record[0]) \
-            + " " + "ARRIVEDEPART" + " = " + str(record[1])
-
     # Collect data outside of specified threshold
     if len(df_gross_resp_is_zero):
-        log_errors(threshold_string)(pd.DataFrame(), run_id, 2)
+        for index, record in df_gross_resp_is_zero.iterrows():
+            error_str = "Step 2 - Gross Response is zero : "
+            threshold_string = \
+                error_str + " " + " NR_PORT_GRP_PV " + str(record[0]) \
+                + " " + "ARRIVEDEPART" + " = " + str(record[1])
+            log_errors(threshold_string)(pd.DataFrame(), run_id, 2)
         raise ValueError(threshold_string)
 
     # Sort df_gnr and df_surveydata ready for producing summary
