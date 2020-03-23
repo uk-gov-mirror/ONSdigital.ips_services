@@ -80,6 +80,7 @@ def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_wei
     df_summary = df_summary.merge(df_summin, on=STRATA, how='outer')
 
     df_check_prior_gross_fulls = df_summary[df_summary[PRIOR_WEIGHT_FULL_COLUMN].isnull()]
+    df_check_prior_gross_fulls = df_check_prior_gross_fulls[df_check_prior_gross_fulls[MINIMUM_COUNT_COLUMN].notnull()]
 
     if not df_check_prior_gross_fulls.empty and not df_summig.empty:
         threshold_string = ""
