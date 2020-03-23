@@ -273,7 +273,7 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
         for index, record in df_crossings_flag.iterrows():
             err_str = "Case(s) contain no crossings factor(s):"
             threshold_string = err_str + " " + df_crossings_flag.columns[0] + " : " + str(record[0])
-        log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
+            log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
         raise ValueError(threshold_string)
     else:
         df_surveydata_merge.loc[df_surveydata_merge[CROSSING_FACTOR_COLUMN].isnull() &
@@ -294,7 +294,7 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
         for index, record in df_possible_shifts.iterrows():
             err_str = "Case(s) has an invalid number of possible shifts - "
             threshold_string = err_str + " " + df_possible_shifts.columns[0] + " : " + str(record[0])
-        log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
+            log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
         raise ValueError(threshold_string)
 
     # Check for invalid crossings data by extracting incorrect values.
@@ -309,7 +309,7 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
         for index, record in df_possible_crossings.iterrows():
             err_str = "Case(s) has an invalid number of total crossings"
             threshold_string = err_str + " " + df_possible_crossings.columns[0] + " : " + str(record[0])
-        log_errors(threshold_string)
+            log_errors(threshold_string)
         raise ValueError(threshold_string)
 
     # Check for missing migration sampling intervals by extracting incorrect values.
@@ -322,7 +322,7 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
         for index, record in df_missing_migsi.iterrows():
             err_str = "Case(s) missing migration sampling interval"
             threshold_string = err_str + " " + df_missing_migsi.columns[0] + " : " + str(record[0])
-        log_errors(threshold_string)
+            log_errors(threshold_string)
         raise ValueError(threshold_string)
 
     # --------------------------------------------------------------------
