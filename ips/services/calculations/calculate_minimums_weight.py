@@ -83,9 +83,9 @@ def do_ips_minweight_calculation(df_surveydata, serial_num, shift_weight, nr_wei
     df_check_prior_gross_fulls = df_check_prior_gross_fulls[df_check_prior_gross_fulls[MINIMUM_COUNT_COLUMN].notnull()]
 
     if not df_check_prior_gross_fulls.empty and not df_summig.empty:
+        err_str = "Error: No complete or partial responses"
         threshold_string = ""
         for index, record in df_check_prior_gross_fulls.iterrows():
-            err_str = "Error: No complete or partial responses"
             threshold_string = err_str + " " + "MINS_PORT_GRP_PV" + " : " + str(record[0]) \
                                + " " + "MINS_CTRY_GRP_PV" + " : " + str(record[1])
             log_errors(threshold_string)(pd.DataFrame(), run_id, 3)

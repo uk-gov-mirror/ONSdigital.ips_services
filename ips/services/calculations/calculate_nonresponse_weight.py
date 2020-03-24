@@ -86,9 +86,9 @@ def do_ips_nrweight_calculation(survey_data, non_response_data, non_response_wei
     df_migtotal_error = df_migtotal_not_zero[df_migtotal_not_zero['grossmignonresp'].isnull()]
 
     if len(df_migtotal_error):
+        error_str = "Step 2 - Unable to gross up non-response total : "
         threshold_string = ""
         for index, record in df_migtotal_error.iterrows():
-            error_str = "Step 2 - Unable to gross up non-response total : "
             threshold_string = \
                 error_str + " " + " NR_PORT_GRP_PV " + str(record[8]) \
                 + " " + "ARRIVEDEPART" + " = " + str(record[3]) \

@@ -247,13 +247,18 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     df_shift_flag = df_shift_flag[df_shift_flag[FACTOR_COLUMN].isnull()]
 
     # Collect data outside of specified threshold
-    threshold_string = ""
-    for index, record in df_shift_flag.iterrows():
-        err_str = "Case(s) contain no shift factor(s) :"
-        threshold_string = err_str + " " + df_shift_flag.columns[0] + " = " + str(record[0])
 
     if len(df_shift_flag):
-        log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
+        err_str = "Case(s) contain no shift factor(s):"
+        threshold_string = ""
+        for index, record in df_shift_flag.iterrows():
+            threshold_string = \
+            err_str + " " + 'SERIAL' + " = " + str(record[0]) \
+            + " " + 'SHIFT_PORT_GRP_PV' + " = " + str(record[1]) \
+            + " " + 'ARRIVEDEPART' + " = " + str(record[2]) \
+            + " " + 'WEEKDAY_END_PV' + " = " + str(record[3]) \
+            + " " + 'AM_PM_NIGHT_PV' + " = " + str(record[4])
+            log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
         raise ValueError(threshold_string)
     else:
         df_surveydata_merge.loc[df_surveydata_merge[FACTOR_COLUMN].isnull() &
@@ -269,11 +274,16 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     # Collect data outside of specified threshold
 
     if len(df_crossings_flag):
+        err_str = "Case(s) contain no crossings factor(s):"
         threshold_string = ""
         for index, record in df_crossings_flag.iterrows():
-            err_str = "Case(s) contain no crossings factor(s):"
-            threshold_string = err_str + " " + df_crossings_flag.columns[0] + " : " + str(record[0])
-            log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
+            threshold_string = \
+            err_str + " " + 'SERIAL' + " = " + str(record[0]) \
+            + " " + 'SHIFT_PORT_GRP_PV' + " = " + str(record[1]) \
+            + " " + 'ARRIVEDEPART' + " = " + str(record[2]) \
+            + " " + 'WEEKDAY_END_PV' + " = " + str(record[3]) \
+            + " " + 'AM_PM_NIGHT_PV' + " = " + str(record[4])
+            # log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
         raise ValueError(threshold_string)
     else:
         df_surveydata_merge.loc[df_surveydata_merge[CROSSING_FACTOR_COLUMN].isnull() &
@@ -283,33 +293,42 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     # --------------------------------------------------------------------
     # Check for invalid shift data by extracting incorrect values
     # --------------------------------------------------------------------
-    df_invalid_shifts = df_surveydata_merge[df_surveydata_merge[FACTOR_COLUMN] <= 0]
-
-    df_possible_shifts = pd.merge(df_shift_flag, df_invalid_shifts, on=['SERIAL'], how='left')
+    df_shift_flag = df_surveydata_merge[df_surveydata_merge[FLAG_COLUMN] == 1]
+    df_invalid_shift = df_shift_flag[df_shift_flag[FACTOR_COLUMN] <= 0]
+    df_invalid_shift = df_invalid_shift[['SERIAL', 'SHIFT_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'AM_PM_NIGHT_PV']]
 
     # Collect data outside of specified threshold
 
-    if len(df_possible_shifts):
+    if len(df_invalid_shift):
+        err_str = "Case(s) has an invalid number of total shifts"
         threshold_string = ""
-        for index, record in df_possible_shifts.iterrows():
-            err_str = "Case(s) has an invalid number of possible shifts - "
-            threshold_string = err_str + " " + df_possible_shifts.columns[0] + " : " + str(record[0])
-            log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
+        for index, record in df_invalid_shift.iterrows():
+            threshold_string = \
+            err_str + " " + 'SERIAL' + " = " + str(record[0]) \
+            + " " + 'SHIFT_PORT_GRP_PV' + " = " + str(record[1]) \
+            + " " + 'ARRIVEDEPART' + " = " + str(record[2]) \
+            + " " + 'WEEKDAY_END_PV' + " = " + str(record[3]) \
+            + " " + 'AM_PM_NIGHT_PV' + " = " + str(record[4])
+            # log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
         raise ValueError(threshold_string)
 
     # Check for invalid crossings data by extracting incorrect values.
-    df_invalid_crossings = df_surveydata_merge[df_surveydata_merge[CROSSING_FACTOR_COLUMN] <= 0]
-
-    df_possible_crossings = pd.merge(df_crossings_flag, df_invalid_crossings, on=['SERIAL'], how='left')
+    df_crossings_flag = df_surveydata_merge[df_surveydata_merge[CROSSING_FLAG_COLUMN] == 1]
+    df_invalid_crossings = df_crossings_flag[df_crossings_flag[CROSSING_FACTOR_COLUMN] <= 0]
+    df_invalid_crossings = df_invalid_crossings[['SERIAL', 'SHIFT_PORT_GRP_PV', 'ARRIVEDEPART', 'WEEKDAY_END_PV', 'AM_PM_NIGHT_PV']]
 
     # Collect data outside of specified threshold
-
-    if len(df_possible_crossings):
+    if len(df_invalid_crossings):
+        err_str = "Case(s) has an invalid number of total crossings"
         threshold_string = ""
-        for index, record in df_possible_crossings.iterrows():
-            err_str = "Case(s) has an invalid number of total crossings"
-            threshold_string = err_str + " " + df_possible_crossings.columns[0] + " : " + str(record[0])
-            log_errors(threshold_string)
+        for index, record in df_invalid_crossings.iterrows():
+            threshold_string = \
+            err_str + " " + 'SERIAL' + " = " + str(record[0]) \
+            + " " + 'SHIFT_PORT_GRP_PV' + " = " + str(record[1]) \
+            + " " + 'ARRIVEDEPART' + " = " + str(record[2]) \
+            + " " + 'WEEKDAY_END_PV' + " = " + str(record[3]) \
+            + " " + 'AM_PM_NIGHT_PV' + " = " + str(record[4])
+            # log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
         raise ValueError(threshold_string)
 
     # Check for missing migration sampling intervals by extracting incorrect values.
@@ -318,11 +337,16 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
     # Collect data outside of specified threshold
 
     if len(df_missing_migsi):
+        err_str = "Case(s) missing migration sampling interval"
         threshold_string = ""
         for index, record in df_missing_migsi.iterrows():
-            err_str = "Case(s) missing migration sampling interval"
-            threshold_string = err_str + " " + df_missing_migsi.columns[0] + " : " + str(record[0])
-            log_errors(threshold_string)
+            threshold_string = \
+            err_str + " " + 'SERIAL' + " = " + str(record[0]) \
+            + " " + 'SHIFT_PORT_GRP_PV' + " = " + str(record[1]) \
+            + " " + 'ARRIVEDEPART' + " = " + str(record[2]) \
+            + " " + 'WEEKDAY_END_PV' + " = " + str(record[3]) \
+            + " " + 'AM_PM_NIGHT_PV' + " = " + str(record[4])
+            # log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
         raise ValueError(threshold_string)
 
     # --------------------------------------------------------------------
