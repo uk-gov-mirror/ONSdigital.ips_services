@@ -283,7 +283,7 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
             + " " + 'ARRIVEDEPART' + " = " + str(record[2]) \
             + " " + 'WEEKDAY_END_PV' + " = " + str(record[3]) \
             + " " + 'AM_PM_NIGHT_PV' + " = " + str(record[4])
-            # log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
+            log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
         raise ValueError(threshold_string)
     else:
         df_surveydata_merge.loc[df_surveydata_merge[CROSSING_FACTOR_COLUMN].isnull() &
@@ -309,7 +309,7 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
             + " " + 'ARRIVEDEPART' + " = " + str(record[2]) \
             + " " + 'WEEKDAY_END_PV' + " = " + str(record[3]) \
             + " " + 'AM_PM_NIGHT_PV' + " = " + str(record[4])
-            # log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
+            log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
         raise ValueError(threshold_string)
 
     # Check for invalid crossings data by extracting incorrect values.
@@ -328,7 +328,7 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
             + " " + 'ARRIVEDEPART' + " = " + str(record[2]) \
             + " " + 'WEEKDAY_END_PV' + " = " + str(record[3]) \
             + " " + 'AM_PM_NIGHT_PV' + " = " + str(record[4])
-            # log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
+            log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
         raise ValueError(threshold_string)
 
     # Check for missing migration sampling intervals by extracting incorrect values.
@@ -346,7 +346,7 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
             + " " + 'ARRIVEDEPART' + " = " + str(record[2]) \
             + " " + 'WEEKDAY_END_PV' + " = " + str(record[3]) \
             + " " + 'AM_PM_NIGHT_PV' + " = " + str(record[4])
-            # log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
+            log_errors(threshold_string)(pd.DataFrame(), run_id, 1)
         raise ValueError(threshold_string)
 
     # --------------------------------------------------------------------
