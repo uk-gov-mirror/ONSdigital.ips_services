@@ -18,5 +18,10 @@ class SinglePvApi(Api):
             raise falcon.HTTPError(falcon.HTTP_400, 'Invalid request',
                                    'Could not decode the request body. The JSON was invalid.')
 
-        edit_process_variable(run_id, data)
-        resp.status = falcon.HTTP_201
+        response = edit_process_variable(run_id, data)
+
+        if response:
+            resp.status = falcon.HTTP_201
+        else:
+            resp.status = falcon.HTTP_500
+

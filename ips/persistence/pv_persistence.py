@@ -73,8 +73,10 @@ def edit_process_variable(data, run_id):
     delete_pv(RUN_ID=run_id, PROCESS_VARIABLE_ID=int(pv_id))
     try:
         insert_pv(record)
+        return True
     except:
         insert_pv(og_record)
+        return False
 
 
 def delete_process_variables(run_id):

@@ -15,7 +15,7 @@ def create_process_variables(data, run_id):
 
 @service
 def edit_process_variable(run_id, data):
-    pv.edit_process_variable(data, run_id)
+    return pv.edit_process_variable(data, run_id)
 
 
 @service
