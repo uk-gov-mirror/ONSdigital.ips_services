@@ -15,6 +15,7 @@ from ips.api.dataimport.import_unsampled import ImportUnsampled
 from ips.api.export import ExportApi
 from ips.api.login_api import LoginApi
 from ips.api.pv_api import PvApi
+from ips.api.single_pv_api import SinglePvApi
 from ips.api.pv_builder_api import PvBuilderApi
 from ips.api.pv_sets import PvSetsApi
 from ips.api.run_api import RunApi
@@ -49,6 +50,8 @@ app.add_route("/health_check", HealthCheck(workflow))
 
 app.add_route("/process_variables/{run_id}", PvApi(workflow))
 app.add_route("/process_variables/test/{template}", PvTestApi(workflow))
+
+app.add_route("/single_process_variable/{run_id}", SinglePvApi(workflow))
 
 app.add_route("/builder/{run_id}", PvBuilderApi(workflow))
 
