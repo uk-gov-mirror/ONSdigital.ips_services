@@ -2,7 +2,6 @@ import math
 import numpy as np
 import pandas as pd
 from ips.util.services_logging import log
-# dataimport survey_support
 from ips.services.calculations import log_warnings
 from ips.services.calculations.sas_rounding import ips_rounding
 

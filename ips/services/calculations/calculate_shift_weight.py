@@ -99,9 +99,6 @@ def calculate_ips_shift_factor(df_shiftsdata, df_surveydata):
     left_join_1[FACTOR_COLUMN] = \
         np.where(left_join_1[FLAG_COLUMN] != 0, left_join_1['NUMERATOR'] / left_join_1['DENOMINATOR'], np.nan)
 
-    # Replaced by above
-    # left_join_1[FACTOR_COLUMN] = left_join_1.apply(calculate_factor, axis=1, args=(FLAG_COLUMN,))
-
     df_surveydata_merge = left_join_1.drop(['NUMERATOR', 'DENOMINATOR'], 1)
 
     # Return the three dataframes produced
@@ -357,26 +354,12 @@ def do_ips_shift_weight_calculation(df_surveydata, df_shiftsdata, serial_number,
         CROSSING_FACTOR_COLUMN] * df_surveydata_merge[
                                             MIG_SI_COLUMN]
 
-    # df_surveydata_merge[shift_weight] = round(
-    #     df_surveydata_merge[FACTOR_COLUMN] * df_surveydata_merge[CROSSING_FACTOR_COLUMN] * df_surveydata_merge[
-    #         MIG_SI_COLUMN], 3)
-
     # --------------------------------------------------------------------
     # produce shift weight summary output
     # --------------------------------------------------------------------
 
     # Sort surveydata
     df_surveydata_merge_sorted = df_surveydata_merge.sort_values(colset1)
-
-    # Group by the necessary columns and aggregate df_surveydata_merge shift weight
-    # df_surveydata_merge_sorted_grouped = \
-    #     df_surveydata_merge_sorted.groupby(SHIFTS_STRATA + [MIG_SI_COLUMN])[shift_weight].agg({
-    #         COUNT_COLUMN: 'count',
-    #         WEIGHT_SUM_COLUMN: 'sum',
-    #         MIN_WEIGHT_COLUMN: 'min',
-    #         AVERAGE_WEIGHT_COLUMN: 'mean',
-    #         MAX_WEIGHT_COLUMN: 'max'
-    #     })
 
     df_surveydata_merge_sorted_grouped = (
         df_surveydata_merge_sorted.groupby(SHIFTS_STRATA + [MIG_SI_COLUMN])[shift_weight].agg(

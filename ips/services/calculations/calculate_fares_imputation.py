@@ -9,8 +9,6 @@ from ips.services.calculations.sas_rounding import ips_rounding
 
 from ips.util.services_logging import log
 
-# dataimport survey_support
-
 INTDATE = 'INTDATE'
 DVFARE = 'DVFARE'
 FARE = 'FARE'
@@ -38,8 +36,7 @@ DUTY_FREE_PV = 'DUTY_FREE_PV'
 PACKAGE = 'PACKAGE'
 OPERA_PV = 'OPERA_PV'
 
-# Setup thresh and strata base nested lists. These are used to group the data
-# differently at each iteration.
+# Setup thresh and strata base nested lists. These are used to group the data differently at each iteration.
 THRESH_BASE_LIST = [3, 3, 3, 3, 3, 3, 3, 0, 0]
 
 STRATA_BASE_LIST = [
@@ -59,6 +56,9 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
     log.debug("Starting fares imputation")
 
     sas_random = SASRandom(123456)
+
+    # Below commented code was original methodolgy for OPERA_PV from SAS
+    # system however was never implemented.  Replicated as per requirements
 
     # for index, row in df_input.iterrows():
     #     if row['FLOW'] < 5:
@@ -90,7 +90,6 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
                                       FAREK)
 
     # Merge df_output_final and df_input by var_serial_num
-
     df_output.sort_values(var_serial, inplace=True)
 
     df_input.sort_values(var_serial, inplace=True)
@@ -106,9 +105,7 @@ def do_ips_fares_imputation(df_input: DataFrame, var_serial: str, num_levels: in
 
     # Re-sort columns by column name in alphabetical order (may not be required)
     # df_output.sort_index(axis=1, inplace=True)
-
     df_output = df_output.apply(compute_additional_fares, axis=1)
-
     df_output = df_output.apply(compute_additional_spend, axis=1)
 
     return df_output[[var_serial, SPEND, SPENDIMPREASON, FARE, FAREK, OPERA_PV]]

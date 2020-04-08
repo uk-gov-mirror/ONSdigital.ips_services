@@ -3,8 +3,6 @@ import pandas as pd
 from ips.services.calculations import ips_impute
 from ips.util.services_logging import log
 
-# dataimport survey_support
-
 OUTPUT_TABLE_NAME = 'SAS_STAY_IMP'
 DONOR_VARIABLE = 'NUMNIGHTS'
 OUTPUT_VARIABLE = 'STAY'
@@ -39,7 +37,6 @@ def do_ips_stay_imputation(df_input, var_serial, num_levels, measure):
                                             IMPUTATION_LEVEL_VARIABLE)
 
     # Round output column to nearest integer
-    # Amended to cast object dtype to float. 24/09/2018. ET
     df_output_final[OUTPUT_VARIABLE] = pd.to_numeric(df_output_final[OUTPUT_VARIABLE], errors='coerce').round()
 
     return df_output_final
