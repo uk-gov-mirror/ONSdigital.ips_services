@@ -16,9 +16,6 @@ def get_run():
 
     if data.empty:
         return '{}'
-        # error = f"No run data"
-        # log.error(error)
-        # raise falcon.HTTPError(falcon.HTTP_400, 'Data Error', error)
 
     try:
         return data.to_json(orient='records')
