@@ -1867,7 +1867,7 @@ VALUES ('TEMPLATE', 58, 'unsamp_region_grp_pv', 'unsamp_region_grp_pv           
 
 
 INSERT INTO ips.PROCESS_VARIABLE_SET(run_id, name, user, period, year)
-VALUES ('TEMPLATE', 'TEMPLATE', 'TEMPLATE', 'Q1', 2019);
+VALUES ('TEMPLATE', 'TEMPLATE', 'TEMPLATE', 'Q2', 2019);
 
 
 INSERT INTO USER (ID, USER_NAME, PASSWORD, FIRST_NAME, SURNAME, ROLE)
