@@ -102,14 +102,7 @@ def ips_impute_match(remainder, df_input, output, strata, var_value, level,
 
     df_input = df_input.sort_values(strata)
 
-    # Merge all data and indicate where the data is found. Keep only rows that
-    # are found in df_remainder
-    # df_remainder = pd.merge(df_remainder, df_input, how = "outer"
-    #                       , indicator = True).query("_merge == 'left_only'")
-
-    # df_remainder = pd.merge(df_remainder, df_input, how="left")
-
-    # TODO: This doesn't seem to do anything?
+    # Merge all data and indicate where the data is found. Keep only rows that are found in df_remainder
     df_remainder.merge(df_input, how="left")
 
     # df_remainder = df_remainder.drop('_merge', axis = 1)

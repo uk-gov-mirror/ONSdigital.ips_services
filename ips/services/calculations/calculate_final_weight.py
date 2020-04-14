@@ -29,7 +29,6 @@ def do_ips_final_wt_calculation(df_surveydata: DataFrame, serial_num, shift_weig
     """
 
     # Calculate the final weight value in a new column
-
     df_final_weight = df_surveydata
 
     df_final_weight[final_weight] = (
@@ -47,10 +46,8 @@ def do_ips_final_wt_calculation(df_surveydata: DataFrame, serial_num, shift_weig
          traffic_weight, unsampled_weight, imbalance_weight, final_weight]
     ]
 
-    # Sort summary, then select var_recordsDisplayed number of random rows for
-    # inclusion in the summary dataset
+    # Sort summary, then select var_recordsDisplayed number of random rows for inclusion in the summary dataset
     df_summary = df_summary.sample(NUMBER_RECORDS_DISPLAYED)
-
     df_summary = df_summary.sort_values(serial_num)
 
     # Condense output dataset to the two required variables

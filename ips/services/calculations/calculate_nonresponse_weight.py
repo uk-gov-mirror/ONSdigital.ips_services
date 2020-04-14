@@ -3,7 +3,6 @@ import pandas as pd
 
 from ips.util.services_logging import log
 
-# dataimport survey_support
 from ips.services.calculations import log_warnings, log_errors
 
 np.seterr(all='raise')

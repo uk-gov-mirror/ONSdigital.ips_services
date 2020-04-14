@@ -1,5 +1,5 @@
 from ips.util.services_logging import log
-from ips.persistence.persistence import delete_from_table, insert_into_table, select_data, read_table_values
+from ips.persistence.persistence import delete_from_table, read_table_values
 from ips.persistence.persistence import execute_sql as exec_sql
 
 SURVEY_SUBSAMPLE_TABLE = "SURVEY_SUBSAMPLE"
@@ -50,16 +50,6 @@ COLUMNS_TO_MOVE = [
 
 
 def nullify_survey_subsample_values(run_id: str, pv_values):
-    """
-    Author       : Elinor Thorne
-    Date         : Apr 2018
-    Purpose      : Updates required columns to null
-    Parameters   : NA
-    Returns      : NA
-    """
-
-    # insert_into_pv_bytes(Run_ID=run_id, PV_Bytes=str(code_bytes), PV_ID=pv_id)
-
     # Construct string for SQL statement
     columns_to_null = []
     for item in pv_values:
@@ -71,20 +61,12 @@ def nullify_survey_subsample_values(run_id: str, pv_values):
         SET {columns_to_null}
         WHERE RUN_ID = '{run_id}'"""
 
-    # Execute and commits the SQL command
-
+    # Execute and commit the SQL command
     execute_sql(sql)
 
 
 def move_survey_subsample_to_sas_table(run_id, step_name):
-    """
-    Author       : Elinor Thorne
-    Date         : Apr 2018
-    Purpose      : Moves data to temporary location
-    Parameters   : NA
-    Returns      : NA
-    """
-
+    # Construct string of columns for SQL statement
     columns = ["" + col + "" for col in COLUMNS_TO_MOVE]
     columns = ','.join(columns)
 
@@ -94,6 +76,7 @@ def move_survey_subsample_to_sas_table(run_id, step_name):
     else:
         respnse = "BETWEEN 1 and 6"
 
+    # Create SQL Statement
     sql = f"""
         INSERT INTO {SAS_SURVEY_SUBSAMPLE_TABLE}
         ({columns})
@@ -104,20 +87,11 @@ def move_survey_subsample_to_sas_table(run_id, step_name):
         AND RESPNSE {respnse})
     """
 
+    # Execute and commit the SQL command
     execute_sql(sql)
 
 
 def populate_survey_data_for_step(run_id, step_configuration):
-    """
-    Author       : Elinor Thorne
-    Date         : 13 Apr 2018
-    Purpose      : Populates survey_data in preparation for step
-    Parameters   : conn - connection object pointing at the database
-                 : run_id -
-                 : step -
-    Returns      : NA
-    """
-
     # Cleanse tables as applicable
     clear_subsample()
 
@@ -129,16 +103,6 @@ def populate_survey_data_for_step(run_id, step_configuration):
 
 
 def populate_step_data(run_id, step_configuration):
-    """
-    Author       : Elinor Thorne
-    Date         : April 2018
-    Purpose      : Populate step
-    Parameters   : run_id -
-                 : conn -
-                 : step -
-    Returns      : NA
-    """
-
     # Assign variables
     table = step_configuration["table_name"]
     data_table = step_configuration["data_table"]
@@ -165,25 +129,13 @@ def populate_step_data(run_id, step_configuration):
 
 
 def copy_step_pvs_for_survey_data(run_id, step_configuration):
-    """
-    Author       : Elinor Thorne
-    Date         : April 2018
-    Purpose      : Copy step process variable data
-    Parameters   : run_id -
-                 : conn -
-                 : step -
-    Returns      : NA
-    """
-
     spv_table = step_configuration["spv_table"]
 
     # Cleanse tables
     delete_from_table(SAS_PROCESS_VARIABLES_TABLE)()
     delete_from_table(spv_table)()
 
-    step = step_configuration["name"]
-
-    # Loops through the pv's and inserts them into the process variable table
+    # Loops through the PVs and inserts them into the process variable table
     count = 0
     for item in step_configuration["pv_columns"]:
         count = count + 1
@@ -197,15 +149,6 @@ def copy_step_pvs_for_survey_data(run_id, step_configuration):
 
 
 def update_survey_data_with_step_pv_output(step_configuration):
-    """
-    Author       : Elinor Thorne / Nassir Mohammad
-    Date         : Apr 2018
-    Purpose      : Updates survey_data with the process variable outputs
-    Parameters   : conn - connection object pointing at the database
-                 : step -
-    Returns      : NA
-    """
-
     # Assign variables
     spv_table = step_configuration["spv_table"]
 
@@ -214,6 +157,7 @@ def update_survey_data_with_step_pv_output(step_configuration):
     cols = ["SSS." + item + " = CALC." + item for item in cols]
     set_statement = ", ".join(map(str, cols))
 
+    # Create and execute SQL statement
     sql = f"""
         UPDATE {SAS_SURVEY_SUBSAMPLE_TABLE} AS SSS, {spv_table} AS CALC
             SET {set_statement}
@@ -226,24 +170,13 @@ def update_survey_data_with_step_pv_output(step_configuration):
     delete_from_table(SAS_PROCESS_VARIABLES_TABLE)()
     delete_from_table(spv_table)()
 
-    # code specific to minimums weight function/step
-    # TODO: consider moving this out to another function called by minimum weight
+    # Code specific to minimums weight function/step
     if step_configuration["name"] == "MINIMUMS_WEIGHT":
         delete_from_table(step_configuration["temp_table"])()
         delete_from_table(step_configuration["sas_ps_table"])()
 
 
 def copy_step_pvs_for_step_data(run_id, step_configuration):
-    """
-    Author       : Elinor Thorne / Nassir Mohammad
-    Date         : July 2018
-    Purpose      : Copies the process variables for the step.
-    Parameters   : run_id -
-                 : conn - connection object pointing at the database.
-                 : step -
-    Returns      : NA
-    """
-
     # Cleanse temp tables
     delete_from_table(SAS_PROCESS_VARIABLES_TABLE)()
     delete_from_table(step_configuration["pv_table"])()
@@ -280,15 +213,6 @@ def copy_step_pvs_for_step_data(run_id, step_configuration):
 
 
 def update_step_data_with_step_pv_output(step_configuration):
-    """
-    Author       : Elinor Thorne / Nassir Mohammad
-    Date         : July 2018
-    Purpose      : Updates data with the process variable output.
-    Parameters   : conn - connection object pointing at the database.
-                 : step -
-    Returns      : NA
-    """
-
     # Construct string for SQL statement
     cols = [item.replace("'", "") for item in step_configuration["pv_columns2"]]
     cols = ["SSS." + item + " = CALC." + item for item in cols]
@@ -314,19 +238,11 @@ def update_step_data_with_step_pv_output(step_configuration):
 
 
 def sql_update_statement(table_to_update_from, columns_to_update):
-    """
-    Author       : Elinor Thorne
-    Date         : May 2018
-    Purpose      : Constructs SQL update statement
-    Parameters   : step -
-    Returns      : String - SQL update statement
-    """
     # Construct SET string
     cols = ["SSS." + item + ' = temp.' + item for item in columns_to_update]
     columns = " , ".join(cols)
 
-    # Construct SQL statement and execute
-
+    # Construct SQL statement and return
     sql = f"""
         UPDATE {SAS_SURVEY_SUBSAMPLE_TABLE} as SSS, {table_to_update_from} as temp
             SET {columns}
@@ -365,7 +281,6 @@ def update_stay_imputation(table, results_columns):
 
 
 def update_spend_imputation(table, results_columns):
-
     sql1 = """
         UPDATE SAS_SURVEY_SUBSAMPLE AS SSS, SAS_SPEND_IMP AS SSI
             SET SSS.SPEND = SSI.NEWSPEND
@@ -389,15 +304,6 @@ def update_others(table):
 
 
 def update_survey_data_with_step_results(step_configuration):
-    """
-    Author       : Elinor Thorne
-    Date         : May 2018
-    Purpose      : Updates survey data with the results
-    Parameters   : conn - connection object pointing at the database
-                 : step -
-    Returns      : NA
-    """
-
     valid_steps = [
         "SHIFT_WEIGHT", "NON_RESPONSE", "MINIMUMS_WEIGHT", "TRAFFIC_WEIGHT",
         "UNSAMPLED_WEIGHT", "FINAL_WEIGHT", "IMBALANCE_WEIGHT", "FARES_IMPUTATION",
@@ -441,15 +347,6 @@ def update_survey_data_with_step_results(step_configuration):
 
 
 def store_survey_data_with_step_results(run_id, step_configuration):
-    """
-    Author       : Elinor Thorne
-    Date         : April 2018
-    Purpose      : Stores the survey data with the results
-    Parameters   : run_id -
-                 : conn - connection object pointing at the database.
-    Returns      : NA
-    """
-
     step = step_configuration["name"]
     cols = step_configuration["nullify_pvs"]
 
@@ -487,16 +384,6 @@ def store_survey_data_with_step_results(run_id, step_configuration):
 
 
 def store_step_summary(run_id, step_configuration):
-    """
-    Author       : Elinor Thorne
-    Date         : May 2018
-    Purpose      : Stores the summary data
-    Parameters   : run_id
-                 : conn - connection object pointing at the database
-                 : step -
-    Returns      : NA
-    """
-
     # Assign variables
     ps_table = step_configuration["ps_table"]
     sas_ps_table = step_configuration["sas_ps_table"]

@@ -50,7 +50,6 @@ def import_survey(run_id, data, month, year):
 
         df.columns = df.columns.str.upper()
         df['TANDTSI'] = df['TANDTSI'].round(0)
-        # [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'DVEXPEND', 'TANDTSI']]
         [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'TANDTSI']]
         errors = Errors()
         validation = validate.validate_survey_data(df, month, year, errors)

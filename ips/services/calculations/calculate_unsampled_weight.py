@@ -260,7 +260,6 @@ def r_population_input(survey_input: pd.DataFrame, ustotals: pd.DataFrame, run_i
 
     df_mod_totals = df_mod_totals.add_prefix('T_')
 
-    # TODO: Move to persistence
     db.insert_from_dataframe('POPROWVEC_UNSAMP', if_exists='replace')(df_mod_totals)
 
 
