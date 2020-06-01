@@ -45,4 +45,3 @@ if __name__ == '__main__':
 
     # print(insert_statement(username, str_pwd, first_name, surname, role))
     print(update_statement(username, str_pwd))
-
