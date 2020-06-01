@@ -9,8 +9,8 @@ def __encrypt_password(pwd: str) -> str:
     return str(generate_password_hash(pwd))
 
 
-def generate_sql_statement(user_name: str, str_pwd: str, first_name: str, surname: str, role: str) -> str:
-    # Generate string of sql statement to insert user credentials to USER table
+def insert_statement(user_name: str, str_pwd: str, first_name: str, surname: str, role: str) -> str:
+    # Generate string of sql statement to insert *new* user credentials to USER table
     if not str_pwd.strip():
         print("Error: Please provide a value for str_pwd.")
         return ""
@@ -18,6 +18,19 @@ def generate_sql_statement(user_name: str, str_pwd: str, first_name: str, surnam
     encrypted_pwd = __encrypt_password(str_pwd)
     sql = f"""INSERT INTO USER(ID, USER_NAME, PASSWORD, FIRST_NAME, SURNAME, ROLE)
                 VALUES('', '{user_name}', '{encrypted_pwd}', '{first_name}', '{surname}', '{role}');"""
+
+    return sql
+
+
+def update_statement(user_name: str, str_pwd: str) -> str:
+    # Generate string of sql statement to insert *new* user credentials to USER table
+    if not str_pwd.strip():
+        print("Error: Please provide a value for str_pwd.")
+        return ""
+
+    encrypted_pwd = __encrypt_password(str_pwd)
+
+    sql = f"""UPDATE USER SET PASSWORD = '{encrypted_pwd}' WHERE USER_NAME = '{user_name}';"""
 
     return sql
 
@@ -30,5 +43,5 @@ if __name__ == '__main__':
     username = ''
     str_pwd = ''
 
-    generate_sql_statement(first_name, surname, role, username, str_pwd)
-
+    # print(insert_statement(username, str_pwd, first_name, surname, role))
+    print(update_statement(username, str_pwd))
