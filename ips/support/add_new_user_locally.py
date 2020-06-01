@@ -54,10 +54,10 @@ def add_new_user_locally(first_name: str, surname: str, role: str, username: str
 
 if __name__ == '__main__':
     """REQUIRED INPUTS:"""
-    first_name = ''
-    surname = ''
-    role = ''
-    username = ''
-    str_pwd = ''
+    first_name = 'elinor'
+    surname = 'thorne'
+    role = 'se'
+    username = 'thorne1'
+    str_pwd = 'helloWorld'
 
     add_new_user_locally(first_name, surname, role, username, str_pwd)
