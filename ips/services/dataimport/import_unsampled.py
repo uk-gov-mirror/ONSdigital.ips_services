@@ -21,7 +21,17 @@ def import_unsampled(run_id, data, month, year):
     errors = Errors()
     validate_df = df.copy()
 
-    validation = validate.validate_reference_data(CSVType.Unsampled.name, validate_df, month, year, errors)
+    try:
+        validation = validate.validate_reference_data(CSVType.Unsampled.name, validate_df, month, year, errors)
+    except TypeError:
+        errors.add(f"{CSVType.Unsampled.name} file invalid or corrupt")
+        log.error(f"Validation failed: {errors.get_messages()}")
+        raise falcon.HTTPError(falcon.HTTP_400, 'file error', errors.get_messages())
+    except Exception as err:
+        errors.add(f"{CSVType.Unsampled.name} file error: {err}")
+        log.error(f"Validation failed: {errors.get_messages()}")
+        raise falcon.HTTPError(falcon.HTTP_400, 'file error', errors.get_messages())
+
     if not validation:
         log.error(f"Validation failed: {errors.get_messages()}")
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())

@@ -52,7 +52,19 @@ def import_survey(run_id, data, month, year):
         df['TANDTSI'] = df['TANDTSI'].round(0)
         [convert_col_to_int(df, x) for x in ['EXPENDITURE', 'TANDTSI']]
         errors = Errors()
-        validation = validate.validate_survey_data(df, month, year, errors)
+
+        try:
+            validation = validate.validate_survey_data(df, month, year, errors)
+
+        except TypeError:
+            errors.add("Survey file invalid or corrupt")
+            log.error(f"Validation failed: {errors.get_messages()}")
+            raise falcon.HTTPError(falcon.HTTP_400, 'file error', errors.get_messages())
+        except Exception as err:
+            errors.add("Survey file error: {err}")
+            log.error(f"Validation failed: {errors.get_messages()}")
+            raise falcon.HTTPError(falcon.HTTP_400, 'file error', errors.get_messages())
+
         if not validation:
             log.error(f"Validation failed: {errors.get_messages()}")
             raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
