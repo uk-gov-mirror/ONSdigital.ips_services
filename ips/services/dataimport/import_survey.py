@@ -61,7 +61,7 @@ def import_survey(run_id, data, month, year):
             log.error(f"Validation failed: {errors.get_messages()}")
             raise falcon.HTTPError(falcon.HTTP_400, 'file error', errors.get_messages())
         except Exception as err:
-            errors.add("Survey file error: {err}")
+            errors.add(f"Survey file error: {err}")
             log.error(f"Validation failed: {errors.get_messages()}")
             raise falcon.HTTPError(falcon.HTTP_400, 'file error', errors.get_messages())
 
