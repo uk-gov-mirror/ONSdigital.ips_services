@@ -25,7 +25,30 @@ All data resides in the database and code connecting to the database can be foun
 
 5. Run `docker-compose up` (This will set up UI, Services & DB)
 
-6. Navigate to localhost:5001, this will show the UI
+6. Run ips_services:
+    * Configure new Python run
+    * In <i>Script path</i> select /ips_services/venv/bin/waitress-serve
+    * In <i>Parameters</i> add `--listen=*:5000 --threads=8 ips.app:app`
+    * In <i>Environment variables</i> add the following: 
+        DB_SERVER=localhost
+        DB_USER_NAME=<REDACTED>
+        DB_PASSWORD=<REDACTED>
+        DB_NAME=<REDACTED>
+    * Ensure the <i>Python interpreter</i> is configured
+
+7. Run ips_user_interface:
+    * Configure new Flask server
+    * In <i>Target</i> add ips
+    * In <i>Additional options</i> add `--port=5001`
+    * In <i>FLASK_ENV</i> add `development`
+    * In <i>Environment variables</i> add the following: 
+        API_HOST=localhost
+        API_PORT=5000
+        API_PROTOCOL=http
+        LOG_CONSOLE_LEVEL=DEBUG
+    * Ensure the <i>Python interpreter</i> is configured
+    
+8. Navigate to localhost:5001, this will show the UI
 
 
 ## Alembic
@@ -71,15 +94,28 @@ API_HOST=ips-services
 API_PORT=5000
 API_PROTOCOL=http
 DB_SERVER=ips-db
-DB_USER_NAME=ips
-DB_PASSWORD=ips
-DB_NAME=ips
-MYSQL_ROOT_PASSWORD=root
-MYSQL_DATABASE=ips
-MYSQL_PASSWORD=ips
-MYSQL_USER=ips
+DB_USER_NAME=<REDACTED>
+DB_PASSWORD=<REDACTED>
+DB_NAME=<REDACTED>
+MYSQL_ROOT_PASSWORD=<REDACTED>
+MYSQL_DATABASE=<REDACTED>
+MYSQL_PASSWORD=<REDACTED>
+MYSQL_USER=<REDACTEED>
 FLASK_APP=myapp
 FLASK_ENV=development
-UI_FLASK_APP=ips
+UI_FLASK_APP=<REDACTED>
+
+#### R Set Up: Local
+
+Ensure you have R installed and run following command in terminal:
+
+`R CMD INSTALL r-packages/ReGenesees_1.9.tar.gz && \
+R CMD INSTALL r-packages/DBI_1.0.0.tar.gz && \
+R CMD INSTALL r-packages/RMySQL_0.10.17.tar.gz`
+    
+
+
+
+
 
 
