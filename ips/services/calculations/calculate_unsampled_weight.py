@@ -214,6 +214,19 @@ def r_population_input(survey_input: pd.DataFrame, ustotals: pd.DataFrame, run_i
 
     df_survey_input = df_survey_input[df_survey_input.OOH_DESIGN_WEIGHT > 0]
     df_survey_input = df_survey_input.fillna('NOTHING')
+    
+        # Error check
+    df_check_1 = df_survey_input[df_survey_input['UNSAMP_PORT_GRP_PV'] == 'NOTHING']
+    df_check_2 = df_check_1[['SERIAL', 'PORTROUTE']]
+
+    if len(df_check_2):
+        error_str = "Step 5 - UNSAMP_PORT_GRP_PV does not exist for:"
+        for index, record in df_check_2.iterrows():
+            threshold_string = \
+                error_str + " " + 'SERIAL' + " = " + str(record[0]) \
+                + " " + 'PORTROUTE' + " = " + str(record[1]) + "\n"
+            log_errors(threshold_string)(pd.DataFrame(), run_id, 5)
+        raise ValueError(threshold_string)
 
     df_prev_totals = df_survey_input.groupby(['UNSAMP_PORT_GRP_PV', 'UNSAMP_REGION_GRP_PV',
                                               'ARRIVEDEPART']).agg({"OOH_DESIGN_WEIGHT": 'sum'}).reset_index()
