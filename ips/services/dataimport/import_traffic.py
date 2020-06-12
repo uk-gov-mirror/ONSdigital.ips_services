@@ -24,9 +24,19 @@ def _import_traffic(import_type, run_id, data, month, year):
     errors = Errors()
     validate_df = df.copy()
 
-    validation = validate.validate_reference_data(import_type.name, validate_df, month, year, errors)
-    if not validation:
+    try:
+        validation = validate.validate_reference_data(import_type.name, validate_df, month, year, errors)
+    except TypeError:
+        errors.add(f"{import_type.name} file invalid or corrupt")
         log.error(f"Validation failed: {errors.get_messages()}")
+        raise falcon.HTTPError(falcon.HTTP_400, 'file error', errors.get_messages())
+    except Exception as err:
+        errors.add(f"{import_type.name} file error: {err}")
+        log.error(f"Validation failed: {errors.get_messages()}")
+        raise falcon.HTTPError(falcon.HTTP_400, 'file error', errors.get_messages())
+
+    if not validation:
+        log.error(f"{import_type.name} data validation failed: {errors.get_messages()}")
         raise falcon.HTTPError(falcon.HTTP_400, 'data error', errors.get_messages())
 
     log.info(f"{import_type.name} validation completed successfully")
