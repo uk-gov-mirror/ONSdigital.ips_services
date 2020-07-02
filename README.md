@@ -2,7 +2,7 @@
 The International Passenger Survey (IPS) collects monthly information relating to overseas travel.
 
 # What does the current IPS System do?
-The current IPS system calculates weighting factors and imputes missing data for specified periods, using statistical configurations supplied and managed by the users IPS team within Social Surveys Division (SSD).
+The current IPS system calculates weighting factors and imputes missing data for specified periods, using statistical configurations supplied and managed by the users IPS team within the Social Surveys Division (SSD).
 
 # Functionality
 This package supports the calculations within IPS System. This is also referred to as the "Main Run".
